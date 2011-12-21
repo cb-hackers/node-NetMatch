@@ -210,11 +210,12 @@ NetMatch.prototype.login = function (client) {
   playerIds = Object.keys(this.players);
   for (var i = playerIds.length; i--;) {
     var player = this.players[playerIds[i]];
-    if (player.name.toLowerCase() == nickname) {
+    if (player.name.toLowerCase() == nickname.toLowerCase()) {
       if (player.kicked || !player.active) {
         player.name = "";
       } else {
         // Nimimerkki oli jo käytössä.
+        console.log('Nickname "' + nickname + '" already in use.');
         replyData = new Packet(3);
         replyData.putByte(NET.LOGIN);
         replyData.putByte(NET.LOGINFAILED);
