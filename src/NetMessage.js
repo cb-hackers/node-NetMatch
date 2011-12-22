@@ -6,7 +6,8 @@
 var NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
   , WPNF = require('./Constants').WPNF
-  , OBJ = require('./Constants').OBJ;
+  , OBJ = require('./Constants').OBJ
+  , log = require('./Utils').log;
 /**#nocode-*/
 
 /**
@@ -58,8 +59,8 @@ NetMessages.fetch = function (toPlayer, data) {
     var d = NetMessages[toPlayer][i];
     
     if (!d.hasOwnProperty('msgType')) {
-      console.log('Virheellistä dataa NetMessages-objektissa!');
-      console.log(d);
+      log.error('Virheellistä dataa NetMessages-objektissa!');
+      console.dir(d);
       continue;
     }
     
@@ -170,8 +171,8 @@ NetMessages.fetch = function (toPlayer, data) {
         break;
         
       default:
-        console.log('VIRHE: Pelaajalle <'+toPlayer+'> oli osoitettu tuntematon paketti:');
-        console.log(d);
+        log.error('VIRHE: Pelaajalle <'+toPlayer+'> oli osoitettu tuntematon paketti:');
+        console.dir(d);
     }
     
     // Poistetaan viesti muistista

@@ -3,7 +3,7 @@
  */
 
 /**#nocode+*/
-var NetMatch = require('./NetMatch');
+var log = require('./Utils').log;
 /**#nocode-*/
 
 exports = module.exports = Player;
@@ -46,7 +46,7 @@ exports = module.exports = Player;
  * @property {Integer} kills         Tappojen lukumäärä
  * @property {Integer} deaths        Kuolemien lukumäärä
  * @property {Float}   killRatio     Tapposuhde
- * @property {Integer} death         Onko pelaaja kuollut
+ * @property {Integer} isDead        Onko pelaaja kuollut
  * @property {Integer} timeToDeath   Kuolinaika
  * @property {Integer} zombie        Onko tämä pelaaja botti
  * @property {Float}   nextAngle     Kulma johon botin pitäisi liikkua

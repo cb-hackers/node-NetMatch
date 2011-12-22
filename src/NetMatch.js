@@ -2,7 +2,7 @@
  * @fileOverview Pitää sisällään {@link NetMatch} nimiavaruuden.
  */
 
-// Vaatii cbNetwork ja node-optimist paketit: https://github.com/substack/node-optimist
+// Vaatii cbNetwork, colors ja node-optimist paketit: https://github.com/substack/node-optimist
 /**#nocode+*/
 var cbNetwork = require('cbNetwork')
   , Packet = cbNetwork.Packet
@@ -10,12 +10,9 @@ var cbNetwork = require('cbNetwork')
   , Player = require('./Player')
   , NetMessages = require('./NetMessage')
   , NET = require('./Constants').NET
-  , WPN = require('./Constants').WPN;
+  , WPN = require('./Constants').WPN
+  , log = require('./Utils').log;
 /**#nocode-*/
-
-exports = module.exports = NetMatch;
-
-NetMatch.prototype.__proto__ = EventEmitter.prototype;
 
 /**
  * Luo uuden palvelimen annettuun porttiin ja osoitteeseen. Kun palvelimeen tulee dataa, emittoi
@@ -30,7 +27,7 @@ NetMatch.prototype.__proto__ = EventEmitter.prototype;
  */
 function NetMatch(c) {
   if('object' !== typeof c || !c.hasOwnProperty('port')) {
-    console.log('Starting NetMatch-server failed!');
+    log.fatal("Initialization of NetMatch server failed because of incorrect starting parameters.");
     return false;
   }
   /**
@@ -83,8 +80,12 @@ function NetMatch(c) {
     this.players[i] = pl;
   }
   
-  //console.log(this.players);
+  log.info('Server initialized successfully.');
 }
+
+// Laajennetaan NetMatchin prototyyppiä EventEmitterin prototyypillä, jotta voitaisiin
+// emittoida viestejä.
+NetMatch.prototype.__proto__ = EventEmitter.prototype;
 
 
 // Palvelimen versio
@@ -204,7 +205,7 @@ NetMatch.prototype.login = function (client) {
   
   // Versio on OK, luetaan pelaajan nimi
   nickname = data.getString().trim();
-  console.log('Player "' + nickname + '" is trying to connect...');
+  log.info('Player "' + nickname + '" (' + client.address + ') is trying to connect...');
   
   // Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa
   playerIds = Object.keys(this.players);
@@ -215,7 +216,7 @@ NetMatch.prototype.login = function (client) {
         player.name = "";
       } else {
         // Nimimerkki oli jo käytössä.
-        console.log('Nickname "' + nickname + '" already in use.');
+        log.notice('Nickname "' + nickname + '" already in use.');
         replyData = new Packet(3);
         replyData.putByte(NET.LOGIN);
         replyData.putByte(NET.LOGINFAILED);
@@ -231,7 +232,7 @@ NetMatch.prototype.login = function (client) {
     var player = this.players[playerIds[i]];
     if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
       // Tyhjä paikka löytyi
-      player.clientId = client.address + ':' + client.id;
+      player.clientId = client.id;
       player.active = true;
       player.loggedIn = false;
       player.name = nickname;
@@ -266,9 +267,9 @@ NetMatch.prototype.login = function (client) {
       replyData.putString(this.gameState.map);
       replyData.putInt(this.gameState.mapCRC);
       // UNIMPLEMENTED
-      replyData.putString(""); // Kartan URL josta sen voi ladata, mikäli se puuttuu
+      replyData.putString(" "); // Kartan URL josta sen voi ladata, mikäli se puuttuu
       client.reply(replyData);
-      console.log(player.name + " logged in (" + client.address + ")");
+      log.info(player.name + " logged in");
       
       // Lisätään viestijonoon ilmoitus uudesta pelaajasta
       var msgData = {
@@ -289,7 +290,7 @@ NetMatch.prototype.login = function (client) {
   }
   
   // Vapaita paikkoja ei ollut
-  console.log('No free slots.');
+  log.notice('No free slots.');
   replyData = new Packet(3);
   replyData.putByte(NET.LOGIN);
   replyData.putByte(NET.LOGINFAILED);
@@ -297,3 +298,26 @@ NetMatch.prototype.login = function (client) {
   client.reply(replyData);
   return false;
 }
+
+
+NetMatch.prototype.logout = function (client, playerId) {
+  var player = this.players[playerId]
+    , playerIds = Object.keys(this.players);
+  
+  player.active = false;
+  player.loggedIn = false;
+  player.admin = false;
+  log.info(player.name + ' logged out.');
+  
+  // Lähetetään viesti kaikille muille paitsi boteille
+  for (var i = playerIds.length; i--;) {
+    var plr = this.players[playerIds[i]];
+    // Lähetetään viesti kaikille muille paitsi boteille ja itselle
+    if (plr.active && !plr.zombie && (plr.playerId != playerId)) {
+      NetMessages.add(plr.playerId, { msgType: NET.LOGOUT, playerId: playerId });
+    }
+  }
+}
+
+exports = module.exports = NetMatch;
+
