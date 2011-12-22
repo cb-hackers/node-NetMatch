@@ -10,7 +10,7 @@
 <span class='line'>  3</span>  */</span><span class="WHIT">
 <span class='line'>  4</span> 
 <span class='line'>  5</span> </span><span class="COMM">/**#nocode+*/</span><span class="WHIT">
-<span class='line'>  6</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">NetMatch</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./NetMatch'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  6</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">log</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Utils'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">log</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>  7</span> </span><span class="COMM">/**#nocode-*/</span><span class="WHIT">
 <span class='line'>  8</span> 
 <span class='line'>  9</span> </span><span class="NAME">exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">module.exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Player</span><span class="PUNC">;</span><span class="WHIT">
@@ -53,7 +53,7 @@
 <span class='line'> 46</span>  * @property {Integer} kills         Tappojen lukumäärä
 <span class='line'> 47</span>  * @property {Integer} deaths        Kuolemien lukumäärä
 <span class='line'> 48</span>  * @property {Float}   killRatio     Tapposuhde
-<span class='line'> 49</span>  * @property {Integer} death         Onko pelaaja kuollut
+<span class='line'> 49</span>  * @property {Integer} isDead        Onko pelaaja kuollut
 <span class='line'> 50</span>  * @property {Integer} timeToDeath   Kuolinaika
 <span class='line'> 51</span>  * @property {Integer} zombie        Onko tämä pelaaja botti
 <span class='line'> 52</span>  * @property {Float}   nextAngle     Kulma johon botin pitäisi liikkua
