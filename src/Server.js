@@ -65,7 +65,7 @@ server.on('message', function (client) {
   }
   
   // Pelaaja poistuu pelistä
-  if (msgType = NET.LOGOUT) {
+  if (msgType === NET.LOGOUT) {
     server.logout(client, currentPlayerId);
     return;
   }
