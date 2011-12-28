@@ -126,14 +126,28 @@ server.on('message', function (client) {
       }
       
     } else if (msgType === NET.PLAYERNAME) {
-      // jotain
+      // Nimilista pyydetty
+      sendNames = true;
+      
     } else if (msgType === NET.TEXTMESSAGE) {
-      // jotain
+      // Pelaaja lähetti tsättiviestin
+      txtMessage = data.getString().trim();
+      if (txtMessage.charAt(0) === '/') {
+        // UNIMPLEMENTED
+        // Komento
+        console.info('Player ' + player.name + ' sent a command: ' + txtMessage);
+        txtMessage = "";
+      }
+      
     } else if (msgType === NET.MAPCHANGE) {
-      // jotain
+      // Pelaaja lähetti kartan nimen
+      player.mapName = data.getString().trim();
+      
     } else {
+      // Viestit loppui tai tuli tuntematon viesti
       break;
     }
+    // Seuraava viesti
     msgType = data.getByte();
   }
 });
