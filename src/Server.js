@@ -17,7 +17,7 @@ var argv = require('optimist')
 var server = new NetMatch({ port: argv.p, address: argv.a});
 
 // Tehdään jotain sitä mukaa, kun dataa tulloo sissään.
-server.on('message', function (client) {
+server.on('message', function onServerMessage(client) {
   var data = client.data
     , msgType = data.getByte()
     , currentPlayerId
@@ -26,26 +26,26 @@ server.on('message', function (client) {
     , sendNames = false
     , txtMessage = ""
     , playerIds;
-  
+
   // Jos oli uusi pelaaja
   if (msgType === NET.LOGIN) {
     server.login(client);
     return;
   }
-  
+
   // Luetaan lähetetty pelaajan ID, joka on pelaajan järjestysnumero ja aina väliltä 1...MAX_PLAYERS
   currentPlayerId = data.getByte();
-  
+
   if (currentPlayerId < 1 || currentPlayerId > server.gameState.maxPlayers) {
     // Pelaajatunnus on väärä
     log.notice('Possible hack attempt from ' + client.address + ' Invalid player ID (' + currentPlayerId + ')');
     return;
   }
-  
+
   // Haetaan pelaajan instanssi Player-luokasta
   player = this.players[currentPlayerId];
-  
-  
+
+
   // Tarkistetaan onko pelaaja potkittu
   if (player.kicked && player.clientId == client.id) {
     reply = new Packet(7);
@@ -56,7 +56,7 @@ server.on('message', function (client) {
     client.reply(reply);
     return;
   }
-  
+
   if (player.clientId != client.id || !player.active) {
     //log.notice("Possible hack attempt from " + client.address + " Not logged in (" + currentPlayerId + ")");
     reply = new Packet(1);
@@ -64,19 +64,19 @@ server.on('message', function (client) {
     client.reply(reply);
     return;
   }
-  
+
   // Pelaaja poistuu pelistä
   if (msgType === NET.LOGOUT) {
     server.logout(client, currentPlayerId);
     return;
   }
-  
+
   // Lasketaan pelaajan ja serverin välinen lagi
   player.lag = timer() - player.lastActivity;
-  
+
   // Päivitetään pelaajan olemassaolo
   player.lastActivity = timer();
-  
+
   // Luetaan saapuneita viestejä
   while (msgType) {
     if (msgType === NET.PLAYER) {
@@ -85,16 +85,16 @@ server.on('message', function (client) {
         , y     = data.getShort()   // y-position
         , angle = data.getShort()   // kulma
         , b     = data.getByte();   // Tämä tavu sisältää useamman muuttujan (alempana)
-      
+
       // Puretaan b-tavu muuttujiin
       // Jos halutaan esim. lukea 4 bittiä kohdasta 0, menee lauseke seuraavasti:
       // var value = (b << (32-0-4)) >> (32-4)
       var weapon   = (b << 28) >> 28  // Valittuna oleva ase (bitit 0-3)
         , hasAmmo  = (b << 27) >> 31  // Onko valitussa aseessa ammuksia (bitti 4)
         , shooting = (b << 26) >> 31; // Ampuuko (bitti 5)
-      
+
       var picked  = data.getByte(); // Poimitun itemin id (0, jos ei poimittu)
-      
+
       // Arvot päivitetään vain jos pelaaja on hengissä
       if (!player.isDead) {
         player.x        = x;
@@ -102,18 +102,18 @@ server.on('message', function (client) {
         player.angle    = angle;
         player.weapon   = weapon;
         player.hasAmmos = hasAmmo;
-        
+
         // UNIMPLEMENTED
         // PositionObject, RotateObject
-        
+
         // UNIMPLEMENTED
         // speedhack
-        
+
         if (shooting === 1) {
           // UNIMPLEMENTED
           // CreateServerBullet
         }
-        
+
         // Poimittiinko jotain
         if (picked > 0) {
           // UNIMPLEMENTED
@@ -125,11 +125,11 @@ server.on('message', function (client) {
       if (!player.loggedIn) {
         player.loggedIn = true;
       }
-      
+
     } else if (msgType === NET.PLAYERNAME) {
       // Nimilista pyydetty
       sendNames = true;
-      
+
     } else if (msgType === NET.TEXTMESSAGE) {
       // Pelaaja lähetti tsättiviestin
       txtMessage = data.getString().trim();
@@ -142,11 +142,11 @@ server.on('message', function (client) {
         // Ei ollut komento, logataanpas tämä.
         log.write('<' + player.name + '> ' + txtMessage);
       }
-      
+
     } else if (msgType === NET.MAPCHANGE) {
       // Pelaaja lähetti kartan nimen
       player.mapName = data.getString().trim();
-      
+
     } else {
       // Viestit loppui tai tuli tuntematon viesti
       break;
@@ -154,14 +154,14 @@ server.on('message', function (client) {
     // Seuraava viesti
     msgType = data.getByte();
   }
-  
+
   // UNIMPLEMENTED
   // Jos erä on päättynyt niin lähetetään kaikkien pelaajien tiedot
   // sendNames = true;
-  
+
   // Lähetetään clientille dataa
   reply = new Packet();
-  
+
   // Lähetetään kaikkien pelaajien tiedot
   playerIds = Object.keys(server.players);
   for (var i = playerIds.length; i--;) {
@@ -176,7 +176,7 @@ server.on('message', function (client) {
         reply.putByte(plr.team);        // Joukkue
       }
     }
-    
+
     // Onko lähetetty tsättiviesti
     if (txtMessage.length > 0) {
       var msgData = {
@@ -197,7 +197,7 @@ server.on('message', function (client) {
         }
       }
     }
-    
+
     // Lähetetään niiden pelaajien tiedot jotka ovat hengissä ja näkyvissä
     if (plr.active) {
       var visible = true
@@ -208,7 +208,7 @@ server.on('message', function (client) {
       if ((Math.abs(x1 - x2) > 450) || (Math.abs(y1 - y2) > 350)) {
         visible = false;
       }
-      
+
       // Onko näkyvissä vai voidaanko muuten lähettää
       if (sendNames || visible || plr.health <= 0) {
         // Näkyy
@@ -217,23 +217,23 @@ server.on('message', function (client) {
         reply.putShort(plr.x);        // Sijainti
         reply.putShort(plr.y);        // Sijainti
         reply.putShort(plr.angle);    // Kulma
-        
+
         // Spawn-protect
         var isProtected = 0;
         if (plr.spawnTime + server.gameState.spawnProtection > timer()) {
           isProtected = 1;
         }
-        
+
         // Muutetaan team arvo välille 0-1
         var teamBit = (plr.team === 2 ? 0 : 1);
-        
+
         // Tungetaan yhteen tavuun useampi muuttuja
         var b = (plr.weapon % 16) << 0  // Ase (bitit 0-3)
               + (plr.hasAmmos << 4)     // Onko ammuksia (bitti 4)
               + (teamBit << 6)          // Joukkue/tiimi (bitti 6)
               + (isProtected << 7);     // Haavoittumaton (bitti 7)
         reply.putByte(b);
-        
+
         reply.putByte(plr.health);      // Terveys
         reply.putShort(plr.kills);      // Tapot
         reply.putShort(plr.deaths);     // Kuolemat
@@ -251,22 +251,22 @@ server.on('message', function (client) {
       }
     }
   }
-  
+
   // UNIMPLEMENTED
   // Kartan vaihtaminen
-  
+
   // Lähetetään kaikki pelaajalle osoitetut viestit
   server.messages.fetch(currentPlayerId, reply);
-  
+
   // UNIMPLEMENTED
   // Jos on pyydetty nimilista niin palautetaan myös kaikkien tavaroiden tiedot
-  
+
   // UNIMPLEMENTED
   // Pelisession aikatiedot
-  
+
   reply.putByte(NET.END);
   client.reply(reply);
-  
+
   // Dodiin, valmiita ollaan :)
   return;
 });
