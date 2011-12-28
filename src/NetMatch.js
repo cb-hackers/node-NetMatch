@@ -144,6 +144,12 @@ NetMatch.config = {
      * @default 15000
      */
   , spawnProtection: 15000
+    /**
+     * Ovatko tutkanuolet käytössä vai ei
+     * @type Boolean
+     * @default true
+     */
+  , radarArrows: true
 }
 
 /** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */

@@ -24,7 +24,8 @@ server.on('message', function (client) {
     , player
     , reply
     , sendNames = false
-    , txtMessage = "";
+    , txtMessage = ""
+    , playerIds;
   
   // Jos oli uusi pelaaja
   if (msgType === NET.LOGIN) {
@@ -150,4 +151,119 @@ server.on('message', function (client) {
     // Seuraava viesti
     msgType = data.getByte();
   }
+  
+  // UNIMPLEMENTED
+  // Jos erä on päättynyt niin lähetetään kaikkien pelaajien tiedot
+  // sendNames = true;
+  
+  // Lähetetään clientille dataa
+  reply = new Packet();
+  
+  // Lähetetään kaikkien pelaajien tiedot
+  playerIds = Object.keys(server.players);
+  for (var i = playerIds.length; i--;) {
+    var plr = server.players[playerIds[i]];
+    // Onko pyydetty nimet
+    if (sendNames) {
+      if (plr.active) {
+        reply.putByte(NET.PLAYERNAME);  // Nimet
+        reply.putByte(plr.playerId);    // Pelaajan tunnus
+        reply.putString(plr.name);      // Nimi
+        reply.putByte(plr.zombie);      // Onko botti
+        reply.putByte(plr.team);        // Joukkue
+      }
+    }
+    
+    // Onko lähetetty tsättiviesti
+    if (txtMessage.length > 0) {
+      var msgData = {
+        msgType: NET.TEXTMESSAGE,
+        playerId: currentPlayerId,
+        msgText: txtMessage
+      };
+      // Lähetetään kaikille muille paitsi boteille
+      if (plr.active && !plr.zombie) {
+        if (txtMessage.charAt(0) === '*') {
+          // Lähetetään vain omalle joukkueelle tämä viesti
+          if (plr.team === player.team) {
+            NetMessages.add(plr.playerId, msgData);
+          }
+        } else {
+          // Ei ollut tähteä ekana kirjaimena, joten tämä viesit on julkinen ja lähtee kaikille.
+          NetMessages.add(plr.playerId, msgData);
+        }
+      }
+    }
+    
+    // Lähetetään niiden pelaajien tiedot jotka ovat hengissä ja näkyvissä
+    if (plr.active) {
+      var visible = true
+        , x1 = player.x
+        , y1 = player.y
+        , x2 = plr.x
+        , y2 = plr.y;
+      if ((Math.abs(x1 - x2) > 450) || (Math.abs(y1 - y2) > 350)) {
+        visible = false;
+      }
+      
+      // Onko näkyvissä vai voidaanko muuten lähettää
+      if (sendNames || visible || plr.health <= 0) {
+        // Näkyy
+        reply.putByte(NET.PLAYER);    // Pelaajan tietoja
+        reply.putByte(plr.playerId);  // Pelaajan tunnus
+        reply.putShort(plr.x);        // Sijainti
+        reply.putShort(plr.y);        // Sijainti
+        reply.putShort(plr.angle);    // Kulma
+        
+        // Spawn-protect
+        var isProtected = 0;
+        if (plr.spawnTime + server.gameState.spawnProtection > timer()) {
+          isProtected = 1;
+        }
+        
+        // Muutetaan team arvo välille 0-1
+        var teamBit = (plr.team === 2 ? 0 : 1);
+        
+        // Tungetaan yhteen tavuun useampi muuttuja
+        var b = (plr.weapon % 16) << 0  // Ase (bitit 0-3)
+              + (plr.hasAmmos << 4)     // Onko ammuksia (bitti 4)
+              + (teamBit << 6)          // Joukkue/tiimi (bitti 6)
+              + (isProtected << 7);     // Haavoittumaton (bitti 7)
+        reply.putByte(b);
+        
+        reply.putByte(plr.health);      // Terveys
+        reply.putByte(plr.kills);       // Tapot
+        reply.putByte(plr.deaths);      // Kuolemat
+      } else if (server.gameState.radarArrows || server.gameState.playMode === 2) {
+        // Ei näy. Lähetetään tutkatieto. playMode === 2 tarkoittaa TDM-pelimuotoa
+        if (player.team === plr.team || server.gameState.radarArrows) {
+          // Lähetetään tutkatiedot jos joukkueet ovat samat tai asetuksista on laitettu että
+          // kaikkien joukkueiden pelaajien tutkatiedot lähetetään
+          reply.putByte(NET.RADAR); // Tutkatietoa tulossa
+          // UNIMPLEMENTED
+          // Missä kulmassa tutkan pitäisi olla
+          reply.putByte(0);         // Kulma muutettuna välille 0-255
+          reply.putByte(plr.team);  // Pelaajan joukkue
+        }
+      }
+    }
+  }
+  
+  // UNIMPLEMENTED
+  // Kartan vaihtaminen
+  
+  // Lähetetään kaikki pelaajalle osoitetut viestit
+  NetMessages.fetch(currentPlayerId, reply);
+  
+  // UNIMPLEMENTED
+  // Jos on pyydetty nimilista niin palautetaan myös kaikkien tavaroiden tiedot
+  
+  // UNIMPLEMENTED
+  // Pelisession aikatiedot
+  
+  reply.putByte(NET.END);
+  client.reply(reply);
+  
+  // Dodiin, valmiita ollaan :)
+  return;
 });

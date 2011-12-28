@@ -13,7 +13,7 @@ exports = module.exports = Player;
  *
  * @class Kaikki pelaajat, niin ihmispelaajat kuin botitkin, ovat tämän luokan jäseniä.
  *
- * @param {Object} [attr]  Objekti joka sisältää joitain valmiiksi asettuja arvoja uudelle pelaajalle.
+ * @param {Object} [attr]  Objekti joka sisältää joitakin valmiiksi asettuja arvoja uudelle pelaajalle.
  *
  * @property {Integer} playerId      Pelaajan tunnus välillä 1-MAX_PLAYERS
  * @property {String}  clientId      ClientId eli ip-osoite ja tunnus
