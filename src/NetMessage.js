@@ -7,7 +7,8 @@ var NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
   , WPNF = require('./Constants').WPNF
   , OBJ = require('./Constants').OBJ
-  , log = require('./Utils').log;
+  , log = require('./Utils').log
+  , colors = require('colors');
 /**#nocode-*/
 
 /**
@@ -15,11 +16,16 @@ var NET = require('./Constants').NET
  * Älä siis kutsu tätä kuten konstruktoria.
  * @class
  */
-var NetMessages = {};
+var NetMessages = function() {
+  /**
+   * Sisältää clienteille lähetettävät viestit
+   * @private
+   */
+  this.data = {};
+}
 
 /**
  * Luo uuden clientille lähetettävän viestin.
- * @static
  *
  * @param {Byte}    toPlayer          Pelaajan ID kelle viesti lähetetään.
  * @param {Object}  data              Pelaajalle lähetettävä data
@@ -36,11 +42,11 @@ var NetMessages = {};
  * @param {Boolean} data.sndPlay      Soitetaanko ääni
  * @param {Boolean} data.handShooted  Kumpi käsi ampui (pistooli) 0 = vasen, 1 = oikea
  */
-NetMessages.add = function (toPlayer, data) {
-  if ('array' !== typeof NetMessages[toPlayer]) {
-    NetMessages[toPlayer] = [];
+NetMessages.prototype.add = function (toPlayer, data) {
+  if ('undefined' === typeof this.data[toPlayer]) {
+    this.data[toPlayer] = [];
   }
-  NetMessages[toPlayer].push(data);
+  this.data[toPlayer].push(data);
 }
 
 /**
@@ -50,13 +56,13 @@ NetMessages.add = function (toPlayer, data) {
  * @param {Byte} toPlayer  Kenen viestit haetaan
  * @param {Packet} data    Mihin pakettiin tiedot lisätään
  */
-NetMessages.fetch = function (toPlayer, data) {
-  if ('array' !== typeof NetMessages[toPlayer]) {
+NetMessages.prototype.fetch = function (toPlayer, data) {
+  if ('undefined' === typeof this.data[toPlayer] || this.data[toPlayer].length == 0) {
     return false;
   }
-  for (var i=0; i<NetMessages[toPlayer].length; i++) {
+  for (var i=0; i<this.data[toPlayer].length; i++) {
     // Tämän viestin data laitetaan d-muuttujaan, jotta tarvitsisi kirjoittaa vähemmän.
-    var d = NetMessages[toPlayer][i];
+    var d = this.data[toPlayer][i];
     
     if (!d.hasOwnProperty('msgType')) {
       log.error('Virheellistä dataa NetMessages-objektissa!');
@@ -176,7 +182,7 @@ NetMessages.fetch = function (toPlayer, data) {
     }
     
     // Poistetaan viesti muistista
-    NetMessages[toPlayer].splice(i, 1);
+    this.data[toPlayer].splice(i, 1);
   }
 }
 

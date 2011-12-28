@@ -6,9 +6,9 @@ var argv = require('optimist')
     .argv
   , Packet = require('cbNetwork').Packet
   , NET = require('./Constants').NET
-  , NetMessages = require('./NetMessage')
   , NetMatch = require('./NetMatch')
   , log = require('./Utils').log
+  , colors = require('colors')
   , timer = require('./Utils').timer;
 /**#nocode-*/
 
@@ -136,8 +136,11 @@ server.on('message', function (client) {
       if (txtMessage.charAt(0) === '/') {
         // UNIMPLEMENTED
         // Komento
-        console.info('Player ' + player.name + ' sent a command: ' + txtMessage);
+        log.info('Player ' + player.name + ' sent a command: ' + txtMessage);
         txtMessage = "";
+      } else {
+        // Ei ollut komento, logataanpas tämä.
+        log.write('<' + player.name + '> ' + txtMessage);
       }
       
     } else if (msgType === NET.MAPCHANGE) {
@@ -186,11 +189,11 @@ server.on('message', function (client) {
         if (txtMessage.charAt(0) === '*') {
           // Lähetetään vain omalle joukkueelle tämä viesti
           if (plr.team === player.team) {
-            NetMessages.add(plr.playerId, msgData);
+            server.messages.add(plr.playerId, msgData);
           }
         } else {
           // Ei ollut tähteä ekana kirjaimena, joten tämä viesit on julkinen ja lähtee kaikille.
-          NetMessages.add(plr.playerId, msgData);
+          server.messages.add(plr.playerId, msgData);
         }
       }
     }
@@ -232,8 +235,8 @@ server.on('message', function (client) {
         reply.putByte(b);
         
         reply.putByte(plr.health);      // Terveys
-        reply.putByte(plr.kills);       // Tapot
-        reply.putByte(plr.deaths);      // Kuolemat
+        reply.putShort(plr.kills);      // Tapot
+        reply.putShort(plr.deaths);     // Kuolemat
       } else if (server.gameState.radarArrows || server.gameState.playMode === 2) {
         // Ei näy. Lähetetään tutkatieto. playMode === 2 tarkoittaa TDM-pelimuotoa
         if (player.team === plr.team || server.gameState.radarArrows) {
@@ -253,7 +256,7 @@ server.on('message', function (client) {
   // Kartan vaihtaminen
   
   // Lähetetään kaikki pelaajalle osoitetut viestit
-  NetMessages.fetch(currentPlayerId, reply);
+  server.messages.fetch(currentPlayerId, reply);
   
   // UNIMPLEMENTED
   // Jos on pyydetty nimilista niin palautetaan myös kaikkien tavaroiden tiedot

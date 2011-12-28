@@ -11,7 +11,8 @@ var cbNetwork = require('cbNetwork')
   , NetMessages = require('./NetMessage')
   , NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
-  , log = require('./Utils').log;
+  , log = require('./Utils').log
+  , colors = require('colors');
 /**#nocode-*/
 
 /**
@@ -41,6 +42,12 @@ function NetMatch(c) {
   this.server.on('message', function (client) {
     self.emit('message', client);
   });
+  
+  /**
+   * Pelaajille lähetettävät viestit. Tämä on instanssi {@link NetMessages}-luokasta.
+   * @see NetMessages
+   */
+  this.messages = new NetMessages();
   
   /**
    * Asetukset tälle palvelimelle
@@ -275,7 +282,7 @@ NetMatch.prototype.login = function (client) {
       // UNIMPLEMENTED
       replyData.putString(" "); // Kartan URL josta sen voi ladata, mikäli se puuttuu
       client.reply(replyData);
-      log.info(player.name + " logged in");
+      log.info(player.name + " logged in, assigned ID " + String(player.playerId).magenta);
       
       // Lisätään viestijonoon ilmoitus uudesta pelaajasta
       var msgData = {
@@ -288,7 +295,7 @@ NetMatch.prototype.login = function (client) {
         var plr = this.players[playerIds[j]];
         // Lähetetään viesti kaikille muille paitsi boteille ja itselle
         if (plr.active && !plr.zombie && (plr.playerId != player.playerId)) {
-          NetMessages.add(plr.playerId, msgData);
+          this.messages.add(plr.playerId, msgData);
         }
       }
       return true;
@@ -320,7 +327,7 @@ NetMatch.prototype.logout = function (client, playerId) {
     var plr = this.players[playerIds[i]];
     // Lähetetään viesti kaikille muille paitsi boteille ja itselle
     if (plr.active && !plr.zombie && (plr.playerId != playerId)) {
-      NetMessages.add(plr.playerId, { msgType: NET.LOGOUT, playerId: playerId });
+      this.messages.add(plr.playerId, { msgType: NET.LOGOUT, playerId: playerId });
     }
   }
 }
