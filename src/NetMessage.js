@@ -54,7 +54,7 @@ NetMessages.fetch = function (toPlayer, data) {
   if ('array' !== typeof NetMessages[toPlayer]) {
     return false;
   }
-  for( var i=0; i<NetMessages[toPlayer].length; i++ ) {
+  for (var i=0; i<NetMessages[toPlayer].length; i++) {
     // Tämän viestin data laitetaan d-muuttujaan, jotta tarvitsisi kirjoittaa vähemmän.
     var d = NetMessages[toPlayer][i];
     

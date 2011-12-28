@@ -76,16 +76,14 @@ server.on('message', function (client) {
   // Päivitetään pelaajan olemassaolo
   player.lastActivity = timer();
   
-  return;
-  
   // Luetaan saapuneita viestejä
   while (msgType) {
     if (msgType === NET.PLAYER) {
       // Pelaajan dataa
-      var x     = client.getShort()   // x-position
-        , y     = client.getShort()   // y-position
-        , angle = client.getShort()   // kulma
-        , b     = client.getByte()    // Tämä tavu sisältää useamman muuttujan (alempana)
+      var x     = data.getShort()   // x-position
+        , y     = data.getShort()   // y-position
+        , angle = data.getShort()   // kulma
+        , b     = data.getByte();   // Tämä tavu sisältää useamman muuttujan (alempana)
       
       // Puretaan b-tavu muuttujiin
       // Jos halutaan esim. lukea 4 bittiä kohdasta 0, menee lauseke seuraavasti:
@@ -94,7 +92,7 @@ server.on('message', function (client) {
         , hasAmmo  = (b << 27) >> 31  // Onko valitussa aseessa ammuksia (bitti 4)
         , shooting = (b << 26) >> 31; // Ampuuko (bitti 5)
       
-      var picked  = client.getByte(); // Poimitun itemin id (0, jos ei poimittu)
+      var picked  = data.getByte(); // Poimitun itemin id (0, jos ei poimittu)
       
       // Arvot päivitetään vain jos pelaaja on hengissä
       if (!player.isDead) {
@@ -110,7 +108,7 @@ server.on('message', function (client) {
         // UNIMPLEMENTED
         // speedhack
         
-        if (shoot === 1) {
+        if (shooting === 1) {
           // UNIMPLEMENTED
           // CreateServerBullet
         }
