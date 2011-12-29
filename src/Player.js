@@ -1,5 +1,5 @@
 /**
- * @fileOverview Sisältää {@link Player}-luokan toteutuksen sekä {@link NetMatch#Players} kokoelman.
+ * @fileOverview Sisältää {@link Player}-luokan toteutuksen.
  */
 
 /**#nocode+*/

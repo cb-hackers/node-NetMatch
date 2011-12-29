@@ -9,7 +9,8 @@ var argv = require('optimist')
   , NetMatch = require('./NetMatch')
   , log = require('./Utils').log
   , colors = require('colors')
-  , timer = require('./Utils').timer;
+  , timer = require('./Utils').timer
+  , Bullet = require('./Weapon').Bullet;
 /**#nocode-*/
 
 // Tehdään uusi palvelin.
@@ -67,7 +68,7 @@ server.on('message', function onServerMessage(client) {
 
   // Pelaaja poistuu pelistä
   if (msgType === NET.LOGOUT) {
-    server.logout(client, currentPlayerId);
+    server.logout(currentPlayerId);
     return;
   }
 
@@ -86,12 +87,12 @@ server.on('message', function onServerMessage(client) {
         , angle = data.getShort()   // kulma
         , b     = data.getByte();   // Tämä tavu sisältää useamman muuttujan (alempana)
 
-      // Puretaan b-tavu muuttujiin
+        // Puretaan b-tavu muuttujiin
       // Jos halutaan esim. lukea 4 bittiä kohdasta 0, menee lauseke seuraavasti:
       // var value = (b << (32-0-4)) >> (32-4)
-      var weapon   = (b << 28) >> 28  // Valittuna oleva ase (bitit 0-3)
-        , hasAmmo  = (b << 27) >> 31  // Onko valitussa aseessa ammuksia (bitti 4)
-        , shooting = (b << 26) >> 31; // Ampuuko (bitti 5)
+      var weapon   = (b << 28) >> 28      // Valittuna oleva ase (bitit 0-3)
+        , hasAmmo  = -((b << 27) >> 31)   // Onko valitussa aseessa ammuksia (bitti 4)
+        , shooting = -((b << 26) >> 31);  // Ampuuko (bitti 5)
 
       var picked  = data.getByte(); // Poimitun itemin id (0, jos ei poimittu)
 
@@ -110,8 +111,11 @@ server.on('message', function onServerMessage(client) {
         // speedhack
 
         if (shooting === 1) {
-          // UNIMPLEMENTED
-          // CreateServerBullet
+          if (argv.d) {
+            log.info('Player ' + player.name.yellow + ' is shooting a new bullet from weapon ' + player.weapon);
+          }
+          new Bullet(server, currentPlayerId);
+          //console.dir(this.bullets);
         }
 
         // Poimittiinko jotain
@@ -228,10 +232,10 @@ server.on('message', function onServerMessage(client) {
         var teamBit = (plr.team === 2 ? 0 : 1);
 
         // Tungetaan yhteen tavuun useampi muuttuja
-        var b = (plr.weapon % 16) << 0  // Ase (bitit 0-3)
-              + (plr.hasAmmos << 4)     // Onko ammuksia (bitti 4)
-              + (teamBit << 6)          // Joukkue/tiimi (bitti 6)
-              + (isProtected << 7);     // Haavoittumaton (bitti 7)
+        var b = ((plr.weapon % 16) << 0)  // Ase (bitit 0-3)
+              + ((plr.hasAmmos << 4))     // Onko ammuksia (bitti 4)
+              + ((teamBit << 6))          // Joukkue/tiimi (bitti 6)
+              + ((isProtected << 7));     // Haavoittumaton (bitti 7)
         reply.putByte(b);
 
         reply.putByte(plr.health);      // Terveys
@@ -255,9 +259,19 @@ server.on('message', function onServerMessage(client) {
   // UNIMPLEMENTED
   // Kartan vaihtaminen
 
+  // Lähetetään bensaa
+  server.messages.add(currentPlayerId, {
+    msgType: NET.ITEM,
+    itemId: 0,
+    itemType: 21,
+    x: 0,
+    y: 0
+  });
+  
   // Lähetetään kaikki pelaajalle osoitetut viestit
-  server.messages.fetch(currentPlayerId, reply);
+  server.messages.fetch(server, currentPlayerId, reply);
 
+  
   // UNIMPLEMENTED
   // Jos on pyydetty nimilista niin palautetaan myös kaikkien tavaroiden tiedot
 

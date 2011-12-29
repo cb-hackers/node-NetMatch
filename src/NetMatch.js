@@ -37,34 +37,45 @@ function NetMatch(c) {
    * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html">cbNetwork.Server</a>
    */
   this.server = new cbNetwork.Server(c.port, c.address);
-  
+
   var self = this;
   this.server.on('message', function (client) {
     self.emit('message', client);
   });
-  
+
   /**
    * Pelaajille lähetettävät viestit. Tämä on instanssi {@link NetMessages}-luokasta.
    * @see NetMessages
    */
   this.messages = new NetMessages();
-  
+
   /**
    * Asetukset tälle palvelimelle
    * @type Object
    * @see NetMatch.config
    */
   this.config = NetMatch.config;
-  
-  // Asetetaan nykyisen pelin tila
+
+  /** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */
+  this.gameState = {};
   this.gameState.playerCount = 0;
   this.gameState.gameMode = this.config.gameMode;
   this.gameState.map = this.config.map;
   this.gameState.mapCRC = -1170754068; // TODO: häx
   this.gameState.maxPlayers = this.config.maxPlayers;
-  
-  // Nyt alustetaan pelaajat
+
+  /**
+   * Sisältää palvelimen pelaajat, eli luokan {@link Player} jäsenet.
+   * Pääset yksittäisen pelaajan dataan näin:
+   * @example
+   * // Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
+   *
+   * // Tulostaa konsoliin ID:n 4 pelaajan nimen.
+   * console.log( server.players[4].name );
+   */
   this.players = {};
+  
+  // Alustetaan pelaajat
   for(var i = 1; i <= this.config.maxPlayers; ++i) {
     var pl = new Player();
     pl.playerId = i;
@@ -83,9 +94,19 @@ function NetMatch(c) {
     pl.admin = false;
     pl.kicked = false;
     pl.kickReason = "";
-    
+
     this.players[i] = pl;
   }
+  
+  /**
+   * Sisältää palvelimen ammukset, eli luokan {@link Weapon} jäsenet.
+   */
+  this.bullets = [];
+  
+  /**
+   * @private
+   */
+  this.lastBulletId = 0;
   
   log.info('Server initialized successfully.');
 }
@@ -99,7 +120,7 @@ NetMatch.prototype.__proto__ = EventEmitter.prototype;
 NetMatch.VERSION = "v2.4"
 
 /**
- * @namespace Sisältää NetMatch-palvelimen oletusasetukset. Näitä voi muuttaa antamalla 
+ * @namespace Sisältää NetMatch-palvelimen oletusasetukset. Näitä voi muuttaa antamalla
  * {@link NetMatch}-konstruktorille parametrina objektin, jonka avaimet sopivat tämän muotoon.
  */
 NetMatch.config = {
@@ -159,26 +180,10 @@ NetMatch.config = {
   , radarArrows: true
 }
 
-/** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */
-NetMatch.prototype.gameState = {};
-
-
-/**
- * Sisältää palvelimen pelaajat, eli luokan {@link Player} jäsenet.
- * Pääset yksittäisen pelaajan dataan näin:
- * @example
- * // Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
- * 
- * // Tulostaa konsoliin ID:n 4 pelaajan nimen.
- * console.log( server.players[4].name );
- */
-NetMatch.prototype.players = {};
-
-
 /**
  * NetMatch-palvelin emittoi tämän eventin aina kun palvelimeen tulee dataa. Tätä täytyy käyttää,
  * mikäli haluat saada palvelimen tekemäänkin jotain. Parametrina tämä antaa cbNetwork-noden
- * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">Client</a>-luokan 
+ * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">Client</a>-luokan
  * instanssin. Katso alla oleva esimerkki, niin saat tietää lisää:
  * @example
  * // Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
@@ -197,13 +202,18 @@ NetMatch.prototype.players = {};
 
 // NetMatch.on('message');
 
+/**
+ * Kirjaa pelaajan sisään peliin.
+ * @param {Client} client  cbNetworkin Client-luokan jäsen.
+ * @returns {Boolean}      Onnistuiko pelaajan liittäminen peliin vai ei.
+ */
 NetMatch.prototype.login = function (client) {
   var data = client.data
     , replyData
     , version = data.getString()
     , nickname
     , playerIds;
-  
+
   // Täsmääkö clientin ja serverin versiot
   if (version !== NetMatch.VERSION) {
     // Eivät täsmää, lähetetään virheilmoitus
@@ -215,11 +225,11 @@ NetMatch.prototype.login = function (client) {
     client.reply(replyData);
     return false;
   }
-  
+
   // Versio on OK, luetaan pelaajan nimi
   nickname = data.getString().trim();
   log.info('Player "' + nickname + '" (' + client.address + ') is trying to connect...');
-  
+
   // Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa
   playerIds = Object.keys(this.players);
   for (var i = playerIds.length; i--;) {
@@ -239,7 +249,7 @@ NetMatch.prototype.login = function (client) {
       }
     }
   }
-  
+
   // Etsitään vapaa "pelipaikka"
   for (var i = playerIds.length; i--;) {
     var player = this.players[playerIds[i]];
@@ -270,7 +280,7 @@ NetMatch.prototype.login = function (client) {
         // Tasainen jako joukkueihin
         player.team = Math.floor(Math.random()*2 + 1) + 1; // Rand(1,2)
       }
-      
+
       // Lähetetään vastaus clientille
       replyData = new Packet(16);
       replyData.putByte(NET.LOGIN);
@@ -283,7 +293,7 @@ NetMatch.prototype.login = function (client) {
       replyData.putString(" "); // Kartan URL josta sen voi ladata, mikäli se puuttuu
       client.reply(replyData);
       log.info(player.name + " logged in, assigned ID " + String(player.playerId).magenta);
-      
+
       // Lisätään viestijonoon ilmoitus uudesta pelaajasta
       var msgData = {
         msgType: NET.LOGIN,
@@ -301,7 +311,7 @@ NetMatch.prototype.login = function (client) {
       return true;
     }
   }
-  
+
   // Vapaita paikkoja ei ollut
   log.notice('No free slots.');
   replyData = new Packet(3);
@@ -312,16 +322,19 @@ NetMatch.prototype.login = function (client) {
   return false;
 }
 
-
-NetMatch.prototype.logout = function (client, playerId) {
+/**
+ * Kirjaa pelaajan ulos pelistä.
+ * @param {Integer} playerId  Pelaajan ID.
+ */
+NetMatch.prototype.logout = function (playerId) {
   var player = this.players[playerId]
     , playerIds = Object.keys(this.players);
-  
+
   player.active = false;
   player.loggedIn = false;
   player.admin = false;
   log.info(player.name + ' logged out.');
-  
+
   // Lähetetään viesti kaikille muille paitsi boteille
   for (var i = playerIds.length; i--;) {
     var plr = this.players[playerIds[i]];
