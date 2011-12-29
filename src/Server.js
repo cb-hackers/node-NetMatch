@@ -229,7 +229,7 @@ server.on('message', function onServerMessage(client) {
         }
 
         // Muutetaan team arvo välille 0-1
-        var teamBit = (plr.team === 2 ? 0 : 1);
+        var teamBit = (plr.team === 2 ? 1 : 0);
 
         // Tungetaan yhteen tavuun useampi muuttuja
         var b = ((plr.weapon % 16) << 0)  // Ase (bitit 0-3)
