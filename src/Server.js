@@ -270,21 +270,24 @@ server.on('message', function onServerMessage(client) {
   // UNIMPLEMENTED
   // Kartan vaihtaminen
 
-  // Lähetetään bensaa
-  server.messages.add(currentPlayerId, {
-    msgType: NET.ITEM,
-    itemId: 0,
-    itemType: 21,
-    x: 0,
-    y: 0
-  });
-
   // Lähetetään kaikki pelaajalle osoitetut viestit
   server.messages.fetch(server, currentPlayerId, reply);
 
 
-  // UNIMPLEMENTED
   // Jos on pyydetty nimilista niin palautetaan myös kaikkien tavaroiden tiedot
+  if (sendNames) {
+    var itemIds = Object.keys(this.items);
+    for (var i = itemIds.length; i--;) {
+      var item = this.items[itemIds[i]];
+      this.messages.add(currentPlayerId, {
+        msgType: NET.ITEM,
+        itemId: item.id,
+        itemType: item.type,
+        x: item.x,
+        y: item.y
+      });
+    }
+  }
 
   // UNIMPLEMENTED
   // Pelisession aikatiedot

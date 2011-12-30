@@ -11,10 +11,12 @@ var cbNetwork = require('cbNetwork')
   , NetMessages = require('./NetMessage')
   , NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
+  , ITEM = require('./Constants').ITEM
   , log = require('./Utils').log
   , colors = require('colors')
   , Map = require('./Map').Map
-  , Input = require('./Input');
+  , Input = require('./Input')
+  , Item = require('./Item');
 /**#nocode-*/
 
 /**
@@ -88,7 +90,7 @@ function NetMatch(c) {
   this.players = {};
 
   // Alustetaan pelaajat
-  for(var i = 1; i <= this.config.maxPlayers; ++i) {
+  for (var i = 1; i <= this.config.maxPlayers; ++i) {
     var pl = new Player();
     pl.playerId = i;
     pl.active = false;
@@ -119,6 +121,33 @@ function NetMatch(c) {
    * @private
    */
   this.lastBulletId = 0;
+
+  /**
+   * Sisältää palvelimella maassa olevat tavarat, kts. {@link Item}.
+   */
+  this.items = {};
+
+  // Alustetaan itemit
+  var mapConfig = this.gameState.map.config;
+  var itemId = 0;
+  for (var i = mapConfig.healthItems - 1; i--;) {
+    new Item(this, ++itemId, ITEM.HEALTH);
+  }
+  for (var i = mapConfig.mgunItems - 1; i--;) {
+    new Item(this, ++itemId, ITEM.AMMO);
+  }
+  for (var i = mapConfig.bazookaItems - 1; i--;) {
+    new Item(this, ++itemId, ITEM.ROCKET);
+  }
+  for (var i = mapConfig.shotgunItems - 1; i--;) {
+    new Item(this, ++itemId, ITEM.FUEL);
+  }
+  for (var i = mapConfig.launcherItems - 1; i--;) {
+    new Item(this, ++itemId, ITEM.SHOTGUN);
+  }
+  for (var i = mapConfig.chainsawItems - 1; i--;) {
+    new Item(this, ++itemId, ITEM.LAUNCHER);
+  }
 
   // Avataan Input
   new Input(this);

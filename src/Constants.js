@@ -358,7 +358,31 @@ var OBJ = {
   COUNT: 47
 }
 
+/**
+ * @namespace Itemit omana kokoelmanaan eroteltuna OBJ kokoelmasta.
+ */
+var ITEM = {
+  /** Healthpack */
+  HEALTH: 18,
+
+  /** Konekiväärin ammuksia */
+  AMMO: 19,
+
+  /** Singon ammuksia */
+  ROCKET: 20,
+
+  /** Moottorisahan bensaa */
+  FUEL: 21,
+
+  /** Haulikon ammuksia */
+  SHOTGUN: 33,
+
+  /** Kranaatteja */
+  LAUNCHER: 34
+}
+
 exports.NET = NET;
 exports.WPN = WPN;
 exports.WPNF = WPNF;
 exports.OBJ = OBJ;
+exports.ITEM = ITEM;

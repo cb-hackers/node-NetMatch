@@ -4,6 +4,7 @@
 
 /**#nocode+*/
 var log = require('./Utils').log
+  , rand = require('./Utils').rand
   , path = require('path')
   , cjson = require('cjson')
   , argv = require('optimist')
@@ -90,6 +91,28 @@ Map.prototype.isColliding = function (x, y) {
 
   // Jos päästiin tänne asti niin ei olla törmätty
   return false;
+}
+
+/**
+ * Etsii satunnaisen paikan kartalta, joka ei ole seinän sisällä, ja palauttaa kyseisen paikan
+ * koordinaatit objektissa, jolla on kentät x ja y.
+ *
+ * @returns {Object}  Objekti, jolla on kentät x ja y, jotka ovat löydetyn paikan koordinaatit
+ */
+Map.prototype.findSpot = function () {
+  var randTileX, randTileY, returnObj = {};
+  // Etsitään vapaata paikkaa kartalta "vain" 10 000 kertaa
+  for (var i = 9999; --i;) {
+    randTileX = rand(0, this.width - 1);
+    randTileY = rand(0, this.height - 1);
+    if (!this.data[randTileY][randTileX]) {
+      // Ei ollut seinän sisällä
+      returnObj.x = (randTileX * this.tileWidth) - (this.width * this.tileWidth) / 2;
+      returnObj.y = -((randTileY * this.tileHeight) - (this.height * this.tileHeight) / 2);
+      break;
+    }
+  }
+  return returnObj;
 }
 
 exports.Map = Map;

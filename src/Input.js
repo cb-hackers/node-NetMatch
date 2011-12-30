@@ -24,14 +24,7 @@ function Input(server) {
   server.on('closed', function () {
     // Nyt ollaan suljettu, voidaan sulkea koko prosessi. Mutta odotetaan toki puoli sekuntia,
     // että muut funktiot jotka kuuntelevat closed-eventtiä voisivat toimia.
-    process.stdin.pause();
-    setTimeout(function closeProcess() {
-      process.exit();
-    }, 500);
-  });
-
-  process.on('exit', function () {
-    log.info('Process exits.');
+    process.stdin.destroySoon();
   });
 
 
