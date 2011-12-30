@@ -67,8 +67,8 @@ function Map(name) {
  * @param {Number} y  Tarkistettava y-koordinaatti pelikoordinaateissa
  */
 Map.prototype.isColliding = function (x, y) {
-  var tileX = Math.round((x + this.width * this.tileWidth / 2) / this.tileWidth)
-    , tileY = Math.round((-y + this.height * this.tileHeight / 2) / this.tileHeight);
+  var tileX = Math.ceil((x + this.width * this.tileWidth / 2) / this.tileWidth) - 1
+    , tileY = Math.ceil((-y + this.height * this.tileHeight / 2) / this.tileHeight) - 1;
 
   if (tileX < 0 || tileX >= this.width || tileY < 0 || tileY >= this.height) {
     // Ollaan kartan ulkopuolella, eli törmätään.

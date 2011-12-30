@@ -216,8 +216,8 @@ function Bullet(server, playerId, extraBullet) {
     if (!server.gameState.map.isColliding(this.x, this.y)) {
       break;
     }
-    this.x += Math.cos((this.angle / 180) * Math.PI);
-    this.y += Math.sin((this.angle / 180) * Math.PI);
+    this.x -= Math.cos((this.angle / 180) * Math.PI);
+    this.y -= Math.sin((this.angle / 180) * Math.PI);
   }
   // Jos mentiin edellinen for-looppi loppuun asti, niin failataan ammuksen luonti.
   if (i < 0) {
