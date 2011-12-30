@@ -16,7 +16,8 @@ var cbNetwork = require('cbNetwork')
   , colors = require('colors')
   , Map = require('./Map').Map
   , Input = require('./Input')
-  , Item = require('./Item');
+  , Item = require('./Item')
+  , Game = require('./Game');
 /**#nocode-*/
 
 /**
@@ -149,6 +150,11 @@ function Server(c) {
     new Item(this, ++itemId, ITEM.LAUNCHER);
   }
 
+  /**
+   * Sisältää palvelimella pyörivän {@link Game}-luokan instanssin
+   */
+  this.game = new Game(this);
+
   // Avataan Input
   new Input(this);
 
@@ -222,6 +228,12 @@ Server.config = {
      * @default true
      */
   , radarArrows: true
+    /**
+     * Palvelimen pelimoottorin päivitystahti, kuinka monta päivitystä per sekunti tehdään.
+     * @type Number
+     * @default 60
+     */
+  , updatesPerSec: 60
 }
 
 // EVENTTIEN DOKUMENTAATIO
@@ -288,7 +300,7 @@ Server.prototype.login = function (client) {
   playerIds = Object.keys(this.players);
   for (var i = playerIds.length; i--;) {
     var player = this.players[playerIds[i]];
-    if (player.name.toLowerCase() == nickname.toLowerCase()) {
+    if (player.name.toLowerCase() === nickname.toLowerCase()) {
       if (player.kicked || !player.active) {
         player.name = "";
       } else {
@@ -329,7 +341,7 @@ Server.prototype.login = function (client) {
       player.admin = false;
       player.kicked = false;
       player.kickReason = "";
-      if (this.gameState.gameMode == "TDM") {
+      if (this.gameState.gameMode === "TDM") {
         // UNIMPLEMENTED
         // Tasainen jako joukkueihin
         player.team = Math.floor(Math.random()*2 + 1) + 1; // Rand(1,2)
@@ -358,7 +370,7 @@ Server.prototype.login = function (client) {
       for (var j = playerIds.length; j--;) {
         var plr = this.players[playerIds[j]];
         // Lähetetään viesti kaikille muille paitsi boteille ja itselle
-        if (plr.active && !plr.zombie && (plr.playerId != player.playerId)) {
+        if (plr.active && !plr.zombie && (plr.playerId !== player.playerId)) {
           this.messages.add(plr.playerId, msgData);
         }
       }
@@ -393,7 +405,7 @@ Server.prototype.logout = function (playerId) {
   for (var i = playerIds.length; i--;) {
     var plr = this.players[playerIds[i]];
     // Lähetetään viesti kaikille muille paitsi boteille ja itselle
-    if (plr.active && !plr.zombie && (plr.playerId != playerId)) {
+    if (plr.active && !plr.zombie && (plr.playerId !== playerId)) {
       this.messages.add(plr.playerId, { msgType: NET.LOGOUT, playerId: playerId });
     }
   }

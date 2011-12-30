@@ -66,7 +66,7 @@ NetMessages.prototype.addToAll = function (data, butNotTo) {
 
   while (iterator--) {
     plr = this.server.players[playerIds[iterator]];
-    if (plr.active && !plr.zombie && (plr.playerId != butNotTo)) {
+    if (plr.active && !plr.zombie && (plr.playerId !== butNotTo)) {
       this.add(plr.playerId, data);
     }
   }
@@ -82,7 +82,7 @@ NetMessages.prototype.addToAll = function (data, butNotTo) {
 NetMessages.prototype.fetch = function (toPlayer, data) {
   var d, b;
 
-  if ('undefined' === typeof this.data[toPlayer] || this.data[toPlayer].length == 0) {
+  if ('undefined' === typeof this.data[toPlayer] || this.data[toPlayer].length === 0) {
     return false;
   }
   // Tämän viestin data laitetaan d-muuttujaan, jotta tarvitsisi kirjoittaa vähemmän.
@@ -111,7 +111,7 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
 
       case NET.NEWBULLET:
         // Uusi ammus on ammuttu
-        if (d.weapon == WPN.CHAINSAW) {
+        if (d.weapon === WPN.CHAINSAW) {
           // Moottorisahalla "ammutaan"
           data.putByte(d.msgType);
           data.putShort(d.bulletId);  // Ammuksen tunnus

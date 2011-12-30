@@ -60,7 +60,7 @@ server.on('message', function onServerMessage(client) {
 
 
   // Tarkistetaan onko pelaaja potkittu
-  if (player.kicked && player.clientId == client.id) {
+  if (player.kicked && player.clientId === client.id) {
     reply = new Packet(7);
     reply.putByte(NET.KICKED);
     reply.putByte(player.kickerId);
@@ -70,7 +70,7 @@ server.on('message', function onServerMessage(client) {
     return;
   }
 
-  if (player.clientId != client.id || !player.active) {
+  if (player.clientId !== client.id || !player.active) {
     //log.notice("Possible hack attempt from " + client.address + " Not logged in (" + currentPlayerId + ")");
     reply = new Packet(1);
     reply.putByte(NET.NOLOGIN);
