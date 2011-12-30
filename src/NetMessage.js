@@ -57,7 +57,7 @@ NetMessages.prototype.add = function (toPlayer, data) {
  */
 NetMessages.prototype.fetch = function (server, toPlayer, data) {
   var d, b;
-  
+
   if ('undefined' === typeof this.data[toPlayer] || this.data[toPlayer].length == 0) {
     return false;
   }
@@ -115,13 +115,13 @@ NetMessages.prototype.fetch = function (server, toPlayer, data) {
             data.putByte(d.msgType);
             data.putShort(d.bulletId);
             data.putByte(d.playerId);
-            
+
             // Tungetaan samaan tavuun useampi muuttuja:
             b = ((d.weapon % 16) << 0)  // Millä aseella (mod 16 ettei vie yli 4 bittiä)
               + (d.sndPlay << 4)        // Soitetaanko ääni
               + (d.handShooted << 5)    // Kummalla kädellä ammuttiin
             data.putByte(b);
-            
+
             // Ammuksen sijainti
             data.putShort(bullet.x);
             data.putShort(bullet.y);

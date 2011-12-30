@@ -166,7 +166,6 @@ function Bullet(server, playerId, extraBullet) {
   // Haetaan pelaaja joka ampui
   player = server.players[playerId];
   // Luodaan ammus
-  server.bullets.push(this);
   this.bulletId = ++server.lastBulletId;  // Ammuksen tunnus
   this.weapon = player.weapon;            // Millä aseella ammuttu
   this.playerId = playerId;               // Kuka ampui
@@ -212,8 +211,23 @@ function Bullet(server, playerId, extraBullet) {
     this.y += Math.sin((this.angle / 180) * Math.PI) * randomSpread;
   }
 
-  // UNIMPLEMENTED
   // Tarkista että onko ammus kartan sisällä ja liikuttele taaksepäin kunnes ei ole
+  for (var i = 50; i--;) {
+    if (!server.gameState.map.isColliding(this.x, this.y)) {
+      break;
+    }
+    this.x += Math.cos((this.angle / 180) * Math.PI);
+    this.y += Math.sin((this.angle / 180) * Math.PI);
+  }
+  // Jos mentiin edellinen for-looppi loppuun asti, niin failataan ammuksen luonti.
+  if (i < 0) {
+    log.warn("Player %0 tried to shoot a bullet while inside of a wall!", player.name);
+    server.lastBulletId--;
+    return;
+  }
+
+  // Lisätään palvelimen bullets-listaan tämä ammus
+  server.bullets.push(this);
 
   // Lisätään ammusviesti lähetettäväksi jokaiselle pelaajalle
   msgData = {

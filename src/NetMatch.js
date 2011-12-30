@@ -12,7 +12,8 @@ var cbNetwork = require('cbNetwork')
   , NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
   , log = require('./Utils').log
-  , colors = require('colors');
+  , colors = require('colors')
+  , Map = require('./Map').Map;
 /**#nocode-*/
 
 /**
@@ -60,9 +61,19 @@ function NetMatch(c) {
   this.gameState = {};
   this.gameState.playerCount = 0;
   this.gameState.gameMode = this.config.gameMode;
-  this.gameState.map = this.config.map;
-  this.gameState.mapCRC = -1170754068; // TODO: häx
   this.gameState.maxPlayers = this.config.maxPlayers;
+
+  // Ladataan kartta
+  this.gameState.map = new Map(this.config.map);
+  if (!this.gameState.map.loaded) {
+    log.fatal('Could not load map "%0"', this.config.map);
+    this.server.close();
+    return;
+  }
+
+  /** Sisältää kaikki kartat */
+  this.maps = {};
+  this.maps[this.gameState.map.name] = this.gameState.map;
 
   /**
    * Sisältää palvelimen pelaajat, eli luokan {@link Player} jäsenet.
@@ -74,7 +85,7 @@ function NetMatch(c) {
    * console.log( server.players[4].name );
    */
   this.players = {};
-  
+
   // Alustetaan pelaajat
   for(var i = 1; i <= this.config.maxPlayers; ++i) {
     var pl = new Player();
@@ -97,17 +108,17 @@ function NetMatch(c) {
 
     this.players[i] = pl;
   }
-  
+
   /**
    * Sisältää palvelimen ammukset, eli luokan {@link Weapon} jäsenet.
    */
   this.bullets = [];
-  
+
   /**
    * @private
    */
   this.lastBulletId = 0;
-  
+
   log.info('Server initialized successfully.');
 }
 
@@ -287,8 +298,8 @@ NetMatch.prototype.login = function (client) {
       replyData.putByte(NET.LOGINOK);
       replyData.putByte(player.playerId);
       replyData.putByte(this.gameState.gameMode);
-      replyData.putString(this.gameState.map);
-      replyData.putInt(this.gameState.mapCRC);
+      replyData.putString(this.gameState.map.name);
+      replyData.putInt(this.gameState.map.crc32);
       // UNIMPLEMENTED
       replyData.putString(" "); // Kartan URL josta sen voi ladata, mikäli se puuttuu
       client.reply(replyData);

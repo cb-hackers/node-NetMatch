@@ -267,11 +267,11 @@ server.on('message', function onServerMessage(client) {
     x: 0,
     y: 0
   });
-  
+
   // Lähetetään kaikki pelaajalle osoitetut viestit
   server.messages.fetch(server, currentPlayerId, reply);
 
-  
+
   // UNIMPLEMENTED
   // Jos on pyydetty nimilista niin palautetaan myös kaikkien tavaroiden tiedot
 
