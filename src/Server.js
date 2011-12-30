@@ -422,6 +422,10 @@ Server.prototype.close = function () {
   this.emit('closing');
   log.info('Closing server...');
   this.gameState.closing = true;
+
+  // Pysäytetään Game-moduulin päivitys
+  clearInterval(this.game.interval);
+
   var self = this;
   setTimeout(function closeServer() {
     self.server.close();
