@@ -14,7 +14,8 @@ var NET = require('./Constants').NET
 /**
  * @class
  */
-var NetMessages = function () {
+var NetMessages = function (server) {
+  this.server = server;
   /**
    * Sisältää clienteille lähetettävät viestit
    * @private
@@ -48,14 +49,37 @@ NetMessages.prototype.add = function (toPlayer, data) {
 }
 
 /**
+ * Lähettää kaikille clienteille viestin.
+ * @see NetMessages#add
+ *
+ * @param {Object} data      Pelaajalle lähetettävä data
+ * @param {Byte} [butNotTo]  Pelaajan ID, kelle EI lähetetä tätä pakettia.
+ */
+NetMessages.prototype.addToAll = function (data, butNotTo) {
+  var playerIds = Object.keys(this.server.players)
+    , plr
+    , iterator = playerIds.length;
+
+  if ('number' !== typeof butNotTo) {
+    butNotTo = 0;
+  }
+
+  while (iterator--) {
+    plr = this.server.players[playerIds[iterator]];
+    if (plr.active && !plr.zombie && (plr.playerId != butNotTo)) {
+      this.add(plr.playerId, data);
+    }
+  }
+}
+
+/**
  * Lisää data-pakettiin yksittäiselle pelaajalle kuuluvat viestit oikein jäsenneltynä.
  * Kts. cbNetwork-node toteutus luokasta <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Packet.html">Packet</a>.
  *
- * @param {Server} server  Päällä oleva NetMatch-palvelin
  * @param {Byte} toPlayer  Kenen viestit haetaan
  * @param {Packet} data    Mihin pakettiin tiedot lisätään
  */
-NetMessages.prototype.fetch = function (server, toPlayer, data) {
+NetMessages.prototype.fetch = function (toPlayer, data) {
   var d, b;
 
   if ('undefined' === typeof this.data[toPlayer] || this.data[toPlayer].length == 0) {
@@ -105,9 +129,9 @@ NetMessages.prototype.fetch = function (server, toPlayer, data) {
         } else {
           // Jokin muu kuin moottorisaha
           var bullet;
-          for (var i = server.bullets.length; i--;) {
-            if (server.bullets[i].bulletId === d.bulletId) {
-              bullet = server.bullets[i];
+          for (var i = this.server.bullets.length; i--;) {
+            if (this.server.bullets[i].bulletId === d.bulletId) {
+              bullet = this.server.bullets[i];
               break;
             }
           }

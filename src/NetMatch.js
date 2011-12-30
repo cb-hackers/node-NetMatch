@@ -6,6 +6,7 @@ var argv = require('optimist')
     .argv
   , Packet = require('cbNetwork').Packet
   , NET = require('./Constants').NET
+  , ITEM = require('./Constants').ITEM
   , Server = require('./Server')
   , log = require('./Utils').log
   , colors = require('colors')
@@ -127,8 +128,12 @@ server.on('message', function onServerMessage(client) {
         }
 
         // Poimittiinko jotain
-        if (picked > 0) {
-          // UNIMPLEMENTED
+        if (picked > 0 && server.items.hasOwnProperty(picked)) {
+          var itemType = server.items[picked].pick();
+          // Poimittiinko healthpack
+          if (itemType === ITEM.HEALTH) {
+            player.health = Math.min(100, player.health + 50);
+          }
         }
       }
       if (player.health > 0) {
@@ -268,7 +273,7 @@ server.on('message', function onServerMessage(client) {
   // Kartan vaihtaminen
 
   // Lähetetään kaikki pelaajalle osoitetut viestit
-  server.messages.fetch(server, currentPlayerId, reply);
+  server.messages.fetch(currentPlayerId, reply);
 
 
   // Jos on pyydetty nimilista niin palautetaan myös kaikkien tavaroiden tiedot

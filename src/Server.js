@@ -51,7 +51,7 @@ function Server(c) {
    * Pelaajille lähetettävät viestit. Tämä on instanssi {@link NetMessages}-luokasta.
    * @see NetMessages
    */
-  this.messages = new NetMessages();
+  this.messages = new NetMessages(this);
 
   /**
    * Asetukset tälle palvelimelle
