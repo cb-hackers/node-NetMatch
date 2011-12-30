@@ -51,9 +51,9 @@ NetMessages.prototype.add = function (toPlayer, data) {
  * Lisää data-pakettiin yksittäiselle pelaajalle kuuluvat viestit oikein jäsenneltynä.
  * Kts. cbNetwork-node toteutus luokasta <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Packet.html">Packet</a>.
  *
- * @param {NetMatch} server  Päällä oleva NetMatch-palvelin
- * @param {Byte} toPlayer    Kenen viestit haetaan
- * @param {Packet} data      Mihin pakettiin tiedot lisätään
+ * @param {Server} server  Päällä oleva NetMatch-palvelin
+ * @param {Byte} toPlayer  Kenen viestit haetaan
+ * @param {Packet} data    Mihin pakettiin tiedot lisätään
  */
 NetMessages.prototype.fetch = function (server, toPlayer, data) {
   var d, b;

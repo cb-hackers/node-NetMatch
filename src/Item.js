@@ -8,12 +8,12 @@ var log = require('./Utils').log
 /**#nocode-*/
 
 /**
- * Luo uuden tavaran ja etsii sille paikan. Lisää tavaran NetMatch.items listaan
+ * Luo uuden tavaran ja etsii sille paikan. Lisää tavaran Server.items listaan
  * @class Tavaroiden toteutus
  *
- * @param {NetMatch} server  Käynnissä oleva NetMatch-palvelin
- * @param {Byte} itemId      Tavaran tunnus
- * @param {Byte} itemType    Tavaran tyyppi, kts. {@link Constants#ITEM}
+ * @param {Server} server  Käynnissä oleva NetMatch-palvelin
+ * @param {Byte} itemId    Tavaran tunnus
+ * @param {Byte} itemType  Tavaran tyyppi, kts. {@link Constants#ITEM}
  *
  * @property {Byte} id    Tavaran tunnus
  * @property {Byte} type  Tavaran tyyppi, kts. {@link Constants#ITEM}

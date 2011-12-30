@@ -1,5 +1,5 @@
 /**
- * @fileOverview Sisältää {@link Weapon}-luokan toteutuksen sekä {@link NetMatch#bullets} kokoelman.
+ * @fileOverview Sisältää {@link Weapon}-luokan toteutuksen sekä {@link Server#bullets} kokoelman.
  */
 
 /**#nocode+*/
@@ -132,8 +132,8 @@ var Weapons = [
  *
  * @class Kaikki pelaajat, niin ihmispelaajat kuin botitkin, ovat tämän luokan jäseniä.
  *
- * @param {NetMatch} server     Palvelimen sisältävä muuttuja, instanssi luokasta {@link NetMatch}.
- * @param {Integer} playerId    Pelaajan, joka ampui ammuksen, ID
+ * @param {Server} server     Palvelimen sisältävä muuttuja, instanssi luokasta {@link Server}.
+ * @param {Integer} playerId  Pelaajan, joka ampui ammuksen, ID
  * @param {Integer} [extraBullet=0]
  *
  * @property {Short}   bulletId     Ammuksen tunnus

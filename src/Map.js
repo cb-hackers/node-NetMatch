@@ -107,8 +107,12 @@ Map.prototype.findSpot = function () {
     randTileY = rand(0, this.height - 1);
     if (!this.data[randTileY][randTileX]) {
       // Ei ollut seinän sisällä
-      returnObj.x = (randTileX * this.tileWidth) - (this.width * this.tileWidth) / 2;
-      returnObj.y = -((randTileY * this.tileHeight) - (this.height * this.tileHeight) / 2);
+      returnObj.x = (randTileX * this.tileWidth)
+                  - (this.width * this.tileWidth) / 2
+                  + this.tileWidth / 2;
+      returnObj.y = -((randTileY * this.tileHeight)
+                  - (this.height * this.tileHeight) / 2
+                  + this.tileHeight / 2);
       break;
     }
   }
