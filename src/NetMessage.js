@@ -140,7 +140,8 @@ NetMessages.prototype.fetch = function (server, toPlayer, data) {
       case NET.SERVERMSG:
         // Palvelimen generoima viesti
         data.putByte(d.msgType);
-        data.putByte(d.msgText);
+        data.putString(d.msgText);
+        break;
 
       case NET.BULLETHIT:
         // Osumaviesti

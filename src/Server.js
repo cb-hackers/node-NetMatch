@@ -13,6 +13,8 @@ var argv = require('optimist')
   , Bullet = require('./Weapon').Bullet;
 /**#nocode-*/
 
+process.title = "NetMatch server";
+
 // Tehdään uusi palvelin.
 /** @ignore */
 var server = new NetMatch({ port: argv.p, address: argv.a});
@@ -27,6 +29,15 @@ server.on('message', function onServerMessage(client) {
     , sendNames = false
     , txtMessage = ""
     , playerIds;
+
+  // Jos palvelin on sulkeutumassa, lähetetään pelaajalle siitä tieto heti
+  if (this.gameState.closing) {
+    reply = new Packet(2);
+    reply.putByte(NET.SERVERCLOSING);
+    reply.putByte(NET.END);
+    client.reply(reply);
+    return;
+  }
 
   // Jos oli uusi pelaaja
   if (msgType === NET.LOGIN) {

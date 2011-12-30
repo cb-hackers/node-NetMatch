@@ -13,7 +13,8 @@ var cbNetwork = require('cbNetwork')
   , WPN = require('./Constants').WPN
   , log = require('./Utils').log
   , colors = require('colors')
-  , Map = require('./Map').Map;
+  , Map = require('./Map').Map
+  , Input = require('./Input');
 /**#nocode-*/
 
 /**
@@ -40,7 +41,7 @@ function NetMatch(c) {
   this.server = new cbNetwork.Server(c.port, c.address);
 
   var self = this;
-  this.server.on('message', function (client) {
+  this.server.on('message', function emitMessage(client) {
     self.emit('message', client);
   });
 
@@ -67,7 +68,7 @@ function NetMatch(c) {
   this.gameState.map = new Map(this.config.map);
   if (!this.gameState.map.loaded) {
     log.fatal('Could not load map "%0"', this.config.map);
-    this.server.close();
+    this.close();
     return;
   }
 
@@ -118,6 +119,9 @@ function NetMatch(c) {
    * @private
    */
   this.lastBulletId = 0;
+
+  // Avataan Input
+  new Input(this);
 
   log.info('Server initialized successfully.');
 }
@@ -191,6 +195,7 @@ NetMatch.config = {
   , radarArrows: true
 }
 
+// EVENTTIEN DOKUMENTAATIO
 /**
  * NetMatch-palvelin emittoi tämän eventin aina kun palvelimeen tulee dataa. Tätä täytyy käyttää,
  * mikäli haluat saada palvelimen tekemäänkin jotain. Parametrina tämä antaa cbNetwork-noden
@@ -209,6 +214,17 @@ NetMatch.config = {
  *
  * @name NetMatch#message
  * @event
+ */
+/**
+ * Palvelin emittoi tämän eventin, kun sen {@link NetMatch#close}-funktiota kutsutaan.
+ * @name NetMatch#closing
+ * @event
+ */
+/**
+ * Palvelin emittoi tämän eventin, kun se on sammutettu.
+ * @name NetMatch#closed
+ * @event
+ * @see NetMatch#close
  */
 
 // NetMatch.on('message');
@@ -354,6 +370,25 @@ NetMatch.prototype.logout = function (playerId) {
       this.messages.add(plr.playerId, { msgType: NET.LOGOUT, playerId: playerId });
     }
   }
+}
+
+/**
+ * Sammuttaa palvelimen. Emittoi eventit {@link NetMatch#closing} ja {@link NetMatch#closed}
+ */
+NetMatch.prototype.close = function () {
+  if (this.gameState.closing) {
+    // Ollaan jo sulkemassa, ei aloiteta samaa prosessia uudelleen.
+    return;
+  }
+  this.emit('closing');
+  log.info('Closing server...');
+  this.gameState.closing = true;
+  var self = this;
+  setTimeout(function closeServer() {
+    self.server.close();
+    log.info('Server closed!');
+    self.emit('closed');
+  }, 2500);
 }
 
 exports = module.exports = NetMatch;
