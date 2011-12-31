@@ -42,7 +42,7 @@ function Server(port, address, debug) {
   this.server = new cbNetwork.Server(port, address);
 
   var self = this;
-  this.server.on('message', function emitMessage(client) {
+  this.server.on('message', function recvPacket(client) {
     var data = client.data
       , msgType = data.getByte()
       , currentPlayerId;
