@@ -76,6 +76,7 @@ exports = module.exports = Player;
  * @property {Integer} lag           Pelaajan lagi millisekunneissa
  * @property {Integer} spHackTimer   Viimeisimmässä nopeuden tarkistuksessa otettu Timer()
  * @property {Byte}    handShooted   Kummalla kädellä on viimeksi ammuttu (pistooli) 0=vasen 1=oikea
+ * @property {Boolean} sendNames     Pelaaja pyysi palvelimelta pelaajien nimilistaukse, lähetään kivasti myös itemien tiedot ":D"
  */
 function Player(attr) {
   // Jeejee, luodaan client.
