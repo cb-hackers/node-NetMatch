@@ -73,6 +73,26 @@ NetMessages.prototype.addToAll = function (data, butNotTo) {
 }
 
 /**
+ * Lähettää kaikille annetun joukkueen jäsenille.
+ * @see NetMessages#add
+ *
+ * @param {Byte} team    Joukkue jonka jäsenille lähetetään viesti
+ * @param {Object} data  Pelaajalle lähetettävä data
+ */
+NetMessages.prototype.addToTeam = function (team, data) {
+  var playerIds = Object.keys(this.server.players)
+    , plr
+    , iterator = playerIds.length;
+
+  while (iterator--) {
+    plr = this.server.players[playerIds[iterator]];
+    if (plr.active && !plr.zombie && (plr.team === team)) {
+      this.add(plr.playerId, data);
+    }
+  }
+}
+
+/**
  * Lisää data-pakettiin yksittäiselle pelaajalle kuuluvat viestit oikein jäsenneltynä.
  * Kts. cbNetwork-node toteutus luokasta <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Packet.html">Packet</a>.
  *

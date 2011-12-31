@@ -108,16 +108,12 @@ server.on(NET.TEXTMESSAGE, function NetTextMessage(client, player) {
     msgText: txtMessage
   };
   // Lähetetään kaikille muille paitsi boteille
-  if (plr.active && !plr.zombie) {
-    if (txtMessage.charAt(0) === '*') {
-      // Lähetetään vain omalle joukkueelle tämä viesti
-      if (plr.team === player.team) {
-        server.messages.add(plr.playerId, msgData);
-      }
-    } else {
-      // Ei ollut tähteä ekana kirjaimena, joten tämä viesit on julkinen ja lähtee kaikille.
-      server.messages.add(plr.playerId, msgData);
-    }
+  if (txtMessage.charAt(0) === '*') {
+    // Lähetetään vain omalle joukkueelle tämä viesti
+    server.messages.addToTeam(player.team, msgData);
+  } else {
+    // Ei ollut tähteä ekana kirjaimena, joten tämä viesit on julkinen ja lähtee kaikille.
+    server.messages.addToAll(msgData);
   }
 });
 
