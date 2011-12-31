@@ -63,9 +63,10 @@ server.on(NET.PLAYER, function NetPlayer(client, player) {
     // speedhack
 
     if (shooting === 1) {
-      if (argv.d) {
-        log.info('Player ' + player.name.yellow +
-        ' is shooting a new bullet from weapon ' + player.weapon);
+      if (server.debug) {
+        log.info('Player %0 is shooting a new bullet from weapon %1'
+          , player.name.yellow
+          , player.weapon);
       }
       new Bullet(server, player.playerId);
       //console.dir(this.bullets);

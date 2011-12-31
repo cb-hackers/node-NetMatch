@@ -2,57 +2,73 @@
  * @fileOverview Pitää sisällään {@link Server} nimiavaruuden.
  */
 
-// Vaatii cbNetwork, colors ja node-optimist paketit: https://github.com/substack/node-optimist
 /**#nocode+*/
 var cbNetwork = require('cbNetwork')
   , Packet = cbNetwork.Packet
-  , EventEmitter = process.EventEmitter
-  , Player = require('./Player')
-  , NetMessages = require('./NetMessage')
+  // Vakiot
   , NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
   , ITM = require('./Constants').ITM
-  , log = require('./Utils').log
-  , timer = require('./Utils').timer
+  // Helpperit
+  , log    = require('./Utils').log
+  , timer  = require('./Utils').timer
   , colors = require('colors')
-  , Map = require('./Map').Map
-  , Input = require('./Input')
-  , Item = require('./Item')
-  , Game = require('./Game')
-  , Config = require('./Config');
+  // Serverin moduulit
+  , NetMsgs = require('./NetMessage')
+  , Player  = require('./Player')
+  , Map     = require('./Map').Map
+  , Input   = require('./Input')
+  , Item    = require('./Item')
+  , Game    = require('./Game')
+  , Config  = require('./Config');
 /**#nocode-*/
+
+Server.VERSION = "v2.4";
 
 /**
  * Luo uuden palvelimen annettuun porttiin ja osoitteeseen. Kun palvelimeen tulee dataa, emittoi
- * se <i>message</i> eventin, kts. {@link Server#event:message}
+ * se siihen kuuluvan eventin paketin ensimmäisen tavun perusteella. esim. NET.LOGIN
  *
  * @class Yleiset Serverin funktiot ja ominaisuudet
  *
- * @param {Object} c            Asetukset, kts. {@link Server.config}
- * @param {Number} c.port       Portti, jota palvelin kuuntelee.
- * @param {String} [c.address]  IP-osoite, jota palvelin kuuntelee. Jos tätä ei anneta, järjestelmä
- *                              yrittää kuunnella kaikkia osoitteita.
+ * @param {Number} port            Portti, jota palvelin kuuntelee.
+ * @param {String} [address]       IP-osoite, jota palvelin kuuntelee. Jos tätä ei anneta, järjestelmä
+ *                                 yrittää kuunnella kaikkia osoitteita (0.0.0.0).
+ * @param {Boolean} [debug=false]  Spämmitäänkö konsoliin paljon "turhaa" tietoa?
  */
 function Server(port, address, debug) {
-  this.debug = debug;
+  if (this.debug = debug) { log.notice('Server running on debug mode, expect spam!'.red); }
   /**
    * cbNetwork-node UDP-palvelin
    * @type cbNetwork.Server
-   * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html" target="_blank">cbNetwork.Server</a>
+   * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html">cbNetwork.Server</a>
    */
   this.server = new cbNetwork.Server(port, address);
 
-  // Handlataan paketit
-  var self = this;
-  this.server.on('message', function recvPacket(client) {
-    self.handlePacket(client);
-  });
+  /** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */
+  this.gameState = {};
 
+  /** Sisältää kaikki kartat */
+  this.maps = {};
+
+  /** Sisältää palvelimen pelaajat, eli luokan {@link Player} jäsenet. */
+  this.players = {};
+
+  /** Sisältää palvelimen ammukset, eli luokan {@link Weapon} jäsenet. */
+  this.bullets = [];
+  /** @private */
+  this.lastBulletId = 0;
+
+  /** Sisältää palvelimella maassa olevat tavarat, kts. {@link Item}. */
+  this.items = {};
+  
+  // Alustetaan moduulit
+  
   /**
    * Pelaajille lähetettävät viestit. Tämä on instanssi {@link NetMessages}-luokasta.
    * @type NetMessages
    */
-  this.messages = new NetMessages(this);
+  this.messages = new NetMsgs(this);
 
   /**
    * Asetukset tälle palvelimelle
@@ -60,8 +76,35 @@ function Server(port, address, debug) {
    */
   this.config = new Config(this);
 
-  /** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */
-  this.gameState = {};
+  /**
+   * Sisältää palvelimella pyörivän {@link Game}-luokan instanssin
+   * @type Game
+   */
+  this.game = new Game(this);
+
+  /**
+   * Sisältää palvelimen konsoli-io:n käsittelyyn käytettävän {@link Input}-luokan instanssin
+   * @type Input
+   */
+  this.input = new Input(this);
+
+  // Alustetaan palvelin (esim. kartta, pelaajat, tavarat)
+  this.initialize();
+
+  log.info('Server initialized successfully. :O)');
+}
+
+Server.prototype.__proto__ = process.EventEmitter.prototype;
+
+/** Alustaa palvelimen */
+Server.prototype.initialize = function () {
+  // Kuunnellaan klinuja
+  var self = this;
+  this.server.on('message', function recvPacket(client) {
+    self.handlePacket(client);
+  });
+
+  // Alustetaan pelitilanne
   this.gameState.playerCount = 0;
   this.gameState.gameMode = this.config.gameMode;
   this.gameState.maxPlayers = this.config.maxPlayers;
@@ -74,20 +117,8 @@ function Server(port, address, debug) {
     return;
   }
 
-  /** Sisältää kaikki kartat */
-  this.maps = {};
+  // UNIMPLEMENTED Mappien rotaatio
   this.maps[this.gameState.map.name] = this.gameState.map;
-
-  /**
-   * Sisältää palvelimen pelaajat, eli luokan {@link Player} jäsenet.
-   * Pääset yksittäisen pelaajan dataan näin:
-   * @example
-   * // Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
-   *
-   * // Tulostaa konsoliin ID:n 4 pelaajan nimen.
-   * console.log( server.players[4].name );
-   */
-  this.players = {};
 
   // Alustetaan pelaajat
   for (var i = 1; i <= this.config.maxPlayers; ++i) {
@@ -112,21 +143,6 @@ function Server(port, address, debug) {
     this.players[i] = pl;
   }
 
-  /**
-   * Sisältää palvelimen ammukset, eli luokan {@link Weapon} jäsenet.
-   */
-  this.bullets = [];
-
-  /**
-   * @private
-   */
-  this.lastBulletId = 0;
-
-  /**
-   * Sisältää palvelimella maassa olevat tavarat, kts. {@link Item}.
-   */
-  this.items = {};
-
   // Alustetaan itemit
   var mapConfig = this.gameState.map.config;
   var itemId = 0;
@@ -148,28 +164,13 @@ function Server(port, address, debug) {
   for (var i = mapConfig.chainsawItems - 1; i--;) {
     new Item(this, ++itemId, ITM.LAUNCHER);
   }
-
-  /**
-   * Sisältää palvelimella pyörivän {@link Game}-luokan instanssin
-   * @type Game
-   */
-  this.game = new Game(this);
-
-  // Avataan Input
-  new Input(this);
-
-  log.info('Server initialized successfully.');
-}
-
-// Laajennetaan Serverin prototyyppiä EventEmitterin prototyypillä, jotta voitaisiin
-// emittoida viestejä.
-Server.prototype.__proto__ = EventEmitter.prototype;
+};
 
 /**
  * Hoitaa saapuneiden viestien käsittelyn.
  *
  * @param {cbNetwork.Client}  cbNetwork-noden Client-luokan instanssi, jolta dataa tulee.
- * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html" target="_blank">cbNetwork.Client</a>
+ * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a>
  */
 Server.prototype.handlePacket = function (client) {
   var data = client.data
@@ -243,19 +244,19 @@ Server.prototype.handlePacket = function (client) {
   }
 
   // Lähetetään dataa pelaajalle
-  this.sendData(client, player);
+  this.sendReply(client, player);
 
   // Valmis! :)
-}
+};
 
 /**
  * Hoitaa datan lähetyksen.
  *
  * @param {cbNetwork.Client} client  cbNetworkin Client-luokan instanssi
  * @param {Player} player            Pelaaja, keneltä on saatu dataa ja kenelle lähetetään vastaus tässä.
- * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html" target="_blank">cbNetwork.Client</a>
+ * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a>
  */
-Server.prototype.sendData = function (client, player) {
+Server.prototype.sendReply = function (client, player) {
   var reply = new Packet()
     , playerIds = Object.keys(this.players)
     , plr;
@@ -361,70 +362,35 @@ Server.prototype.sendData = function (client, player) {
   return;
 };
 
-// Palvelimen versio
-Server.VERSION = "v2.4"
-
-// EVENTTIEN DOKUMENTAATIO
-/**
- * NetMatch-palvelin emittoi tämän eventin aina kun palvelimeen tulee dataa. Tätä täytyy käyttää,
- * mikäli haluat saada palvelimen tekemäänkin jotain. Parametrina tämä antaa cbNetwork-noden
- * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html" target="_blank">Client</a>-luokan
- * instanssin. Katso alla oleva esimerkki, niin saat tietää lisää:
- * @example
- * // Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
- *
- * server.on('message', function (client) {
- *   // Tulostetaan clientin ID ja osoite cbNetworkin tapaan CoolBasicissa
- *   console.log(client.address + ':' + client.id);
- *
- *   // Lähetetään clientille sen lähettämä data takaisin
- *   client.reply(client.data);
- * });
- *
- * @name Server#message
- * @event
- */
-/**
- * Palvelin emittoi tämän eventin, kun sen {@link Server#close}-funktiota kutsutaan.
- * @name Server#closing
- * @event
- */
-/**
- * Palvelin emittoi tämän eventin, kun se on sammutettu.
- * @name Server#closed
- * @event
- * @see Server#close
- */
-
 /**
  * Kirjaa pelaajan sisään peliin.
  * @param {cbNetwork.Client} client  cbNetworkin Client-luokan jäsen.
  * @returns {Boolean}                Onnistuiko pelaajan liittäminen peliin vai ei.
- * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html" target="_blank">cbNetwork.Client</a>
+ * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a>
  */
 Server.prototype.login = function (client) {
   var data = client.data
-    , replyData
     , version = data.getString()
+    , replyData
     , nickname
     , playerIds
     , randomPlace;
 
   // Täsmääkö clientin ja serverin versiot
   if (version !== Server.VERSION) {
-    // Eivät täsmää, lähetetään virheilmoitus
+    log.notice('Player trying to connect with incorrect client version.');
     replyData = new Packet(3);
     replyData.putByte(NET.LOGIN);
     replyData.putByte(NET.LOGINFAILED);
     replyData.putByte(NET.WRONGVERSION);
     replyData.putString(Server.VERSION);
     client.reply(replyData);
-    return false;
+    return;
   }
 
   // Versio on OK, luetaan pelaajan nimi
   nickname = data.getString().trim();
-  log.info('Player "' + nickname + '" (' + client.address + ') is trying to connect...');
+  log.info('Player "%0" is trying to login...', nickname.green);
 
   // Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa
   playerIds = Object.keys(this.players);
@@ -435,18 +401,18 @@ Server.prototype.login = function (client) {
         player.name = "";
       } else {
         // Nimimerkki oli jo käytössä.
-        log.notice('Nickname "' + nickname + '" already in use.');
+        log.info(' -> Nickname "%0" already in use.', nickname.green);
         replyData = new Packet(3);
         replyData.putByte(NET.LOGIN);
         replyData.putByte(NET.LOGINFAILED);
         replyData.putByte(NET.NICKNAMEINUSE);
         client.reply(replyData);
-        return false;
+        return;
       }
     }
   }
 
-  // Etsitään vapaa "pelipaikka"
+  // Etsitään inaktiivinen pelaaja
   for (var i = playerIds.length; i--;) {
     var player = this.players[playerIds[i]];
     if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
@@ -488,7 +454,7 @@ Server.prototype.login = function (client) {
       // UNIMPLEMENTED
       replyData.putString(" "); // Kartan URL josta sen voi ladata, mikäli se puuttuu
       client.reply(replyData);
-      log.info(player.name + " logged in, assigned ID " + String(player.playerId).magenta);
+      log.info(' -> login successful, assigned ID (%0)', String(player.playerId).magenta);
 
       // Lisätään viestijonoon ilmoitus uudesta pelaajasta, kaikille muille paitsi boteille ja itselle.
       this.messages.addToAll({
@@ -497,19 +463,19 @@ Server.prototype.login = function (client) {
         playerId: player.playerId,
         playerId2: player.zombie
       }, player.playerId);
-      return true;
+      return;
     }
   }
 
   // Vapaita paikkoja ei ollut
-  log.notice('No free slots.');
+  log.info(' -> Server is full!');
   replyData = new Packet(3);
   replyData.putByte(NET.LOGIN);
   replyData.putByte(NET.LOGINFAILED);
   replyData.putByte(NET.TOOMANYPLAYERS);
   client.reply(replyData);
-  return false;
-}
+  return;
+};
 
 /**
  * Kirjaa pelaajan ulos pelistä.
@@ -549,6 +515,19 @@ Server.prototype.close = function () {
     log.info('Server closed!');
     self.emit('closed');
   }, 1000);
-}
+};
 
-exports = module.exports = Server;
+// Tapahtumien dokumentaatio
+/**
+ * Palvelin emittoi tämän eventin, kun sen {@link Server#close}-funktiota kutsutaan.
+ * @name Server#closing
+ * @event
+ */
+/**
+ * Palvelin emittoi tämän eventin, kun se on sammutettu.
+ * @name Server#closed
+ * @event
+ * @see Server#close
+ */
+
+module.exports = Server;
