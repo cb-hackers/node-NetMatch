@@ -1,3 +1,7 @@
+/**
+ * @fileOverview Ajettava palvelin
+ */
+
 // Vaatii cbNetwork ja node-optimist-paketin: https://github.com/substack/node-optimist
 /**#nocode+*/
 var argv = require('optimist')

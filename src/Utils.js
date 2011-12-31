@@ -10,7 +10,7 @@ var colors = require('colors')
 var Utils = {
   /**
    * Yleinen funktio lokiin/konsoliin (stdout) kirjoittamista varteen. Tämä on instanssi cbNetwork-noden
-   * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Logger.html">Logger</a>-luokasta.
+   * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Logger.html" target="_blank">Logger</a>-luokasta.
    * Voit käyttää tätä näin:
    * @example
    * var log = Utils.log;

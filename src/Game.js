@@ -21,6 +21,13 @@ function Game(server) {
 }
 
 /**
+ * Pysäyttää pelimekaniikan päivityksen.
+ */
+Game.prototype.stop = function () {
+  clearInterval(this.interval);
+}
+
+/**
  * Päivittää pelimekaniikan, mikäli viime päivityksestä on kulunut tarpeeksi aikaa ja
  * pelaajia on palvelimella. Tämän funktion kutsu hoidetaan automaattisesti.
  * @private

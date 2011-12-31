@@ -37,86 +37,14 @@ function Server(port, address, debug) {
   /**
    * cbNetwork-node UDP-palvelin
    * @type cbNetwork.Server
-   * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html">cbNetwork.Server</a>
+   * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html" target="_blank">cbNetwork.Server</a>
    */
   this.server = new cbNetwork.Server(port, address);
 
+  // Handlataan paketit
   var self = this;
   this.server.on('message', function recvPacket(client) {
-    var data = client.data
-      , msgType = data.getByte()
-      , currentPlayerId;
-    // Onko servu sammumassa?
-    if (self.gameState.closing) {
-      reply = new Packet(2);
-      reply.putByte(NET.SERVERCLOSING);
-      reply.putByte(NET.END);
-      client.reply(reply);
-      return;
-    }
-
-    if (msgType === NET.LOGIN) {
-      // Login paketissa ei ole pelaajan ID:tä vielä, joten se on käsiteltävä erikseen
-      self.emit(NET.LOGIN, client);
-      return;
-    }
-
-    // Luetaan lähetetty pelaajan ID, joka on pelaajan järjestysnumero ja aina väliltä 1...MAX_PLAYERS
-    currentPlayerId = data.getByte();
-    // Tai jos ei ole niin sitten ei päästetä sisään >:(
-    if (currentPlayerId < 1 || currentPlayerId > self.gameState.maxPlayers) {
-      log.notice('Possible hack attempt from ' + client.address + ' Invalid player ID (' + currentPlayerId + ')');
-      return;
-    }
-
-    // Haetaan pelaajan instanssi Player-luokasta
-    player = self.players[currentPlayerId];
-
-    // Tarkistetaan onko pelaaja potkittu
-    if (player.kicked && player.clientId === client.id) {
-      reply = new Packet(7);
-      reply.putByte(NET.KICKED);
-      reply.putByte(player.kickerId);
-      reply.putByte(currentPlayerId);
-      reply.putString(player.kickReason);
-      client.reply(reply);
-      return;
-    }
-    // Vielä yksi tarkistus
-    if (player.clientId !== client.id || !player.active) {
-      reply = new Packet(1);
-      reply.putByte(NET.NOLOGIN);
-      client.reply(reply);
-      return;
-    }
-
-    // Logout on erikseen, koska sen jälkeen ei varmasti tule mitään muuta
-    if (msgType === NET.LOGOUT) {
-      self.emit(NET.LOGOUT, client, currentPlayerId);
-      return;
-    }
-
-    // Lasketaan pelaajan ja serverin välinen lagi
-    player.lag = timer() - player.lastActivity;
-    // Päivitetään pelaajan olemassaolo
-    player.lastActivity = timer();
-
-    // Luupataan kaikkien pakettien läpi
-    while (msgType) {
-      /*log.info(NET[msgType]);
-      // Tuli outoa dataa, POIS!
-      if (!NET[msgType]) {
-        break;
-      }*/
-      // Lähetetään tietoa paketista käsiteltäväksi
-      self.emit(msgType, client, player);
-      msgType = data.getByte();
-    }
-
-    // Lähetetään dataa pelaajalle
-    self.sendData(client, player);
-
-    // Valmis! :)
+    self.handlePacket(client);
   });
 
   /**
@@ -237,10 +165,93 @@ function Server(port, address, debug) {
 Server.prototype.__proto__ = EventEmitter.prototype;
 
 /**
+ * Hoitaa saapuneiden viestien käsittelyn.
+ *
+ * @param {cbNetwork.Client}  cbNetwork-noden Client-luokan instanssi, jolta dataa tulee.
+ * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html" target="_blank">cbNetwork.Client</a>
+ */
+Server.prototype.handlePacket = function (client) {
+  var data = client.data
+    , msgType = data.getByte()
+    , currentPlayerId;
+  // Onko servu sammumassa?
+  if (this.gameState.closing) {
+    reply = new Packet(2);
+    reply.putByte(NET.SERVERCLOSING);
+    reply.putByte(NET.END);
+    client.reply(reply);
+    return;
+  }
+
+  if (msgType === NET.LOGIN) {
+    // Login paketissa ei ole pelaajan ID:tä vielä, joten se on käsiteltävä erikseen
+    this.emit(NET.LOGIN, client);
+    return;
+  }
+
+  // Luetaan lähetetty pelaajan ID, joka on pelaajan järjestysnumero ja aina väliltä 1...MAX_PLAYERS
+  currentPlayerId = data.getByte();
+  // Tai jos ei ole niin sitten ei päästetä sisään >:(
+  if (currentPlayerId < 1 || currentPlayerId > this.gameState.maxPlayers) {
+    log.notice('Possible hack attempt from ' + client.address + ' Invalid player ID (' + currentPlayerId + ')');
+    return;
+  }
+
+  // Haetaan pelaajan instanssi Player-luokasta
+  player = this.players[currentPlayerId];
+
+  // Tarkistetaan onko pelaaja potkittu
+  if (player.kicked && player.clientId === client.id) {
+    reply = new Packet(7);
+    reply.putByte(NET.KICKED);
+    reply.putByte(player.kickerId);
+    reply.putByte(currentPlayerId);
+    reply.putString(player.kickReason);
+    client.reply(reply);
+    return;
+  }
+  // Vielä yksi tarkistus
+  if (player.clientId !== client.id || !player.active) {
+    reply = new Packet(1);
+    reply.putByte(NET.NOLOGIN);
+    client.reply(reply);
+    return;
+  }
+
+  // Logout on erikseen, koska sen jälkeen ei varmasti tule mitään muuta
+  if (msgType === NET.LOGOUT) {
+    this.emit(NET.LOGOUT, client, currentPlayerId);
+    return;
+  }
+
+  // Lasketaan pelaajan ja serverin välinen lagi
+  player.lag = timer() - player.lastActivity;
+  // Päivitetään pelaajan olemassaolo
+  player.lastActivity = timer();
+
+  // Luupataan kaikkien pakettien läpi
+  while (msgType) {
+    /*log.info(NET[msgType]);
+    // Tuli outoa dataa, POIS!
+    if (!NET[msgType]) {
+      break;
+    }*/
+    // Lähetetään tietoa paketista käsiteltäväksi
+    this.emit(msgType, client, player);
+    msgType = data.getByte();
+  }
+
+  // Lähetetään dataa pelaajalle
+  this.sendData(client, player);
+
+  // Valmis! :)
+}
+
+/**
  * Hoitaa datan lähetyksen.
  *
- * @param {Client} client  cbNetworkin Client-luokan instanssi
- * @param {Player} player  Pelaaja, keneltä on saatu dataa ja kenelle lähetetään vastaus tässä.
+ * @param {cbNetwork.Client} client  cbNetworkin Client-luokan instanssi
+ * @param {Player} player            Pelaaja, keneltä on saatu dataa ja kenelle lähetetään vastaus tässä.
  * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html" target="_blank">cbNetwork.Client</a>
  */
 Server.prototype.sendData = function (client, player) {
@@ -362,68 +373,68 @@ Server.config = {
    * @type String
    * @default "http://netmatch.vesq.org"
    */
-  regHost: "http://netmatch.vesq.org"
+  regHost: "http://netmatch.vesq.org",
   /**
    * GSS-palvelimella oleva polku gss.php tiedostoon
    * @type String
    * @default "/reg/gss.php"
    */
-, regPath: "/reg/gss.php"
+  regPath: "/reg/gss.php",
   /**
    * Rekisteröidäänkö palvelin
    * @type Boolean
    * @default false
    */
-, register: false
+  register: false,
   /**
    * Palvelimen kuvaus, näkyy listauksessa
    * @type String
    * @default "Node.js powered server"
    */
-, description: "Node.js powered server"
+  description: "Node.js powered server",
   /**
    * Nykyinen kartta
    * @type String
    * @default "Luna"
    */
-, map: "Luna"
+  map: "Luna",
   /**
    * Maksimimäärä pelaajia
    * @type Number
    * @default 5
    */
-, maxPlayers: 5
+  maxPlayers: 5,
   /**
    * Pelimoodi, DM = 1 ja TDM = 2
    * @type Byte
    * @default 1
    */
-, gameMode: 1
+  gameMode: 1,
   /**
    * Kuinka pitkän ajan pelaajilla on suoja spawnauksen jälkeen. Aika millisekunteissa
    * @type Number
    * @default 15000
    */
-, spawnProtection: 15000
+  spawnProtection: 15000,
   /**
    * Ovatko tutkanuolet käytössä vai ei
    * @type Boolean
    * @default true
    */
-, radarArrows: true
-    /**
-     * Palvelimen pelimoottorin päivitystahti, kuinka monta päivitystä per sekunti tehdään.
-     * @type Number
-     * @default 60
-     */
-  , updatesPerSec: 60
+  radarArrows: true,
+  /**
+   * Palvelimen pelimoottorin päivitystahti, kuinka monta päivitystä per sekunti tehdään.
+   * @type Number
+   * @default 60
+   */
+  updatesPerSec: 60
 }
 
 // EVENTTIEN DOKUMENTAATIO
 /**
  * NetMatch-palvelin emittoi tämän eventin aina kun palvelimeen tulee dataa. Tätä täytyy käyttää,
  * mikäli haluat saada palvelimen tekemäänkin jotain. Parametrina tämä antaa cbNetwork-noden
- * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">Client</a>-luokan
+ * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html" target="_blank">Client</a>-luokan
  * instanssin. Katso alla oleva esimerkki, niin saat tietää lisää:
  * @example
  * // Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
@@ -453,8 +464,9 @@ Server.config = {
 
 /**
  * Kirjaa pelaajan sisään peliin.
- * @param {Client} client  cbNetworkin Client-luokan jäsen.
- * @returns {Boolean}      Onnistuiko pelaajan liittäminen peliin vai ei.
+ * @param {cbNetwork.Client} client  cbNetworkin Client-luokan jäsen.
+ * @returns {Boolean}                Onnistuiko pelaajan liittäminen peliin vai ei.
+ * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html" target="_blank">cbNetwork.Client</a>
  */
 Server.prototype.login = function (client) {
   var data = client.data
@@ -595,7 +607,7 @@ Server.prototype.close = function () {
   this.emit('closing');
 
   // Pysäytetään Game-moduulin päivitys
-  clearInterval(this.game.interval);
+  this.game.stop();
 
   var self = this;
   setTimeout(function closeServer() {
@@ -606,4 +618,3 @@ Server.prototype.close = function () {
 }
 
 exports = module.exports = Server;
-
