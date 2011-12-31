@@ -18,7 +18,8 @@ var cbNetwork = require('cbNetwork')
   , Map = require('./Map').Map
   , Input = require('./Input')
   , Item = require('./Item')
-  , Game = require('./Game');
+  , Game = require('./Game')
+  , Config = require('./Config');
 /**#nocode-*/
 
 /**
@@ -49,16 +50,15 @@ function Server(port, address, debug) {
 
   /**
    * Pelaajille lähetettävät viestit. Tämä on instanssi {@link NetMessages}-luokasta.
-   * @see NetMessages
+   * @type NetMessages
    */
   this.messages = new NetMessages(this);
 
   /**
    * Asetukset tälle palvelimelle
-   * @type Object
-   * @see Server.config
+   * @type Config
    */
-  this.config = Server.config;
+  this.config = new Config(this);
 
   /** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */
   this.gameState = {};
@@ -151,6 +151,7 @@ function Server(port, address, debug) {
 
   /**
    * Sisältää palvelimella pyörivän {@link Game}-luokan instanssin
+   * @type Game
    */
   this.game = new Game(this);
 
@@ -362,73 +363,6 @@ Server.prototype.sendData = function (client, player) {
 
 // Palvelimen versio
 Server.VERSION = "v2.4"
-
-/**
- * @namespace Sisältää NetMatch-palvelimen oletusasetukset. Näitä voi muuttaa antamalla
- * {@link Server}-konstruktorille parametrina objektin, jonka avaimet sopivat tämän muotoon.
- */
-Server.config = {
-  /**
-   * GSS-palvelimen osoite
-   * @type String
-   * @default "http://netmatch.vesq.org"
-   */
-  regHost: "http://netmatch.vesq.org",
-  /**
-   * GSS-palvelimella oleva polku gss.php tiedostoon
-   * @type String
-   * @default "/reg/gss.php"
-   */
-  regPath: "/reg/gss.php",
-  /**
-   * Rekisteröidäänkö palvelin
-   * @type Boolean
-   * @default false
-   */
-  register: false,
-  /**
-   * Palvelimen kuvaus, näkyy listauksessa
-   * @type String
-   * @default "Node.js powered server"
-   */
-  description: "Node.js powered server",
-  /**
-   * Nykyinen kartta
-   * @type String
-   * @default "Luna"
-   */
-  map: "Luna",
-  /**
-   * Maksimimäärä pelaajia
-   * @type Number
-   * @default 5
-   */
-  maxPlayers: 5,
-  /**
-   * Pelimoodi, DM = 1 ja TDM = 2
-   * @type Byte
-   * @default 1
-   */
-  gameMode: 1,
-  /**
-   * Kuinka pitkän ajan pelaajilla on suoja spawnauksen jälkeen. Aika millisekunteissa
-   * @type Number
-   * @default 15000
-   */
-  spawnProtection: 15000,
-  /**
-   * Ovatko tutkanuolet käytössä vai ei
-   * @type Boolean
-   * @default true
-   */
-  radarArrows: true,
-  /**
-   * Palvelimen pelimoottorin päivitystahti, kuinka monta päivitystä per sekunti tehdään.
-   * @type Number
-   * @default 60
-   */
-  updatesPerSec: 60
-}
 
 // EVENTTIEN DOKUMENTAATIO
 /**
