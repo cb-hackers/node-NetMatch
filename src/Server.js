@@ -11,7 +11,7 @@ var cbNetwork = require('cbNetwork')
   , NetMessages = require('./NetMessage')
   , NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
-  , ITEM = require('./Constants').ITEM
+  , ITM = require('./Constants').ITM
   , log = require('./Utils').log
   , colors = require('colors')
   , Map = require('./Map').Map
@@ -132,22 +132,22 @@ function Server(c) {
   var mapConfig = this.gameState.map.config;
   var itemId = 0;
   for (var i = mapConfig.healthItems - 1; i--;) {
-    new Item(this, ++itemId, ITEM.HEALTH);
+    new Item(this, ++itemId, ITM.HEALTH);
   }
   for (var i = mapConfig.mgunItems - 1; i--;) {
-    new Item(this, ++itemId, ITEM.AMMO);
+    new Item(this, ++itemId, ITM.AMMO);
   }
   for (var i = mapConfig.bazookaItems - 1; i--;) {
-    new Item(this, ++itemId, ITEM.ROCKET);
+    new Item(this, ++itemId, ITM.ROCKET);
   }
   for (var i = mapConfig.shotgunItems - 1; i--;) {
-    new Item(this, ++itemId, ITEM.FUEL);
+    new Item(this, ++itemId, ITM.FUEL);
   }
   for (var i = mapConfig.launcherItems - 1; i--;) {
-    new Item(this, ++itemId, ITEM.SHOTGUN);
+    new Item(this, ++itemId, ITM.SHOTGUN);
   }
   for (var i = mapConfig.chainsawItems - 1; i--;) {
-    new Item(this, ++itemId, ITEM.LAUNCHER);
+    new Item(this, ++itemId, ITM.LAUNCHER);
   }
 
   /**

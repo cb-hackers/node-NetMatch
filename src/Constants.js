@@ -361,7 +361,7 @@ var OBJ = {
 /**
  * @namespace Itemit omana kokoelmanaan eroteltuna OBJ kokoelmasta.
  */
-var ITEM = {
+var ITM = {
   /** Healthpack */
   HEALTH: 18,
 
@@ -385,4 +385,4 @@ exports.NET = NET;
 exports.WPN = WPN;
 exports.WPNF = WPNF;
 exports.OBJ = OBJ;
-exports.ITEM = ITEM;
+exports.ITM = ITM;

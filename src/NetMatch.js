@@ -1,3 +1,7 @@
+/**
+ * @fileOverview Ajettava palvelin
+ */
+
 // Vaatii cbNetwork ja node-optimist-paketin: https://github.com/substack/node-optimist
 /**#nocode+*/
 var argv = require('optimist')
@@ -6,7 +10,7 @@ var argv = require('optimist')
     .argv
   , Packet = require('cbNetwork').Packet
   , NET = require('./Constants').NET
-  , ITEM = require('./Constants').ITEM
+  , ITM = require('./Constants').ITM
   , Server = require('./Server')
   , log = require('./Utils').log
   , colors = require('colors')
@@ -131,7 +135,7 @@ server.on('message', function onServerMessage(client) {
         if (picked > 0 && server.items.hasOwnProperty(picked)) {
           var itemType = server.items[picked].pick();
           // Poimittiinko healthpack
-          if (itemType === ITEM.HEALTH) {
+          if (itemType === ITM.HEALTH) {
             player.health = Math.min(100, player.health + 50);
           }
         }

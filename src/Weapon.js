@@ -12,14 +12,28 @@ var log = require('./Utils').log
 /**#nocode-*/
 
 /**
- * @namespace Sisältää aseet ja niiden ominaisuudet
+ * @namespace Sisältää aseet ja niiden ominaisuudet. Jokaisella aseella on alla olevat kentät:
+ * <table>
+ * <tr><td>reloadTime</td><td>Latausaika</td></tr>
+ * <tr><td>bulletSpeed</td><td>Paljonko ammus liikkuu yhdessä sekunnissa</td></tr>
+ * <tr><td>bulletForth</td><td>Ammuksen lähtöpaikka pelaajan etupuolella</td></tr>
+ * <tr><td>bulletYaw</td><td>Ammuksen lähtöpaikka sivusuunnassa</td></tr>
+ * <tr><td>damage</td><td>Ammuksen aiheuttama tuho</td></tr>
+ * <tr><td>damageRange</td><td>Tuhoalueen laajuus</td></tr>
+ * <tr><td>spread</td><td>Hajonta asteina</td></tr>
+ * <tr><td>maxAmmo</td><td>Ammusten maksimimäärä</td></tr>
+ * <tr><td>pickCount</td><td>Kuinka paljon tavaraa saa poimittaessa</td></tr>
+ * <tr><td>safeRange</td><td>Etäisyys jonka alle kohteesta oleva botti ei ammu</td></tr>
+ * <tr><td>shootRange</td><td>Etäisyys jonka alle kohteesta oleva botti ampuu</td></tr>
+ * <tr><td>weight</td><td>Aseen paino, vaikuttaa liikkumisen nopeuteen. 100 = normaali</td></tr>
+ * </table>
  */
 var Weapons = [
   // Aseet alkavat vasta ID:stä 1
   null,
   /**
-   * Pistooli
-   * @name Weapons[WPN.PISTOL]
+   * Pistooli, <code>Weapons[WPN.PISTOL]</code>
+   * @name Weapons#1
    */
   {
     reloadTime: 250,
@@ -36,8 +50,8 @@ var Weapons = [
     weight: 100
   },
   /**
-   * Konekivääri
-   * @name Weapons[WPN.MGUN]
+   * Konekivääri, <code>Weapons[WPN.MGUN]</code>
+   * @name Weapons#2
    */
   {
     reloadTime: 100,
@@ -54,8 +68,8 @@ var Weapons = [
     weight: 100
   },
   /**
-   * Sinko
-   * @name Weapons[WPN.BAZOOKA]
+   * Sinko, <code>Weapons[WPN.BAZOOKA]</code>
+   * @name Weapons#3
    */
   {
     reloadTime: 1500,
@@ -72,8 +86,8 @@ var Weapons = [
     weight: 115
   },
   /**
-   * Haulikko
-   * @name Weapons[WPN.SHOTGUN]
+   * Haulikko, <code>Weapons[WPN.SHOTGUN]</code>
+   * @name Weapons#4
    */
   {
     reloadTime: 1000,
@@ -90,8 +104,8 @@ var Weapons = [
     weight: 100
   },
   /**
-   * Kranaatinlaukaisin
-   * @name Weapons[WPN.LAUNCHER]
+   * Kranaatinlaukaisin, <code>Weapons[WPN.LAUNCHER]</code>
+   * @name Weapons#5
    */
   {
     reloadTime: 1000,
@@ -108,8 +122,8 @@ var Weapons = [
     weight: 110
   },
   /**
-   * Moottorisaha
-   * @name Weapons[WPN.CHAINSAW]
+   * Moottorisaha, <code>Weapons[WPN.CHAINSAW]</code>
+   * @name Weapons#6
    */
   {
     reloadTime: 100,
@@ -130,7 +144,7 @@ var Weapons = [
 /**
  * Luo uuden ammuksen.
  *
- * @class Kaikki pelaajat, niin ihmispelaajat kuin botitkin, ovat tämän luokan jäseniä.
+ * @class Ammus
  *
  * @param {Server} server     Palvelimen sisältävä muuttuja, instanssi luokasta {@link Server}.
  * @param {Integer} playerId  Pelaajan, joka ampui ammuksen, ID

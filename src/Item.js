@@ -3,8 +3,7 @@
  */
 /**#nocode+*/
 var log = require('./Utils').log
-  , NET = require('./Constants').NET
-  , ITEM = require('./Constants').ITEM;
+  , NET = require('./Constants').NET;
 /**#nocode-*/
 
 /**
@@ -13,10 +12,10 @@ var log = require('./Utils').log
  *
  * @param {Server} server  Käynnissä oleva NetMatch-palvelin
  * @param {Byte} itemId    Tavaran tunnus
- * @param {Byte} itemType  Tavaran tyyppi, kts. {@link Constants#ITEM}
+ * @param {Byte} itemType  Tavaran tyyppi, kts. {@link ITM}
  *
  * @property {Byte} id    Tavaran tunnus
- * @property {Byte} type  Tavaran tyyppi, kts. {@link Constants#ITEM}
+ * @property {Byte} type  Tavaran tyyppi, kts. {@link ITM}
  * @property {Number} x   Tavaran sijainti
  * @property {Number} y   Tavaran sijainti
  */
@@ -39,7 +38,7 @@ function Item(server, itemId, itemType) {
 }
 
 /**
- * Siirtää tavaran toiseen paikkaan ja palauttaa siirretyn tavaran tyypin, kts. {@link Constants#ITEM}.
+ * Siirtää tavaran toiseen paikkaan ja palauttaa siirretyn tavaran tyypin, kts. {@link ITM}.
  * Lähettää kaikille clienteille tiedon uudesta sijainnista.
  *
  * @returns {Byte}  Siirretyn tavaran tyyppi

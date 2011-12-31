@@ -1,5 +1,5 @@
 /**
- * @fileOverview Viestinvälitykseen liittyvät toiminnot
+ * @fileOverview Viestien säilytykseen liittyvät toiminnot
  */
 
 /**#nocode+*/
@@ -12,7 +12,7 @@ var NET = require('./Constants').NET
 /**#nocode-*/
 
 /**
- * @class
+ * @class Viestien säilytys
  */
 var NetMessages = function (server) {
   this.server = server;
