@@ -1,0 +1,446 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview Pitää sisällään {@link Server} nimiavaruuden.
+<span class='line'>  3</span>  */</span><span class="WHIT">
+<span class='line'>  4</span> 
+<span class='line'>  5</span> </span><span class="COMM">// Vaatii cbNetwork, colors ja node-optimist paketit: https://github.com/substack/node-optimist</span><span class="WHIT">
+<span class='line'>  6</span> </span><span class="COMM">/**#nocode+*/</span><span class="WHIT">
+<span class='line'>  7</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">cbNetwork</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'cbNetwork'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>  8</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">Packet</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cbNetwork.Packet</span><span class="WHIT">
+<span class='line'>  9</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">EventEmitter</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">process.EventEmitter</span><span class="WHIT">
+<span class='line'> 10</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">Player</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Player'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 11</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">NetMessages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./NetMessage'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">NET</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Constants'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">NET</span><span class="WHIT">
+<span class='line'> 13</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">WPN</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Constants'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">WPN</span><span class="WHIT">
+<span class='line'> 14</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ITM</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Constants'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">ITM</span><span class="WHIT">
+<span class='line'> 15</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">log</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Utils'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">log</span><span class="WHIT">
+<span class='line'> 16</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">colors</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'colors'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 17</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">Map</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Map'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">Map</span><span class="WHIT">
+<span class='line'> 18</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">Input</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Input'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 19</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">Item</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Item'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 20</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">Game</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Game'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 21</span> </span><span class="COMM">/**#nocode-*/</span><span class="WHIT">
+<span class='line'> 22</span> 
+<span class='line'> 23</span> </span><span class="COMM">/**
+<span class='line'> 24</span>  * Luo uuden palvelimen annettuun porttiin ja osoitteeseen. Kun palvelimeen tulee dataa, emittoi
+<span class='line'> 25</span>  * se &lt;i>message&lt;/i> eventin, kts. {@link Server#event:message}
+<span class='line'> 26</span>  *
+<span class='line'> 27</span>  * @class Yleiset Serverin funktiot ja ominaisuudet
+<span class='line'> 28</span>  *
+<span class='line'> 29</span>  * @param {Object} c            Asetukset, kts. {@link Server.config}
+<span class='line'> 30</span>  * @param {Number} c.port       Portti, jota palvelin kuuntelee.
+<span class='line'> 31</span>  * @param {String} [c.address]  IP-osoite, jota palvelin kuuntelee. Jos tätä ei anneta, järjestelmä
+<span class='line'> 32</span>  *                              yrittää kuunnella kaikkia osoitteita.
+<span class='line'> 33</span>  */</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">Server</span><span class="PUNC">(</span><span class="NAME">c</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 35</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="PUNC">(</span><span class="STRN">'object'</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">c</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">c.hasOwnProperty</span><span class="PUNC">(</span><span class="STRN">'port'</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 36</span> </span><span class="WHIT">    </span><span class="NAME">log.fatal</span><span class="PUNC">(</span><span class="STRN">"Initialization of NetMatch server failed because of incorrect starting parameters."</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 37</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 40</span>    * cbNetwork-node UDP-palvelin
+<span class='line'> 41</span>    * @type cbNetwork.Server
+<span class='line'> 42</span>    * @see &lt;a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html">cbNetwork.Server&lt;/a>
+<span class='line'> 43</span>    */</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">  </span><span class="NAME">this.server</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">cbNetwork.Server</span><span class="PUNC">(</span><span class="NAME">c.port</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">c.address</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 45</span> 
+<span class='line'> 46</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">self</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">  </span><span class="NAME">this.server.on</span><span class="PUNC">(</span><span class="STRN">'message'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">emitMessage</span><span class="PUNC">(</span><span class="NAME">client</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT">    </span><span class="NAME">self.emit</span><span class="PUNC">(</span><span class="STRN">'message'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">client</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 50</span> 
+<span class='line'> 51</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 52</span>    * Pelaajille lähetettävät viestit. Tämä on instanssi {@link NetMessages}-luokasta.
+<span class='line'> 53</span>    * @see NetMessages
+<span class='line'> 54</span>    */</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">  </span><span class="NAME">this.messages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">NetMessages</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 56</span> 
+<span class='line'> 57</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 58</span>    * Asetukset tälle palvelimelle
+<span class='line'> 59</span>    * @type Object
+<span class='line'> 60</span>    * @see Server.config
+<span class='line'> 61</span>    */</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">  </span><span class="NAME">this.config</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Server.config</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 63</span> 
+<span class='line'> 64</span> </span><span class="WHIT">  </span><span class="COMM">/** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">  </span><span class="NAME">this.gameState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">  </span><span class="NAME">this.gameState.playerCount</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">  </span><span class="NAME">this.gameState.gameMode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.config.gameMode</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">  </span><span class="NAME">this.gameState.maxPlayers</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.config.maxPlayers</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 69</span> 
+<span class='line'> 70</span> </span><span class="WHIT">  </span><span class="COMM">// Ladataan kartta</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">  </span><span class="NAME">this.gameState.map</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Map</span><span class="PUNC">(</span><span class="NAME">this.config.map</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.gameState.map.loaded</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="NAME">log.fatal</span><span class="PUNC">(</span><span class="STRN">'Could not load map "%0"'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.config.map</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="NAME">this.close</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 77</span> 
+<span class='line'> 78</span> </span><span class="WHIT">  </span><span class="COMM">/** Sisältää kaikki kartat */</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">  </span><span class="NAME">this.maps</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">  </span><span class="NAME">this.maps</span><span class="PUNC">[</span><span class="NAME">this.gameState.map.name</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.gameState.map</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 81</span> 
+<span class='line'> 82</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 83</span>    * Sisältää palvelimen pelaajat, eli luokan {@link Player} jäsenet.
+<span class='line'> 84</span>    * Pääset yksittäisen pelaajan dataan näin:
+<span class='line'> 85</span>    * @example
+<span class='line'> 86</span>    * // Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
+<span class='line'> 87</span>    *
+<span class='line'> 88</span>    * // Tulostaa konsoliin ID:n 4 pelaajan nimen.
+<span class='line'> 89</span>    * console.log( server.players[4].name );
+<span class='line'> 90</span>    */</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">  </span><span class="NAME">this.players</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 92</span> 
+<span class='line'> 93</span> </span><span class="WHIT">  </span><span class="COMM">// Alustetaan pelaajat</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;=</span><span class="WHIT"> </span><span class="NAME">this.config.maxPlayers</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="NAME">i</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pl</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Player</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="NAME">pl.playerId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">    </span><span class="NAME">pl.active</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">    </span><span class="NAME">pl.team</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="WHIT">    </span><span class="NAME">pl.botName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"Bot_"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">    </span><span class="NAME">pl.clientId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">    </span><span class="NAME">pl.active</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">    </span><span class="NAME">pl.loggedIn</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">    </span><span class="NAME">pl.name</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">skill</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">21</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">pl.playerId</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Botteja hieman eritasoisiksi vissiinkin?</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">    </span><span class="NAME">pl.fightRotate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1.5</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">skill</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">1.5</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">    </span><span class="NAME">pl.shootingAngle</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">4.0</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">pl.playerId</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">1.5</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">    </span><span class="NAME">pl.fov</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">100</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">skill</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">3.5</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">    </span><span class="NAME">pl.hasAmmos</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">    </span><span class="NAME">pl.admin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">    </span><span class="NAME">pl.kicked</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">    </span><span class="NAME">pl.kickReason</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>112</span> 
+<span class='line'>113</span> </span><span class="WHIT">    </span><span class="NAME">this.players</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pl</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>115</span> 
+<span class='line'>116</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>117</span>    * Sisältää palvelimen ammukset, eli luokan {@link Weapon} jäsenet.
+<span class='line'>118</span>    */</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">  </span><span class="NAME">this.bullets</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>120</span> 
+<span class='line'>121</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>122</span>    * @private
+<span class='line'>123</span>    */</span><span class="WHIT">
+<span class='line'>124</span> </span><span class="WHIT">  </span><span class="NAME">this.lastBulletId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>125</span> 
+<span class='line'>126</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>127</span>    * Sisältää palvelimella maassa olevat tavarat, kts. {@link Item}.
+<span class='line'>128</span>    */</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">  </span><span class="NAME">this.items</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>130</span> 
+<span class='line'>131</span> </span><span class="WHIT">  </span><span class="COMM">// Alustetaan itemit</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">mapConfig</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.gameState.map.config</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">itemId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">mapConfig.healthItems</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">    </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Item</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="NAME">itemId</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ITM.HEALTH</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">mapConfig.mgunItems</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">    </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Item</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="NAME">itemId</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ITM.AMMO</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">mapConfig.bazookaItems</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">    </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Item</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="NAME">itemId</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ITM.ROCKET</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">mapConfig.shotgunItems</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="WHIT">    </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Item</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="NAME">itemId</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ITM.FUEL</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">mapConfig.launcherItems</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">    </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Item</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="NAME">itemId</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ITM.SHOTGUN</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">mapConfig.chainsawItems</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="WHIT">    </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Item</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">++</span><span class="NAME">itemId</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">ITM.LAUNCHER</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>151</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>152</span> 
+<span class='line'>153</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>154</span>    * Sisältää palvelimella pyörivän {@link Game}-luokan instanssin
+<span class='line'>155</span>    */</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT">  </span><span class="NAME">this.game</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Game</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>157</span> 
+<span class='line'>158</span> </span><span class="WHIT">  </span><span class="COMM">// Avataan Input</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">  </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Input</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>160</span> 
+<span class='line'>161</span> </span><span class="WHIT">  </span><span class="NAME">log.info</span><span class="PUNC">(</span><span class="STRN">'Server initialized successfully.'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>162</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>163</span> 
+<span class='line'>164</span> </span><span class="COMM">// Laajennetaan Serverin prototyyppiä EventEmitterin prototyypillä, jotta voitaisiin</span><span class="WHIT">
+<span class='line'>165</span> </span><span class="COMM">// emittoida viestejä.</span><span class="WHIT">
+<span class='line'>166</span> </span><span class="NAME">Server.prototype.__proto__</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">EventEmitter.prototype</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>167</span> 
+<span class='line'>168</span> 
+<span class='line'>169</span> </span><span class="COMM">// Palvelimen versio</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="NAME">Server.VERSION</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"v2.4"</span><span class="WHIT">
+<span class='line'>171</span> 
+<span class='line'>172</span> </span><span class="COMM">/**
+<span class='line'>173</span>  * @namespace Sisältää NetMatch-palvelimen oletusasetukset. Näitä voi muuttaa antamalla
+<span class='line'>174</span>  * {@link Server}-konstruktorille parametrina objektin, jonka avaimet sopivat tämän muotoon.
+<span class='line'>175</span>  */</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="NAME">Server.config</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>178</span>      * GSS-palvelimen osoite
+<span class='line'>179</span>      * @type String
+<span class='line'>180</span>      * @default "http://netmatch.vesq.org"
+<span class='line'>181</span>      */</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">    </span><span class="NAME">regHost</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"http://netmatch.vesq.org"</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>184</span>      * GSS-palvelimella oleva polku gss.php tiedostoon
+<span class='line'>185</span>      * @type String
+<span class='line'>186</span>      * @default "/reg/gss.php"
+<span class='line'>187</span>      */</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">regPath</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"/reg/gss.php"</span><span class="WHIT">
+<span class='line'>189</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>190</span>      * Rekisteröidäänkö palvelin
+<span class='line'>191</span>      * @type Boolean
+<span class='line'>192</span>      * @default false
+<span class='line'>193</span>      */</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">register</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>196</span>      * Palvelimen kuvaus, näkyy listauksessa
+<span class='line'>197</span>      * @type String
+<span class='line'>198</span>      * @default "Node.js powered server"
+<span class='line'>199</span>      */</span><span class="WHIT">
+<span class='line'>200</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">description</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"Node.js powered server"</span><span class="WHIT">
+<span class='line'>201</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>202</span>      * Nykyinen kartta
+<span class='line'>203</span>      * @type String
+<span class='line'>204</span>      * @default "Luna"
+<span class='line'>205</span>      */</span><span class="WHIT">
+<span class='line'>206</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">map</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"Luna"</span><span class="WHIT">
+<span class='line'>207</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>208</span>      * Maksimimäärä pelaajia
+<span class='line'>209</span>      * @type Number
+<span class='line'>210</span>      * @default 5
+<span class='line'>211</span>      */</span><span class="WHIT">
+<span class='line'>212</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">maxPlayers</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">5</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>214</span>      * Pelimoodi, DM = 1 ja TDM = 2
+<span class='line'>215</span>      * @type Byte
+<span class='line'>216</span>      * @default 1
+<span class='line'>217</span>      */</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">gameMode</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>220</span>      * Kuinka pitkän ajan pelaajilla on suoja spawnauksen jälkeen. Aika millisekunteissa
+<span class='line'>221</span>      * @type Number
+<span class='line'>222</span>      * @default 15000
+<span class='line'>223</span>      */</span><span class="WHIT">
+<span class='line'>224</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">spawnProtection</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">15000</span><span class="WHIT">
+<span class='line'>225</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>226</span>      * Ovatko tutkanuolet käytössä vai ei
+<span class='line'>227</span>      * @type Boolean
+<span class='line'>228</span>      * @default true
+<span class='line'>229</span>      */</span><span class="WHIT">
+<span class='line'>230</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">radarArrows</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="WHIT">
+<span class='line'>231</span> </span><span class="WHIT">    </span><span class="COMM">/**
+<span class='line'>232</span>      * Palvelimen pelimoottorin päivitystahti, kuinka monta päivitystä per sekunti tehdään.
+<span class='line'>233</span>      * @type Number
+<span class='line'>234</span>      * @default 60
+<span class='line'>235</span>      */</span><span class="WHIT">
+<span class='line'>236</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">updatesPerSec</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">60</span><span class="WHIT">
+<span class='line'>237</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>238</span> 
+<span class='line'>239</span> </span><span class="COMM">// EVENTTIEN DOKUMENTAATIO</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="COMM">/**
+<span class='line'>241</span>  * NetMatch-palvelin emittoi tämän eventin aina kun palvelimeen tulee dataa. Tätä täytyy käyttää,
+<span class='line'>242</span>  * mikäli haluat saada palvelimen tekemäänkin jotain. Parametrina tämä antaa cbNetwork-noden
+<span class='line'>243</span>  * &lt;a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">Client&lt;/a>-luokan
+<span class='line'>244</span>  * instanssin. Katso alla oleva esimerkki, niin saat tietää lisää:
+<span class='line'>245</span>  * @example
+<span class='line'>246</span>  * // Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
+<span class='line'>247</span>  *
+<span class='line'>248</span>  * server.on('message', function (client) {
+<span class='line'>249</span>  *   // Tulostetaan clientin ID ja osoite cbNetworkin tapaan CoolBasicissa
+<span class='line'>250</span>  *   console.log(client.address + ':' + client.id);
+<span class='line'>251</span>  *
+<span class='line'>252</span>  *   // Lähetetään clientille sen lähettämä data takaisin
+<span class='line'>253</span>  *   client.reply(client.data);
+<span class='line'>254</span>  * });
+<span class='line'>255</span>  *
+<span class='line'>256</span>  * @name Server#message
+<span class='line'>257</span>  * @event
+<span class='line'>258</span>  */</span><span class="WHIT">
+<span class='line'>259</span> </span><span class="COMM">/**
+<span class='line'>260</span>  * Palvelin emittoi tämän eventin, kun sen {@link Server#close}-funktiota kutsutaan.
+<span class='line'>261</span>  * @name Server#closing
+<span class='line'>262</span>  * @event
+<span class='line'>263</span>  */</span><span class="WHIT">
+<span class='line'>264</span> </span><span class="COMM">/**
+<span class='line'>265</span>  * Palvelin emittoi tämän eventin, kun se on sammutettu.
+<span class='line'>266</span>  * @name Server#closed
+<span class='line'>267</span>  * @event
+<span class='line'>268</span>  * @see Server#close
+<span class='line'>269</span>  */</span><span class="WHIT">
+<span class='line'>270</span> 
+<span class='line'>271</span> </span><span class="COMM">/**
+<span class='line'>272</span>  * Kirjaa pelaajan sisään peliin.
+<span class='line'>273</span>  * @param {Client} client  cbNetworkin Client-luokan jäsen.
+<span class='line'>274</span>  * @returns {Boolean}      Onnistuiko pelaajan liittäminen peliin vai ei.
+<span class='line'>275</span>  */</span><span class="WHIT">
+<span class='line'>276</span> </span><span class="NAME">Server.prototype.login</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">client</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>277</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">client.data</span><span class="WHIT">
+<span class='line'>278</span> </span><span class="WHIT">    </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">replyData</span><span class="WHIT">
+<span class='line'>279</span> </span><span class="WHIT">    </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">version</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">data.getString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>280</span> </span><span class="WHIT">    </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">nickname</span><span class="WHIT">
+<span class='line'>281</span> </span><span class="WHIT">    </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">playerIds</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>282</span> 
+<span class='line'>283</span> </span><span class="WHIT">  </span><span class="COMM">// Täsmääkö clientin ja serverin versiot</span><span class="WHIT">
+<span class='line'>284</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">version</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">Server.VERSION</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>285</span> </span><span class="WHIT">    </span><span class="COMM">// Eivät täsmää, lähetetään virheilmoitus</span><span class="WHIT">
+<span class='line'>286</span> </span><span class="WHIT">    </span><span class="NAME">replyData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Packet</span><span class="PUNC">(</span><span class="NUMB">3</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>287</span> </span><span class="WHIT">    </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.LOGIN</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>288</span> </span><span class="WHIT">    </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.LOGINFAILED</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>289</span> </span><span class="WHIT">    </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.WRONGVERSION</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>290</span> </span><span class="WHIT">    </span><span class="NAME">replyData.putString</span><span class="PUNC">(</span><span class="NAME">Server.VERSION</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>291</span> </span><span class="WHIT">    </span><span class="NAME">client.reply</span><span class="PUNC">(</span><span class="NAME">replyData</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>292</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>293</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>294</span> 
+<span class='line'>295</span> </span><span class="WHIT">  </span><span class="COMM">// Versio on OK, luetaan pelaajan nimi</span><span class="WHIT">
+<span class='line'>296</span> </span><span class="WHIT">  </span><span class="NAME">nickname</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">data.getString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">trim</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>297</span> </span><span class="WHIT">  </span><span class="NAME">log.info</span><span class="PUNC">(</span><span class="STRN">'Player "'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">nickname</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'" ('</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">client.address</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">') is trying to connect...'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>298</span> 
+<span class='line'>299</span> </span><span class="WHIT">  </span><span class="COMM">// Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa</span><span class="WHIT">
+<span class='line'>300</span> </span><span class="WHIT">  </span><span class="NAME">playerIds</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Object.keys</span><span class="PUNC">(</span><span class="NAME">this.players</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">playerIds.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>302</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">player</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.players</span><span class="PUNC">[</span><span class="NAME">playerIds</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>303</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">player.name.toLowerCase</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">nickname.toLowerCase</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>304</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">player.kicked</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">player.active</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>305</span> </span><span class="WHIT">        </span><span class="NAME">player.name</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>306</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>307</span> </span><span class="WHIT">        </span><span class="COMM">// Nimimerkki oli jo käytössä.</span><span class="WHIT">
+<span class='line'>308</span> </span><span class="WHIT">        </span><span class="NAME">log.notice</span><span class="PUNC">(</span><span class="STRN">'Nickname "'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">nickname</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'" already in use.'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>309</span> </span><span class="WHIT">        </span><span class="NAME">replyData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Packet</span><span class="PUNC">(</span><span class="NUMB">3</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>310</span> </span><span class="WHIT">        </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.LOGIN</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>311</span> </span><span class="WHIT">        </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.LOGINFAILED</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>312</span> </span><span class="WHIT">        </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.NICKNAMEINUSE</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>313</span> </span><span class="WHIT">        </span><span class="NAME">client.reply</span><span class="PUNC">(</span><span class="NAME">replyData</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>314</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>315</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>316</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>317</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>318</span> 
+<span class='line'>319</span> </span><span class="WHIT">  </span><span class="COMM">// Etsitään vapaa "pelipaikka"</span><span class="WHIT">
+<span class='line'>320</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">playerIds.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>321</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">player</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.players</span><span class="PUNC">[</span><span class="NAME">playerIds</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>322</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.gameState.playerCount</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.config.maxPlayers</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">player.active</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>323</span> </span><span class="WHIT">      </span><span class="COMM">// Tyhjä paikka löytyi</span><span class="WHIT">
+<span class='line'>324</span> </span><span class="WHIT">      </span><span class="NAME">player.clientId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">client.id</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>325</span> </span><span class="WHIT">      </span><span class="NAME">player.active</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>326</span> </span><span class="WHIT">      </span><span class="NAME">player.loggedIn</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>327</span> </span><span class="WHIT">      </span><span class="NAME">player.name</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">nickname</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>328</span> </span><span class="WHIT">      </span><span class="COMM">// UNIMPLEMENTED</span><span class="WHIT">
+<span class='line'>329</span> </span><span class="WHIT">      </span><span class="NAME">player.x</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.round</span><span class="PUNC">(</span><span class="PUNC">-</span><span class="NUMB">100</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">Math.random</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">200</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>330</span> </span><span class="WHIT">      </span><span class="NAME">player.y</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.round</span><span class="PUNC">(</span><span class="PUNC">-</span><span class="NUMB">100</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">Math.random</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">200</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>331</span> </span><span class="WHIT">      </span><span class="NAME">player.hackTestX</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">player.x</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>332</span> </span><span class="WHIT">      </span><span class="NAME">player.hackTestY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">player.y</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>333</span> </span><span class="WHIT">      </span><span class="NAME">player.angle</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.floor</span><span class="PUNC">(</span><span class="NAME">Math.random</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">360</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>334</span> </span><span class="WHIT">      </span><span class="NAME">player.zombie</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>335</span> </span><span class="WHIT">      </span><span class="NAME">player.health</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">100</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>336</span> </span><span class="WHIT">      </span><span class="NAME">player.kills</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>337</span> </span><span class="WHIT">      </span><span class="NAME">player.deaths</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>338</span> </span><span class="WHIT">      </span><span class="NAME">player.weapon</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">WPN.PISTOL</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>339</span> </span><span class="WHIT">      </span><span class="NAME">player.lastActivity</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>340</span> </span><span class="WHIT">      </span><span class="NAME">player.spawnTime</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">player.lastActivity</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>341</span> </span><span class="WHIT">      </span><span class="NAME">player.admin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>342</span> </span><span class="WHIT">      </span><span class="NAME">player.kicked</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>343</span> </span><span class="WHIT">      </span><span class="NAME">player.kickReason</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>344</span> </span><span class="WHIT">      </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.gameState.gameMode</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">"TDM"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>345</span> </span><span class="WHIT">        </span><span class="COMM">// UNIMPLEMENTED</span><span class="WHIT">
+<span class='line'>346</span> </span><span class="WHIT">        </span><span class="COMM">// Tasainen jako joukkueihin</span><span class="WHIT">
+<span class='line'>347</span> </span><span class="WHIT">        </span><span class="NAME">player.team</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.floor</span><span class="PUNC">(</span><span class="NAME">Math.random</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="NUMB">2</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Rand(1,2)</span><span class="WHIT">
+<span class='line'>348</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>349</span> 
+<span class='line'>350</span> </span><span class="WHIT">      </span><span class="COMM">// Lähetetään vastaus clientille</span><span class="WHIT">
+<span class='line'>351</span> </span><span class="WHIT">      </span><span class="NAME">replyData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Packet</span><span class="PUNC">(</span><span class="NUMB">16</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>352</span> </span><span class="WHIT">      </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.LOGIN</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>353</span> </span><span class="WHIT">      </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.LOGINOK</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>354</span> </span><span class="WHIT">      </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">player.playerId</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>355</span> </span><span class="WHIT">      </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">this.gameState.gameMode</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>356</span> </span><span class="WHIT">      </span><span class="NAME">replyData.putString</span><span class="PUNC">(</span><span class="NAME">this.gameState.map.name</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>357</span> </span><span class="WHIT">      </span><span class="NAME">replyData.putInt</span><span class="PUNC">(</span><span class="NAME">this.gameState.map.crc32</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>358</span> </span><span class="WHIT">      </span><span class="COMM">// UNIMPLEMENTED</span><span class="WHIT">
+<span class='line'>359</span> </span><span class="WHIT">      </span><span class="NAME">replyData.putString</span><span class="PUNC">(</span><span class="STRN">" "</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Kartan URL josta sen voi ladata, mikäli se puuttuu</span><span class="WHIT">
+<span class='line'>360</span> </span><span class="WHIT">      </span><span class="NAME">client.reply</span><span class="PUNC">(</span><span class="NAME">replyData</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>361</span> </span><span class="WHIT">      </span><span class="NAME">log.info</span><span class="PUNC">(</span><span class="NAME">player.name</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">" logged in, assigned ID "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">String</span><span class="PUNC">(</span><span class="NAME">player.playerId</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">magenta</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>362</span> 
+<span class='line'>363</span> </span><span class="WHIT">      </span><span class="COMM">// Lisätään viestijonoon ilmoitus uudesta pelaajasta</span><span class="WHIT">
+<span class='line'>364</span> </span><span class="WHIT">      </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">msgData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>365</span> </span><span class="WHIT">        </span><span class="NAME">msgType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">NET.LOGIN</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>366</span> </span><span class="WHIT">        </span><span class="NAME">msgText</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">nickname</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>367</span> </span><span class="WHIT">        </span><span class="NAME">playerId</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">player.playerId</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>368</span> </span><span class="WHIT">        </span><span class="NAME">playerId2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">player.zombie</span><span class="WHIT">
+<span class='line'>369</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>370</span> </span><span class="WHIT">      </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">playerIds.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">j</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>371</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">plr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.players</span><span class="PUNC">[</span><span class="NAME">playerIds</span><span class="PUNC">[</span><span class="NAME">j</span><span class="PUNC">]</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>372</span> </span><span class="WHIT">        </span><span class="COMM">// Lähetetään viesti kaikille muille paitsi boteille ja itselle</span><span class="WHIT">
+<span class='line'>373</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">plr.active</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">plr.zombie</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">plr.playerId</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">player.playerId</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>374</span> </span><span class="WHIT">          </span><span class="NAME">this.messages.add</span><span class="PUNC">(</span><span class="NAME">plr.playerId</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">msgData</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>375</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>376</span> </span><span class="WHIT">      </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>377</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>378</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>379</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>380</span> 
+<span class='line'>381</span> </span><span class="WHIT">  </span><span class="COMM">// Vapaita paikkoja ei ollut</span><span class="WHIT">
+<span class='line'>382</span> </span><span class="WHIT">  </span><span class="NAME">log.notice</span><span class="PUNC">(</span><span class="STRN">'No free slots.'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>383</span> </span><span class="WHIT">  </span><span class="NAME">replyData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Packet</span><span class="PUNC">(</span><span class="NUMB">3</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>384</span> </span><span class="WHIT">  </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.LOGIN</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>385</span> </span><span class="WHIT">  </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.LOGINFAILED</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>386</span> </span><span class="WHIT">  </span><span class="NAME">replyData.putByte</span><span class="PUNC">(</span><span class="NAME">NET.TOOMANYPLAYERS</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>387</span> </span><span class="WHIT">  </span><span class="NAME">client.reply</span><span class="PUNC">(</span><span class="NAME">replyData</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>388</span> </span><span class="WHIT">  </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>389</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>390</span> 
+<span class='line'>391</span> </span><span class="COMM">/**
+<span class='line'>392</span>  * Kirjaa pelaajan ulos pelistä.
+<span class='line'>393</span>  * @param {Integer} playerId  Pelaajan ID.
+<span class='line'>394</span>  */</span><span class="WHIT">
+<span class='line'>395</span> </span><span class="NAME">Server.prototype.logout</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">playerId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>396</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">player</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.players</span><span class="PUNC">[</span><span class="NAME">playerId</span><span class="PUNC">]</span><span class="WHIT">
+<span class='line'>397</span> </span><span class="WHIT">    </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">playerIds</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Object.keys</span><span class="PUNC">(</span><span class="NAME">this.players</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>398</span> 
+<span class='line'>399</span> </span><span class="WHIT">  </span><span class="NAME">player.active</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>400</span> </span><span class="WHIT">  </span><span class="NAME">player.loggedIn</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>401</span> </span><span class="WHIT">  </span><span class="NAME">player.admin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>402</span> </span><span class="WHIT">  </span><span class="NAME">log.info</span><span class="PUNC">(</span><span class="NAME">player.name</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">' logged out.'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>403</span> 
+<span class='line'>404</span> </span><span class="WHIT">  </span><span class="COMM">// Lähetetään viesti kaikille muille paitsi boteille</span><span class="WHIT">
+<span class='line'>405</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">playerIds.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">--</span><span class="PUNC">;</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>406</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">plr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.players</span><span class="PUNC">[</span><span class="NAME">playerIds</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>407</span> </span><span class="WHIT">    </span><span class="COMM">// Lähetetään viesti kaikille muille paitsi boteille ja itselle</span><span class="WHIT">
+<span class='line'>408</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">plr.active</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">plr.zombie</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">plr.playerId</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="NAME">playerId</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>409</span> </span><span class="WHIT">      </span><span class="NAME">this.messages.add</span><span class="PUNC">(</span><span class="NAME">plr.playerId</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">msgType</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">NET.LOGOUT</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">playerId</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">playerId</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>410</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>411</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>412</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>413</span> 
+<span class='line'>414</span> </span><span class="COMM">/**
+<span class='line'>415</span>  * Sammuttaa palvelimen. Emittoi eventit {@link Server#closing} ja {@link Server#closed}
+<span class='line'>416</span>  */</span><span class="WHIT">
+<span class='line'>417</span> </span><span class="NAME">Server.prototype.close</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>418</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.gameState.closing</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>419</span> </span><span class="WHIT">    </span><span class="COMM">// Ollaan jo sulkemassa, ei aloiteta samaa prosessia uudelleen.</span><span class="WHIT">
+<span class='line'>420</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>421</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>422</span> </span><span class="WHIT">  </span><span class="NAME">this.emit</span><span class="PUNC">(</span><span class="STRN">'closing'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>423</span> </span><span class="WHIT">  </span><span class="NAME">log.info</span><span class="PUNC">(</span><span class="STRN">'Closing server...'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>424</span> </span><span class="WHIT">  </span><span class="NAME">this.gameState.closing</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>425</span> 
+<span class='line'>426</span> </span><span class="WHIT">  </span><span class="COMM">// Pysäytetään Game-moduulin päivitys</span><span class="WHIT">
+<span class='line'>427</span> </span><span class="WHIT">  </span><span class="NAME">clearInterval</span><span class="PUNC">(</span><span class="NAME">this.game.interval</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>428</span> 
+<span class='line'>429</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">self</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>430</span> </span><span class="WHIT">  </span><span class="NAME">setTimeout</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">closeServer</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>431</span> </span><span class="WHIT">    </span><span class="NAME">self.server.close</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>432</span> </span><span class="WHIT">    </span><span class="NAME">log.info</span><span class="PUNC">(</span><span class="STRN">'Server closed!'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>433</span> </span><span class="WHIT">    </span><span class="NAME">self.emit</span><span class="PUNC">(</span><span class="STRN">'closed'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>434</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">1000</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>435</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>436</span> 
+<span class='line'>437</span> </span><span class="NAME">exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">module.exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Server</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>438</span> 
+<span class='line'>439</span> </span></pre></body></html>

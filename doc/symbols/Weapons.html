@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
-		<title>WPN | JsDoc Reference</title>
+		<title>Weapons | JsDoc Reference</title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta name="mobileoptimized" content="0" />
@@ -88,12 +88,26 @@
 			<header>
 				<h1 class="classTitle">
 					
-					Namespace <span>WPN</span>
+					Namespace <span>Weapons</span>
 				</h1>
 				
 				<div class="intro">
 					<p class="description summary">
-						Aseet
+						Sisältää aseet ja niiden ominaisuudet. Jokaisella aseella on alla olevat kentät:
+<table>
+<tr><td>reloadTime</td><td>Latausaika</td></tr>
+<tr><td>bulletSpeed</td><td>Paljonko ammus liikkuu yhdessä sekunnissa</td></tr>
+<tr><td>bulletForth</td><td>Ammuksen lähtöpaikka pelaajan etupuolella</td></tr>
+<tr><td>bulletYaw</td><td>Ammuksen lähtöpaikka sivusuunnassa</td></tr>
+<tr><td>damage</td><td>Ammuksen aiheuttama tuho</td></tr>
+<tr><td>damageRange</td><td>Tuhoalueen laajuus</td></tr>
+<tr><td>spread</td><td>Hajonta asteina</td></tr>
+<tr><td>maxAmmo</td><td>Ammusten maksimimäärä</td></tr>
+<tr><td>pickCount</td><td>Kuinka paljon tavaraa saa poimittaessa</td></tr>
+<tr><td>safeRange</td><td>Etäisyys jonka alle kohteesta oleva botti ei ammu</td></tr>
+<tr><td>shootRange</td><td>Etäisyys jonka alle kohteesta oleva botti ampuu</td></tr>
+<tr><td>weight</td><td>Aseen paino, vaikuttaa liikkumisen nopeuteen. 100 = normaali</td></tr>
+</table>
 					</p>
 						
 					
@@ -101,7 +115,7 @@
 							
 							
 							
-								<li>Defined in: <a href="../symbols/src/src_nm_Constants.js.html">Constants.js</a></li>
+								<li>Defined in: <a href="../symbols/src/src_nm_Weapon.js.html">Weapon.js</a></li>
 							
 							
 						</ul>
@@ -117,7 +131,7 @@
 					
 						<nav>
 							<div class="props">
-								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class WPN.">
+								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Weapons.">
 									<caption class="sectionTitle">Field Summary</caption>
 									
 									<thead>
@@ -130,72 +144,62 @@
 									<tbody>
 										
 											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													WPN.<b><a href="../symbols/WPN.html#.BAZOOKA">BAZOOKA</a></b>
+													<b><a href="../symbols/Weapons.html#1">1</a></b>
 													</div>
-													<div class="description">Sinko</div>
+													<div class="description">Pistooli, <code>Weapons[WPN.PISTOL]</code></div>
 												</td>
 											</tr>
 										
 											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													WPN.<b><a href="../symbols/WPN.html#.CHAINSAW">CHAINSAW</a></b>
+													<b><a href="../symbols/Weapons.html#2">2</a></b>
 													</div>
-													<div class="description">Moottorisaha</div>
+													<div class="description">Konekivääri, <code>Weapons[WPN.MGUN]</code></div>
 												</td>
 											</tr>
 										
 											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													WPN.<b><a href="../symbols/WPN.html#.COUNT">COUNT</a></b>
+													<b><a href="../symbols/Weapons.html#3">3</a></b>
 													</div>
-													<div class="description">Aseiden lukumäärä</div>
+													<div class="description">Sinko, <code>Weapons[WPN.BAZOOKA]</code></div>
 												</td>
 											</tr>
 										
 											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													WPN.<b><a href="../symbols/WPN.html#.LAUNCHER">LAUNCHER</a></b>
+													<b><a href="../symbols/Weapons.html#4">4</a></b>
 													</div>
-													<div class="description">Kranaatinlaukaisin</div>
+													<div class="description">Haulikko, <code>Weapons[WPN.SHOTGUN]</code></div>
 												</td>
 											</tr>
 										
 											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													WPN.<b><a href="../symbols/WPN.html#.MGUN">MGUN</a></b>
+													<b><a href="../symbols/Weapons.html#5">5</a></b>
 													</div>
-													<div class="description">Konepistooli</div>
+													<div class="description">Kranaatinlaukaisin, <code>Weapons[WPN.LAUNCHER]</code></div>
 												</td>
 											</tr>
 										
 											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													WPN.<b><a href="../symbols/WPN.html#.PISTOL">PISTOL</a></b>
+													<b><a href="../symbols/Weapons.html#6">6</a></b>
 													</div>
-													<div class="description">Pistooli</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													WPN.<b><a href="../symbols/WPN.html#.SHOTGUN">SHOTGUN</a></b>
-													</div>
-													<div class="description">Haulikko</div>
+													<div class="description">Moottorisaha, <code>Weapons[WPN.CHAINSAW]</code></div>
 												</td>
 											</tr>
 										
@@ -233,18 +237,18 @@
 							</h2>
 							
 							
-								<div class="fixedFont heading" id=".BAZOOKA">
+								<div class="fixedFont heading" id="1">
 									<span class='lighter'>
-									&lt;static&gt; 
+									
 									</span>
 									
 									
 									
-									<span class="light">WPN.</span><b>BAZOOKA</b>							
+									<b>1</b>							
 								</div>
 								
 								<div class="description">
-									Sinko
+									Pistooli, <code>Weapons[WPN.PISTOL]</code>
 									
 									
 									
@@ -255,18 +259,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".CHAINSAW">
+								<div class="fixedFont heading" id="2">
 									<span class='lighter'>
-									&lt;static&gt; 
+									
 									</span>
 									
 									
 									
-									<span class="light">WPN.</span><b>CHAINSAW</b>							
+									<b>2</b>							
 								</div>
 								
 								<div class="description">
-									Moottorisaha
+									Konekivääri, <code>Weapons[WPN.MGUN]</code>
 									
 									
 									
@@ -277,18 +281,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".COUNT">
+								<div class="fixedFont heading" id="3">
 									<span class='lighter'>
-									&lt;static&gt; 
+									
 									</span>
 									
 									
 									
-									<span class="light">WPN.</span><b>COUNT</b>							
+									<b>3</b>							
 								</div>
 								
 								<div class="description">
-									Aseiden lukumäärä
+									Sinko, <code>Weapons[WPN.BAZOOKA]</code>
 									
 									
 									
@@ -299,18 +303,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".LAUNCHER">
+								<div class="fixedFont heading" id="4">
 									<span class='lighter'>
-									&lt;static&gt; 
+									
 									</span>
 									
 									
 									
-									<span class="light">WPN.</span><b>LAUNCHER</b>							
+									<b>4</b>							
 								</div>
 								
 								<div class="description">
-									Kranaatinlaukaisin
+									Haulikko, <code>Weapons[WPN.SHOTGUN]</code>
 									
 									
 									
@@ -321,18 +325,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".MGUN">
+								<div class="fixedFont heading" id="5">
 									<span class='lighter'>
-									&lt;static&gt; 
+									
 									</span>
 									
 									
 									
-									<span class="light">WPN.</span><b>MGUN</b>							
+									<b>5</b>							
 								</div>
 								
 								<div class="description">
-									Konepistooli
+									Kranaatinlaukaisin, <code>Weapons[WPN.LAUNCHER]</code>
 									
 									
 									
@@ -343,40 +347,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".PISTOL">
+								<div class="fixedFont heading" id="6">
 									<span class='lighter'>
-									&lt;static&gt; 
+									
 									</span>
 									
 									
 									
-									<span class="light">WPN.</span><b>PISTOL</b>							
+									<b>6</b>							
 								</div>
 								
 								<div class="description">
-									Pistooli
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id=".SHOTGUN">
-									<span class='lighter'>
-									&lt;static&gt; 
-									</span>
-									
-									
-									
-									<span class="light">WPN.</span><b>SHOTGUN</b>							
-								</div>
-								
-								<div class="description">
-									Haulikko
+									Moottorisaha, <code>Weapons[WPN.CHAINSAW]</code>
 									
 									
 									

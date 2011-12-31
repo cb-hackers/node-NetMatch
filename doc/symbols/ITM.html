@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
-		<title>Utils | JsDoc Reference</title>
+		<title>ITM | JsDoc Reference</title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta name="mobileoptimized" content="0" />
@@ -88,12 +88,12 @@
 			<header>
 				<h1 class="classTitle">
 					
-					Namespace <span>Utils</span>
+					Namespace <span>ITM</span>
 				</h1>
 				
 				<div class="intro">
 					<p class="description summary">
-						Sisältää hyödyllisiä funktioita.
+						Itemit omana kokoelmanaan eroteltuna OBJ kokoelmasta.
 					</p>
 						
 					
@@ -101,7 +101,7 @@
 							
 							
 							
-								<li>Defined in: <a href="../symbols/src/src_nm_Utils.js.html">Utils.js</a></li>
+								<li>Defined in: <a href="../symbols/src/src_nm_Constants.js.html">Constants.js</a></li>
 							
 							
 						</ul>
@@ -117,7 +117,7 @@
 					
 						<nav>
 							<div class="props">
-								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Utils.">
+								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class ITM.">
 									<caption class="sectionTitle">Field Summary</caption>
 									
 									<thead>
@@ -133,9 +133,59 @@
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													Utils.<b><a href="../symbols/Utils.html#.log">log</a></b>
+													ITM.<b><a href="../symbols/ITM.html#.AMMO">AMMO</a></b>
 													</div>
-													<div class="description">Yleinen funktio lokiin/konsoliin (stdout) kirjoittamista varteen.</div>
+													<div class="description">Konekiväärin ammuksia</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													ITM.<b><a href="../symbols/ITM.html#.FUEL">FUEL</a></b>
+													</div>
+													<div class="description">Moottorisahan bensaa</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													ITM.<b><a href="../symbols/ITM.html#.HEALTH">HEALTH</a></b>
+													</div>
+													<div class="description">Healthpack</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													ITM.<b><a href="../symbols/ITM.html#.LAUNCHER">LAUNCHER</a></b>
+													</div>
+													<div class="description">Kranaatteja</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													ITM.<b><a href="../symbols/ITM.html#.ROCKET">ROCKET</a></b>
+													</div>
+													<div class="description">Singon ammuksia</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													ITM.<b><a href="../symbols/ITM.html#.SHOTGUN">SHOTGUN</a></b>
+													</div>
+													<div class="description">Haulikon ammuksia</div>
 												</td>
 											</tr>
 										
@@ -151,56 +201,6 @@
 	<!--
 	#### METHODS SUMMARY
 	-->
-			
-				<section>
-					
-					
-					<div class="props">
-						<h2 class="sectionTitle">Method Summary</h2>
-						
-						
-							<nav>
-								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Utils.">
-									<thead>
-										<tr>
-											<th scope="col">Method Attributes</th>
-											<th scope="col">Method Name and Description</th>
-										</tr>
-									</thead>
-									
-									<tbody>
-										
-										
-											<tr
-												 class='item0'
-											>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">Utils.<b><a href="../symbols/Utils.html#.rand">rand</a></b>(minVal, maxVal, floatVal)
-													</div>
-													<div class="description">Palauttaa satunnaisen luvun väliltä minVal.</div>
-												</td>
-											</tr>
-										
-											<tr
-												 class='item1'
-											>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">Utils.<b><a href="../symbols/Utils.html#.timer">timer</a></b>()
-													</div>
-													<div class="description">Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().</div>
-												</td>
-											</tr>
-										
-									</tbody>
-								</table>
-							</nav>
-						
-					
-						
-					</div>
-				</section>
 			
 			
 	<!--
@@ -223,20 +223,18 @@
 							</h2>
 							
 							
-								<div class="fixedFont heading" id=".log">
+								<div class="fixedFont heading" id=".AMMO">
 									<span class='lighter'>
 									&lt;static&gt; 
 									</span>
 									
 									
 									
-									<span class="light">Utils.</span><b>log</b>							
+									<span class="light">ITM.</span><b>AMMO</b>							
 								</div>
 								
 								<div class="description">
-									Yleinen funktio lokiin/konsoliin (stdout) kirjoittamista varteen. Tämä on instanssi cbNetwork-noden
-<a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Logger.html">Logger</a>-luokasta.
-Voit käyttää tätä näin:
+									Konekiväärin ammuksia
 									
 									
 									
@@ -244,15 +242,114 @@ Voit käyttää tätä näin:
 								
 								
 									
-										<pre class="code">var log = Utils.log;
-
-log.write('Perusviesti, tämä on ilman värejä.');
-log.info('Jotain tiedotettavaa tapahtui. Tulostuu vihreänä.');
-log.warn('Varoitus! Tulostuu keltaisena.');
-log.notice('Ilmoitus! Tulostuu keltaisena.');
-log.error('VIRHE! Tulostuu punaisena ja lihavoituna.');
-log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');</pre>
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".FUEL">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
 									
+									
+									
+									<span class="light">ITM.</span><b>FUEL</b>							
+								</div>
+								
+								<div class="description">
+									Moottorisahan bensaa
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".HEALTH">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									
+									
+									<span class="light">ITM.</span><b>HEALTH</b>							
+								</div>
+								
+								<div class="description">
+									Healthpack
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".LAUNCHER">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									
+									
+									<span class="light">ITM.</span><b>LAUNCHER</b>							
+								</div>
+								
+								<div class="description">
+									Kranaatteja
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".ROCKET">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									
+									
+									<span class="light">ITM.</span><b>ROCKET</b>							
+								</div>
+								
+								<div class="description">
+									Singon ammuksia
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".SHOTGUN">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									
+									
+									<span class="light">ITM.</span><b>SHOTGUN</b>							
+								</div>
+								
+								<div class="description">
+									Haulikon ammuksia
+									
+									
+									
+								</div>
+								
 								
 									
 								
@@ -265,103 +362,6 @@ log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');</pre>
 	<!--
 	#### METHOD DETAILS
 	-->		
-			
-				<section>
-					<div class="details props">
-						<div class="innerProps">
-							<h2 class="sectionTitle">
-								Method Detail
-							</h2>
-							
-							<ul class="methodDetail" id="MethodDetail">
-								
-								
-									<li 
-										 class='item0'
-									>
-										<div class="fixedFont heading" id=".rand">
-											<span class='lighter'>
-											&lt;static&gt; 
-											</span>
-											
-											
-											
-											<span class="light">Utils.</span><b>rand</b>(minVal, maxVal, floatVal)
-										</div>
-										
-										<div class="description">
-											Palauttaa satunnaisen luvun väliltä minVal...maxVal tarkkuudella floatVal
-											
-											
-											
-											
-										</div>
-										
-										
-										
-										
-											<dl class="detailList params">
-												<dt class="heading">Parameters:</dt>
-												
-													<dt>
-														<span class="light fixedFont">{Number}</span> <b>minVal</b>
-														
-													</dt>
-													<dd>Pienin mahdollinen luku</dd>
-												
-													<dt>
-														<span class="light fixedFont">{Number}</span> <b>maxVal</b>
-														
-													</dt>
-													<dd>Suurin mahdollinen luku</dd>
-												
-													<dt>
-														<span class="light fixedFont">{Number}</span> <b>floatVal</b>
-														<i>Optional</i>
-													</dt>
-													<dd>Palautettavan satunnaisen luvun tarkkuus. Mikäli tätä ei anneta,
-                            palautetaan kokonaisluku.</dd>
-												
-											</dl>
-										
-										
-										
-										<div class="hr"></div>
-									</li>
-								
-									<li 
-										 class='item1'
-									>
-										<div class="fixedFont heading" id=".timer">
-											<span class='lighter'>
-											&lt;static&gt; 
-											</span>
-											
-											
-											
-											<span class="light">Utils.</span><b>timer</b>()
-										</div>
-										
-										<div class="description">
-											Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().
-											
-											
-											
-											
-										</div>
-										
-										
-										
-										
-										
-										
-										
-									</li>
-								
-							</ul>
-						</div>
-					</div>
-				</section>
 			
 			
 	<!--

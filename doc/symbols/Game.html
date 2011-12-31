@@ -1,0 +1,668 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="generator" content="JsDoc Toolkit" />
+		<title>Game | JsDoc Reference</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+		<meta name="mobileoptimized" content="0" />
+	
+		<link rel="stylesheet" href="../css/all.css" media="all" />
+		<link rel="stylesheet" href="../css/handheld.css" media="only screen and (max-width: 660px)" />
+		<link rel="stylesheet" href="../css/handheld.css" media="handheld" />
+		<link rel="stylesheet" href="../css/screen.css" media="screen and (min-width: 661px)" />
+
+		<script src="../javascript/all.js"></script>
+		<!--[if lt IE 9]>
+			<script src="../javascript/html5.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+<div class="index">
+	<div class="menu">
+		<div class="indexLinks">
+			<a href="../index.html">Classes</a>
+			<a href="../files.html">Files</a>
+		</div>
+	
+		<h2 class="heading1">Classes</h2>
+		
+		<input type="text" name="classFilter" class="classFilter" id="ClassFilter" placeholder="Filter"></input>
+		
+		<nav>
+			<ul class="classList" id="ClassList">
+				
+					<li><a href="../symbols/Bullet.html">Bullet</a></li>
+				
+					<li><a href="../symbols/Game.html">Game</a></li>
+				
+					<li><a href="../symbols/Item.html">Item</a></li>
+				
+					<li><a href="../symbols/ITM.html">ITM</a></li>
+				
+					<li><a href="../symbols/Map.html">Map</a></li>
+				
+					<li><a href="../symbols/NET.html">NET</a></li>
+				
+					<li><a href="../symbols/NetMessages.html">NetMessages</a></li>
+				
+					<li><a href="../symbols/OBJ.html">OBJ</a></li>
+				
+					<li><a href="../symbols/Player.html">Player</a></li>
+				
+					<li><a href="../symbols/Server.html">Server</a></li>
+				
+					<li><a href="../symbols/Server.config.html">Server<span class='break'> </span>.<span class='break'> </span>config</a></li>
+				
+					<li><a href="../symbols/Utils.html">Utils</a></li>
+				
+					<li><a href="../symbols/Weapons.html">Weapons</a></li>
+				
+					<li><a href="../symbols/WPN.html">WPN</a></li>
+				
+					<li><a href="../symbols/WPNF.html">WPNF</a></li>
+				
+			</ul>
+		</nav>
+	</div>
+	<div class="fineprint" style="clear:both">
+		<footer>
+			
+			Documentation generator: <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0<br />
+			Template: <a href="http://www.thebrightlines.com/2010/05/06/new-template-for-jsdoctoolkit-codeview/" target="_blank">Codeview</a> 1.2<br />
+			Generated on:
+			<time datetime='2011-11-31' pubdate>2011-11-31 2:54</time>
+		</footer>
+	</div>
+</div>
+
+<div class="index indexStatic"></div>
+
+<div class="content">
+	<div class="innerContent">
+		<article>
+			<header>
+				<h1 class="classTitle">
+					
+					Class <span>Game</span>
+				</h1>
+				
+				<div class="intro">
+					<p class="description summary">
+						Pelimekaniikan päivittämiseen liittyvät toiminnot
+					</p>
+						
+					
+						<ul class="summary">
+							
+							
+							
+								<li>Defined in: <a href="../symbols/src/src_nm_Game.js.html">Game.js</a></li>
+							
+							
+						</ul>
+					
+				</div>
+			</header>
+			
+			
+				<section>
+					<div class="props">
+						<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Game.">
+							<caption class="sectionTitle">Class Summary</caption>
+							<thead>
+								<tr>
+									<th scope="col">Constructor Attributes</th>
+									<th scope="col">Constructor Name and Description</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="attributes">&nbsp;</td>
+									<td class="nameDescription" >
+										<div class="fixedFont">
+											<b><a href="../symbols/Game.html#constructor">Game</a></b>(server)
+										</div>
+										<div class="description">Alustaa uuden pelimekaniikasta huolehtivan Game-luokan instanssin.</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+			
+			
+			
+	<!--
+	#### METHODS SUMMARY
+	-->
+			
+				<section>
+					
+					
+					<div class="props">
+						<h2 class="sectionTitle">Method Summary</h2>
+						
+						
+							<nav>
+								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Game.">
+									<thead>
+										<tr>
+											<th scope="col">Method Attributes</th>
+											<th scope="col">Method Name and Description</th>
+										</tr>
+									</thead>
+									
+									<tbody>
+										
+										
+											<tr
+												 class='item0'
+											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Game.html#update">update</a></b>(self)
+													</div>
+													<div class="description">Päivittää pelimekaniikan, mikäli viime päivityksestä on kulunut tarpeeksi aikaa ja
+pelaajia on palvelimella.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item1'
+											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Game.html#updateBotsAI">updateBotsAI</a></b>()
+													</div>
+													<div class="description">Hoitaa bottien tekoälyn.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item2'
+											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Game.html#updateBotsAmount">updateBotsAmount</a></b>()
+													</div>
+													<div class="description">Pitää bottien lukumäärän oikeana</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item3'
+											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Game.html#updateBullets">updateBullets</a></b>()
+													</div>
+													<div class="description">Hoitaa ammusten siirtelyn, osumisen ja poistamisen.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item4'
+											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Game.html#updateFrameTimer">updateFrameTimer</a></b>()
+													</div>
+													<div class="description">Päivittää vakionopeusajastimen</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item5'
+											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Game.html#updatePlayers">updatePlayers</a></b>()
+													</div>
+													<div class="description">Päivittää pelaajat.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item6'
+											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Game.html#updateRegistration">updateRegistration</a></b>()
+													</div>
+													<div class="description">Pitää palvelimen rekisteröinnin kunnossa</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item7'
+											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Game.html#updateRoundTime">updateRoundTime</a></b>()
+													</div>
+													<div class="description">Tarkistaa onko erä päättynyt ja hoitaa vastaavat päivitykset, jos on</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item8'
+											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Game.html#updateStats">updateStats</a></b>()
+													</div>
+													<div class="description">Päivittää pelaajien ja joukkueiden statsit, pelaajien määrän yms.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item9'
+											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Game.html#updateTimeouts">updateTimeouts</a></b>()
+													</div>
+													<div class="description">Poistaa pelaajat, joista ei ole hetkeen kuulunut mitään.</div>
+												</td>
+											</tr>
+										
+									</tbody>
+								</table>
+							</nav>
+						
+					
+						
+					</div>
+				</section>
+			
+			
+	<!--
+	#### EVENTS SUMMARY
+	-->
+			
+	<!--
+	#### CONSTRUCTOR DETAILS
+	-->
+			
+				<section>
+					<div class="details props">
+						<div class="innerProps">
+							<h2 class="sectionTitle" id="constructor">
+								Class Detail
+							</h2>
+							
+							<div class="fixedFont">
+								<b>Game</b>(server)
+							</div>
+							
+							<div class="description">
+								Alustaa uuden pelimekaniikasta huolehtivan Game-luokan instanssin.
+								
+							</div>
+							
+							
+						
+							
+								<dl class="detailList params">
+									<dt class="heading">Parameters:</dt>
+									
+										<dt>
+											<span class="light fixedFont">{<a href="../symbols/Server.html">Server</a>}</span>  <b>server</b>
+											
+										</dt>
+										<dd>Nykyisen <a href="../symbols/Server.html">Server</a>-luokan instanssi</dd>
+									
+								</dl>
+							
+							
+							
+						</div>
+					</div>
+				</section>
+			
+	<!--
+	#### FIELD DETAILS
+	-->
+			
+	<!--
+	#### METHOD DETAILS
+	-->		
+			
+				<section>
+					<div class="details props">
+						<div class="innerProps">
+							<h2 class="sectionTitle">
+								Method Detail
+							</h2>
+							
+							<ul class="methodDetail" id="MethodDetail">
+								
+								
+									<li 
+										 class='item0'
+									>
+										<div class="fixedFont heading" id="update">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>update</b>(self)
+										</div>
+										
+										<div class="description">
+											Päivittää pelimekaniikan, mikäli viime päivityksestä on kulunut tarpeeksi aikaa ja
+pelaajia on palvelimella. Tämän funktion kutsu hoidetaan automaattisesti.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<b>self</b>
+														
+													</dt>
+													<dd></dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item1'
+									>
+										<div class="fixedFont heading" id="updateBotsAI">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>updateBotsAI</b>()
+										</div>
+										
+										<div class="description">
+											Hoitaa bottien tekoälyn.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item2'
+									>
+										<div class="fixedFont heading" id="updateBotsAmount">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>updateBotsAmount</b>()
+										</div>
+										
+										<div class="description">
+											Pitää bottien lukumäärän oikeana
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item3'
+									>
+										<div class="fixedFont heading" id="updateBullets">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>updateBullets</b>()
+										</div>
+										
+										<div class="description">
+											Hoitaa ammusten siirtelyn, osumisen ja poistamisen.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item4'
+									>
+										<div class="fixedFont heading" id="updateFrameTimer">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>updateFrameTimer</b>()
+										</div>
+										
+										<div class="description">
+											Päivittää vakionopeusajastimen
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item5'
+									>
+										<div class="fixedFont heading" id="updatePlayers">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>updatePlayers</b>()
+										</div>
+										
+										<div class="description">
+											Päivittää pelaajat. Hoitaa kuolleista herätykset ja sen etteivät pelaajat ole kartan sisällä.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item6'
+									>
+										<div class="fixedFont heading" id="updateRegistration">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>updateRegistration</b>()
+										</div>
+										
+										<div class="description">
+											Pitää palvelimen rekisteröinnin kunnossa
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item7'
+									>
+										<div class="fixedFont heading" id="updateRoundTime">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>updateRoundTime</b>()
+										</div>
+										
+										<div class="description">
+											Tarkistaa onko erä päättynyt ja hoitaa vastaavat päivitykset, jos on
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item8'
+									>
+										<div class="fixedFont heading" id="updateStats">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>updateStats</b>()
+										</div>
+										
+										<div class="description">
+											Päivittää pelaajien ja joukkueiden statsit, pelaajien määrän yms.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item9'
+									>
+										<div class="fixedFont heading" id="updateTimeouts">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>updateTimeouts</b>()
+										</div>
+										
+										<div class="description">
+											Poistaa pelaajat, joista ei ole hetkeen kuulunut mitään.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										
+									</li>
+								
+							</ul>
+						</div>
+					</div>
+				</section>
+			
+			
+	<!--
+	#### EVENT DETAILS
+	-->		
+			
+		</article>
+	</div>
+</div>
+
+		<script type="text/javascript">
+			wbos.CssTools.MediaQueryFallBack.LoadCss('../css/screen.css', '../css/handheld.css', 660)
+			codeview.classFilter.Init()
+		</script>
+	</body>
+</html>
+

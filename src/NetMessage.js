@@ -1,5 +1,5 @@
 /**
- * @fileOverview Viestinvälitykseen liittyvät toiminnot
+ * @fileOverview Viestien säilytykseen liittyvät toiminnot
  */
 
 /**#nocode+*/
@@ -7,19 +7,24 @@ var NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
   , WPNF = require('./Constants').WPNF
   , OBJ = require('./Constants').OBJ
-  , log = require('./Utils').log;
+  , log = require('./Utils').log
+  , colors = require('colors');
 /**#nocode-*/
 
 /**
- * Tämä on oikeasti objekti, joka pitää sisällään clienteille lähetettävät viestit.
- * Älä siis kutsu tätä kuten konstruktoria.
- * @class
+ * @class Viestien säilytys
  */
-var NetMessages = {};
+var NetMessages = function (server) {
+  this.server = server;
+  /**
+   * Sisältää clienteille lähetettävät viestit
+   * @private
+   */
+  this.data = {};
+}
 
 /**
  * Luo uuden clientille lähetettävän viestin.
- * @static
  *
  * @param {Byte}    toPlayer          Pelaajan ID kelle viesti lähetetään.
  * @param {Object}  data              Pelaajalle lähetettävä data
@@ -36,11 +41,35 @@ var NetMessages = {};
  * @param {Boolean} data.sndPlay      Soitetaanko ääni
  * @param {Boolean} data.handShooted  Kumpi käsi ampui (pistooli) 0 = vasen, 1 = oikea
  */
-NetMessages.add = function (toPlayer, data) {
-  if ('array' !== typeof NetMessages[toPlayer]) {
-    NetMessages[toPlayer] = [];
+NetMessages.prototype.add = function (toPlayer, data) {
+  if ('undefined' === typeof this.data[toPlayer]) {
+    this.data[toPlayer] = [];
   }
-  NetMessages[toPlayer].push(data);
+  this.data[toPlayer].push(data);
+}
+
+/**
+ * Lähettää kaikille clienteille viestin.
+ * @see NetMessages#add
+ *
+ * @param {Object} data      Pelaajalle lähetettävä data
+ * @param {Byte} [butNotTo]  Pelaajan ID, kelle EI lähetetä tätä pakettia.
+ */
+NetMessages.prototype.addToAll = function (data, butNotTo) {
+  var playerIds = Object.keys(this.server.players)
+    , plr
+    , iterator = playerIds.length;
+
+  if ('number' !== typeof butNotTo) {
+    butNotTo = 0;
+  }
+
+  while (iterator--) {
+    plr = this.server.players[playerIds[iterator]];
+    if (plr.active && !plr.zombie && (plr.playerId !== butNotTo)) {
+      this.add(plr.playerId, data);
+    }
+  }
 }
 
 /**
@@ -50,20 +79,20 @@ NetMessages.add = function (toPlayer, data) {
  * @param {Byte} toPlayer  Kenen viestit haetaan
  * @param {Packet} data    Mihin pakettiin tiedot lisätään
  */
-NetMessages.fetch = function (toPlayer, data) {
-  if ('array' !== typeof NetMessages[toPlayer]) {
+NetMessages.prototype.fetch = function (toPlayer, data) {
+  var d, b;
+
+  if ('undefined' === typeof this.data[toPlayer] || this.data[toPlayer].length === 0) {
     return false;
   }
-  for( var i=0; i<NetMessages[toPlayer].length; i++ ) {
-    // Tämän viestin data laitetaan d-muuttujaan, jotta tarvitsisi kirjoittaa vähemmän.
-    var d = NetMessages[toPlayer][i];
-    
+  // Tämän viestin data laitetaan d-muuttujaan, jotta tarvitsisi kirjoittaa vähemmän.
+  while (d = this.data[toPlayer][0]) {
     if (!d.hasOwnProperty('msgType')) {
       log.error('Virheellistä dataa NetMessages-objektissa!');
       console.dir(d);
       continue;
     }
-    
+
     // Lisätään dataa riippuen siitä minkälaista dataa pitää lähettää.
     switch (d.msgType) {
       case NET.LOGIN:
@@ -73,58 +102,81 @@ NetMessages.fetch = function (toPlayer, data) {
         data.putString(d.msgText);  // Liittymisteksti
         data.putByte(d.playerId2);  // Kenen tilalle pelaaja tuli
         break;
-        
+
       case NET.LOGOUT:
         // Joku on poistunut pelistä
         data.putByte(d.msgType);
         data.putByte(d.playerId);
         break;
-        
+
       case NET.NEWBULLET:
         // Uusi ammus on ammuttu
-        if (d.weapon == WPN.CHAINSAW) {
+        if (d.weapon === WPN.CHAINSAW) {
           // Moottorisahalla "ammutaan"
           data.putByte(d.msgType);
           data.putShort(d.bulletId);  // Ammuksen tunnus
           data.putByte(d.playerId);   // Kuka ampui
-          
+
           // Tungetaan samaan tavuun useampi muuttuja:
-          var b = (d.weapon % 16) << 0
-                + d.sndPlay << 4;
+          b = ((d.weapon % 16) << 0)
+            + (d.sndPlay << 4);
           data.putByte(b);
-          
+
           // Ammuksen sijainti
-          data.putByte(d.x);
-          data.putByte(d.y);
+          data.putShort(d.x);
+          data.putShort(d.y);
           data.putShort(0);  // Ammuksen kulma, mutta koska moottirisahalla ei ole kulmaa, on tämä 0
         } else {
           // Jokin muu kuin moottorisaha
-          // UNIMPLEMENTED
+          var bullet;
+          for (var i = this.server.bullets.length; i--;) {
+            if (this.server.bullets[i].bulletId === d.bulletId) {
+              bullet = this.server.bullets[i];
+              break;
+            }
+          }
+          if ('undefined' !== typeof bullet) {
+            data.putByte(d.msgType);
+            data.putShort(d.bulletId);
+            data.putByte(d.playerId);
+
+            // Tungetaan samaan tavuun useampi muuttuja:
+            b = ((d.weapon % 16) << 0)  // Millä aseella (mod 16 ettei vie yli 4 bittiä)
+              + (d.sndPlay << 4)        // Soitetaanko ääni
+              + (d.handShooted << 5)    // Kummalla kädellä ammuttiin
+            data.putByte(b);
+
+            // Ammuksen sijainti
+            data.putShort(bullet.x);
+            data.putShort(bullet.y);
+            data.putShort(bullet.angle);
+          }
         }
         break;
-        
+
       case NET.TEXTMESSAGE:
         // Tsättiviesti
         data.putByte(d.msgType);
         data.putByte(d.playerId);
         data.putString(d.msgText);
         break;
-        
+
       case NET.SERVERMSG:
         // Palvelimen generoima viesti
         data.putByte(d.msgType);
-        data.putByte(d.msgText);
-        
+        data.putString(d.msgText);
+        break;
+
       case NET.BULLETHIT:
         // Osumaviesti
         data.putByte(d.msgType);
         data.putShort(d.bulletId);  // Ammuksen tunnus
         data.putByte(d.playerId);   // Keneen osui
-        data.putByte(d.x);          // Missä osui
-        data.putByte(d.y);          // Missä osui
+        data.putShort(d.x);          // Missä osui
+        data.putShort(d.y);          // Missä osui
         data.putByte(d.weapon);     // Mistä aseesta ammus on
         break;
-        
+
       case NET.ITEM:
         // Tavaraviesti
         data.putByte(d.msgType);
@@ -133,7 +185,7 @@ NetMessages.fetch = function (toPlayer, data) {
         data.putShort(d.x);         // Missä tavara on
         data.putShort(d.y);         // Missä tavara on
         break;
-        
+
       case NET.KILLMESSAGE:
         // Tappoviesti! Buahahahaaaa
         data.putByte(d.msgType);
@@ -146,7 +198,7 @@ NetMessages.fetch = function (toPlayer, data) {
         data.putShort(0);           // Uhrin tapot
         data.putShort(0);           // Uhrin kuolemat
         break;
-        
+
       case NET.KICKED:
         // Pelaaja potkittiin
         data.putByte(d.msgType);
@@ -154,7 +206,7 @@ NetMessages.fetch = function (toPlayer, data) {
         data.putByte(d.playerId2);  // Kenet potkittiin
         data.putString(d.msgText);  // Potkujen syy
         break;
-        
+
       case NET.TEAMINFO:
         // Lähetetään pelaajan joukkue
         data.putByte(d.msgType);
@@ -162,21 +214,21 @@ NetMessages.fetch = function (toPlayer, data) {
         // UNIMPLEMENTED
         data.putByte(1);            // Pelaajan joukkue
         break;
-        
+
       case NET.SPEEDHACK:
         // Tämä client on haxor!
         data.putByte(d.msgType);
         // UNIMPLEMENTED
         // Login( False, gCurrentPlayerId )
         break;
-        
+
       default:
         log.error('VIRHE: Pelaajalle <'+toPlayer+'> oli osoitettu tuntematon paketti:');
         console.dir(d);
     }
-    
+
     // Poistetaan viesti muistista
-    NetMessages[toPlayer].splice(i, 1);
+    this.data[toPlayer].splice(0, 1);
   }
 }
 

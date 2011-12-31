@@ -1,0 +1,95 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @fileOverview Sisältää {@link Player}-luokan toteutuksen.
+<span class='line'>  3</span>  */</span><span class="WHIT">
+<span class='line'>  4</span> 
+<span class='line'>  5</span> </span><span class="COMM">/**#nocode+*/</span><span class="WHIT">
+<span class='line'>  6</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">log</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Utils'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">log</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  7</span> </span><span class="COMM">/**#nocode-*/</span><span class="WHIT">
+<span class='line'>  8</span> 
+<span class='line'>  9</span> </span><span class="NAME">exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">module.exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Player</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 10</span> 
+<span class='line'> 11</span> </span><span class="COMM">/**
+<span class='line'> 12</span>  * Luo uuden pelaajan.
+<span class='line'> 13</span>  *
+<span class='line'> 14</span>  * @class Kaikki pelaajat, niin ihmispelaajat kuin botitkin, ovat tämän luokan jäseniä.
+<span class='line'> 15</span>  *
+<span class='line'> 16</span>  * @param {Object} [attr]  Objekti joka sisältää joitakin valmiiksi asettuja arvoja uudelle pelaajalle.
+<span class='line'> 17</span>  *
+<span class='line'> 18</span>  * @property {Integer} playerId      Pelaajan tunnus välillä 1-MAX_PLAYERS
+<span class='line'> 19</span>  * @property {String}  clientId      ClientId eli ip-osoite ja tunnus
+<span class='line'> 20</span>  * @property {Integer} active        Onko tämä pelaaja pelissä
+<span class='line'> 21</span>  * @property {Integer} loggedIn      Pelaaja on kirjautunut
+<span class='line'> 22</span>  * @property {String}  name          Pelaajan nimimerkki
+<span class='line'> 23</span>  * @property {String}  statName      Pelaajan nimimerkki
+<span class='line'> 24</span>  * @property {String}  botName       Botin nimi
+<span class='line'> 25</span>  * @property {Integer} lastActivity  Koska viimeksi pelaajalta on saatu dataa
+<span class='line'> 26</span>  * @property {Integer} x             Sijainti
+<span class='line'> 27</span>  * @property {Integer} y             Sijainti
+<span class='line'> 28</span>  * @property {Integer} angle         Kulma
+<span class='line'> 29</span>  * @property {Integer} passCount     Kunka monta kierrosta pelaaja on ollut päivittämättä
+<span class='line'> 30</span>  * @property {Integer} obj           Pelihahmo
+<span class='line'> 31</span>  * @property {Integer} leftLegObj    Vasen jalka
+<span class='line'> 32</span>  * @property {Integer} rightLegObj   Oikea jalka
+<span class='line'> 33</span>  * @property {Integer} fireObj       Suuliekkianimaatio
+<span class='line'> 34</span>  * @property {Integer} fireObj2      Suuliekkianimaatio (toinen pistooli)
+<span class='line'> 35</span>  * @property {Integer} showFire      Näytetäänkö suuliekki
+<span class='line'> 36</span>  * @property {Float}   prevPosX      Pelaajan edellinen sijainti
+<span class='line'> 37</span>  * @property {Float}   prevPosY      Pelaajan edellinen sijainti
+<span class='line'> 38</span>  * @property {Float}   legPos        Jalkojen asento kävelyanimaatiossa
+<span class='line'> 39</span>  * @property {Integer} lastValidX    Viimeisin paikka jossa pelaaja on varmasti ollut kentällä
+<span class='line'> 40</span>  * @property {Integer} lastValidY    Viimeisin paikka jossa pelaaja on varmasti ollut kentällä
+<span class='line'> 41</span>  * @property {Integer} weapon        Käytössä oleva ase
+<span class='line'> 42</span>  * @property {Integer} lastShoot     Koska on viimeksi ammuttu
+<span class='line'> 43</span>  * @property {Integer} lastSound     Koska on viimeksi soitettu ampumisääni (käytetään moottorisahassa)
+<span class='line'> 44</span>  * @property {Integer} health        Terveys
+<span class='line'> 45</span>  * @property {Integer} prevHealth    Terveys edellisellä kierroksella
+<span class='line'> 46</span>  * @property {Integer} kills         Tappojen lukumäärä
+<span class='line'> 47</span>  * @property {Integer} deaths        Kuolemien lukumäärä
+<span class='line'> 48</span>  * @property {Float}   killRatio     Tapposuhde
+<span class='line'> 49</span>  * @property {Integer} isDead        Onko pelaaja kuollut
+<span class='line'> 50</span>  * @property {Integer} timeToDeath   Kuolinaika
+<span class='line'> 51</span>  * @property {Integer} zombie        Onko tämä pelaaja botti
+<span class='line'> 52</span>  * @property {Float}   nextAngle     Kulma johon botin pitäisi liikkua
+<span class='line'> 53</span>  * @property {Float}   lastAngle     Kuinka paljon botin ja kohdekulman ero oli edellisellä kierroksella
+<span class='line'> 54</span>  * @property {Float}   rotation      Tällä käännetään objektia (TurnObject)
+<span class='line'> 55</span>  * @property {Float}   sideStep      Botin sivuaskeleet
+<span class='line'> 56</span>  * @property {integer} nextAction    Ajankohta jolloin botille arvotaan uusi suunta
+<span class='line'> 57</span>  * @property {Integer} tooClose      Botti on liian lähellä seinää tai toista pelaajaa
+<span class='line'> 58</span>  * @property {Float}   fightRotate   Kääntymisnopeus kun ollaan havaittu vastustaja
+<span class='line'> 59</span>  * @property {Float}   shootingAngle Ammutaan kun uhri on tämän kulman sisällä botin edessä
+<span class='line'> 60</span>  * @property {Integer} shootedBy     Kuka on viimeksi ampunut pelaajaa
+<span class='line'> 61</span>  * @property {Float}   fov           Field of View
+<span class='line'> 62</span>  * @property {Integer} idleSound     Esim. moottorisahan tyhjäkäynti
+<span class='line'> 63</span>  * @property {Integer} idleTimer     Koska soitettu viimeksi
+<span class='line'> 64</span>  * @property {Integer} hasAmmos      Onko pelaajalla ammuksia nykyisessä aseessa
+<span class='line'> 65</span>  * @property {Byte}    team          Joukkue
+<span class='line'> 66</span>  * @property {String}  mapName       Pelaajalla ladattuna oleva kartta
+<span class='line'> 67</span>  * @property {Integer} outOfMap      Kuinka monta päivityskierrosta pelaaja on ollut poissa kartalta
+<span class='line'> 68</span>  * @property {Integer} spawnTime     Syntymäaika
+<span class='line'> 69</span>  * @property {Integer} visible       Ukon vilkuttaminen syntymän jälkeen
+<span class='line'> 70</span>  * @property {Byte}    admin         Onko pelaaja admin vai ei
+<span class='line'> 71</span>  * @property {Byte}    kicked        Onko pelaaja potkittu pois
+<span class='line'> 72</span>  * @property {String}  kickReason    Mikä syy on annettu potkuille
+<span class='line'> 73</span>  * @property {Byte}    kickerId      Kuka potkaisi
+<span class='line'> 74</span>  * @property {Integer} hackTestX     Pelaajan viimeisin sijainti nopeuden tarkistuksessa
+<span class='line'> 75</span>  * @property {Integer} hackTestY     Pelaajan viimeisin sijainti nopeuden tarkistuksessa
+<span class='line'> 76</span>  * @property {Integer} lag           Pelaajan lagi millisekunneissa
+<span class='line'> 77</span>  * @property {Integer} spHackTimer   Viimeisimmässä nopeuden tarkistuksessa otettu Timer()
+<span class='line'> 78</span>  * @property {Byte}    handShooted   Kummalla kädellä on viimeksi ammuttu (pistooli) 0=vasen 1=oikea
+<span class='line'> 79</span>  */</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">Player</span><span class="PUNC">(</span><span class="NAME">attr</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">  </span><span class="COMM">// Jeejee, luodaan client.</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">prop</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">attr</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">attr.hasOwnProperty</span><span class="PUNC">(</span><span class="NAME">prop</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">      </span><span class="KEYW">this</span><span class="PUNC">[</span><span class="NAME">prop</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">attr.prop</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 87</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 88</span> </span></pre></body></html>

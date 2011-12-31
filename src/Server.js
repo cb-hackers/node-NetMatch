@@ -1,141 +1,438 @@
-// Vaatii cbNetwork ja node-optimist-paketin: https://github.com/substack/node-optimist
+/**
+ * @fileOverview Pitää sisällään {@link Server} nimiavaruuden.
+ */
+
+// Vaatii cbNetwork, colors ja node-optimist paketit: https://github.com/substack/node-optimist
 /**#nocode+*/
-var argv = require('optimist')
-    .default({p : 1337, a : undefined})
-    .alias({'p' : 'port', 'a' : 'address', 'd' : 'debug'})
-    .argv
-  , Packet = require('cbNetwork').Packet
-  , NET = require('./Constants').NET
+var cbNetwork = require('cbNetwork')
+  , Packet = cbNetwork.Packet
+  , EventEmitter = process.EventEmitter
+  , Player = require('./Player')
   , NetMessages = require('./NetMessage')
-  , NetMatch = require('./NetMatch')
+  , NET = require('./Constants').NET
+  , WPN = require('./Constants').WPN
+  , ITM = require('./Constants').ITM
   , log = require('./Utils').log
-  , timer = require('./Utils').timer;
+  , colors = require('colors')
+  , Map = require('./Map').Map
+  , Input = require('./Input')
+  , Item = require('./Item')
+  , Game = require('./Game');
 /**#nocode-*/
 
-// Tehdään uusi palvelin.
-/** @ignore */
-var server = new NetMatch({ port: argv.p, address: argv.a});
+/**
+ * Luo uuden palvelimen annettuun porttiin ja osoitteeseen. Kun palvelimeen tulee dataa, emittoi
+ * se <i>message</i> eventin, kts. {@link Server#event:message}
+ *
+ * @class Yleiset Serverin funktiot ja ominaisuudet
+ *
+ * @param {Object} c            Asetukset, kts. {@link Server.config}
+ * @param {Number} c.port       Portti, jota palvelin kuuntelee.
+ * @param {String} [c.address]  IP-osoite, jota palvelin kuuntelee. Jos tätä ei anneta, järjestelmä
+ *                              yrittää kuunnella kaikkia osoitteita.
+ */
+function Server(c) {
+  if('object' !== typeof c || !c.hasOwnProperty('port')) {
+    log.fatal("Initialization of NetMatch server failed because of incorrect starting parameters.");
+    return false;
+  }
+  /**
+   * cbNetwork-node UDP-palvelin
+   * @type cbNetwork.Server
+   * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html">cbNetwork.Server</a>
+   */
+  this.server = new cbNetwork.Server(c.port, c.address);
 
-// Tehdään jotain sitä mukaa, kun dataa tulloo sissään.
-server.on('message', function (client) {
+  var self = this;
+  this.server.on('message', function emitMessage(client) {
+    self.emit('message', client);
+  });
+
+  /**
+   * Pelaajille lähetettävät viestit. Tämä on instanssi {@link NetMessages}-luokasta.
+   * @see NetMessages
+   */
+  this.messages = new NetMessages(this);
+
+  /**
+   * Asetukset tälle palvelimelle
+   * @type Object
+   * @see Server.config
+   */
+  this.config = Server.config;
+
+  /** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */
+  this.gameState = {};
+  this.gameState.playerCount = 0;
+  this.gameState.gameMode = this.config.gameMode;
+  this.gameState.maxPlayers = this.config.maxPlayers;
+
+  // Ladataan kartta
+  this.gameState.map = new Map(this.config.map);
+  if (!this.gameState.map.loaded) {
+    log.fatal('Could not load map "%0"', this.config.map);
+    this.close();
+    return;
+  }
+
+  /** Sisältää kaikki kartat */
+  this.maps = {};
+  this.maps[this.gameState.map.name] = this.gameState.map;
+
+  /**
+   * Sisältää palvelimen pelaajat, eli luokan {@link Player} jäsenet.
+   * Pääset yksittäisen pelaajan dataan näin:
+   * @example
+   * // Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
+   *
+   * // Tulostaa konsoliin ID:n 4 pelaajan nimen.
+   * console.log( server.players[4].name );
+   */
+  this.players = {};
+
+  // Alustetaan pelaajat
+  for (var i = 1; i <= this.config.maxPlayers; ++i) {
+    var pl = new Player();
+    pl.playerId = i;
+    pl.active = false;
+    pl.team = 1;
+    pl.botName = "Bot_" + i;
+    pl.clientId = "";
+    pl.active = false;
+    pl.loggedIn = false;
+    pl.name = "";
+    var skill = 21 - pl.playerId; // Botteja hieman eritasoisiksi vissiinkin?
+    pl.fightRotate = 1.5 + (skill / 1.5);
+    pl.shootingAngle = 4.0 + (pl.playerId * 1.5);
+    pl.fov = 100 + (skill * 3.5);
+    pl.hasAmmos = false;
+    pl.admin = false;
+    pl.kicked = false;
+    pl.kickReason = "";
+
+    this.players[i] = pl;
+  }
+
+  /**
+   * Sisältää palvelimen ammukset, eli luokan {@link Weapon} jäsenet.
+   */
+  this.bullets = [];
+
+  /**
+   * @private
+   */
+  this.lastBulletId = 0;
+
+  /**
+   * Sisältää palvelimella maassa olevat tavarat, kts. {@link Item}.
+   */
+  this.items = {};
+
+  // Alustetaan itemit
+  var mapConfig = this.gameState.map.config;
+  var itemId = 0;
+  for (var i = mapConfig.healthItems - 1; i--;) {
+    new Item(this, ++itemId, ITM.HEALTH);
+  }
+  for (var i = mapConfig.mgunItems - 1; i--;) {
+    new Item(this, ++itemId, ITM.AMMO);
+  }
+  for (var i = mapConfig.bazookaItems - 1; i--;) {
+    new Item(this, ++itemId, ITM.ROCKET);
+  }
+  for (var i = mapConfig.shotgunItems - 1; i--;) {
+    new Item(this, ++itemId, ITM.FUEL);
+  }
+  for (var i = mapConfig.launcherItems - 1; i--;) {
+    new Item(this, ++itemId, ITM.SHOTGUN);
+  }
+  for (var i = mapConfig.chainsawItems - 1; i--;) {
+    new Item(this, ++itemId, ITM.LAUNCHER);
+  }
+
+  /**
+   * Sisältää palvelimella pyörivän {@link Game}-luokan instanssin
+   */
+  this.game = new Game(this);
+
+  // Avataan Input
+  new Input(this);
+
+  log.info('Server initialized successfully.');
+}
+
+// Laajennetaan Serverin prototyyppiä EventEmitterin prototyypillä, jotta voitaisiin
+// emittoida viestejä.
+Server.prototype.__proto__ = EventEmitter.prototype;
+
+
+// Palvelimen versio
+Server.VERSION = "v2.4"
+
+/**
+ * @namespace Sisältää NetMatch-palvelimen oletusasetukset. Näitä voi muuttaa antamalla
+ * {@link Server}-konstruktorille parametrina objektin, jonka avaimet sopivat tämän muotoon.
+ */
+Server.config = {
+    /**
+     * GSS-palvelimen osoite
+     * @type String
+     * @default "http://netmatch.vesq.org"
+     */
+    regHost: "http://netmatch.vesq.org"
+    /**
+     * GSS-palvelimella oleva polku gss.php tiedostoon
+     * @type String
+     * @default "/reg/gss.php"
+     */
+  , regPath: "/reg/gss.php"
+    /**
+     * Rekisteröidäänkö palvelin
+     * @type Boolean
+     * @default false
+     */
+  , register: false
+    /**
+     * Palvelimen kuvaus, näkyy listauksessa
+     * @type String
+     * @default "Node.js powered server"
+     */
+  , description: "Node.js powered server"
+    /**
+     * Nykyinen kartta
+     * @type String
+     * @default "Luna"
+     */
+  , map: "Luna"
+    /**
+     * Maksimimäärä pelaajia
+     * @type Number
+     * @default 5
+     */
+  , maxPlayers: 5
+    /**
+     * Pelimoodi, DM = 1 ja TDM = 2
+     * @type Byte
+     * @default 1
+     */
+  , gameMode: 1
+    /**
+     * Kuinka pitkän ajan pelaajilla on suoja spawnauksen jälkeen. Aika millisekunteissa
+     * @type Number
+     * @default 15000
+     */
+  , spawnProtection: 15000
+    /**
+     * Ovatko tutkanuolet käytössä vai ei
+     * @type Boolean
+     * @default true
+     */
+  , radarArrows: true
+    /**
+     * Palvelimen pelimoottorin päivitystahti, kuinka monta päivitystä per sekunti tehdään.
+     * @type Number
+     * @default 60
+     */
+  , updatesPerSec: 60
+}
+
+// EVENTTIEN DOKUMENTAATIO
+/**
+ * NetMatch-palvelin emittoi tämän eventin aina kun palvelimeen tulee dataa. Tätä täytyy käyttää,
+ * mikäli haluat saada palvelimen tekemäänkin jotain. Parametrina tämä antaa cbNetwork-noden
+ * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">Client</a>-luokan
+ * instanssin. Katso alla oleva esimerkki, niin saat tietää lisää:
+ * @example
+ * // Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
+ *
+ * server.on('message', function (client) {
+ *   // Tulostetaan clientin ID ja osoite cbNetworkin tapaan CoolBasicissa
+ *   console.log(client.address + ':' + client.id);
+ *
+ *   // Lähetetään clientille sen lähettämä data takaisin
+ *   client.reply(client.data);
+ * });
+ *
+ * @name Server#message
+ * @event
+ */
+/**
+ * Palvelin emittoi tämän eventin, kun sen {@link Server#close}-funktiota kutsutaan.
+ * @name Server#closing
+ * @event
+ */
+/**
+ * Palvelin emittoi tämän eventin, kun se on sammutettu.
+ * @name Server#closed
+ * @event
+ * @see Server#close
+ */
+
+/**
+ * Kirjaa pelaajan sisään peliin.
+ * @param {Client} client  cbNetworkin Client-luokan jäsen.
+ * @returns {Boolean}      Onnistuiko pelaajan liittäminen peliin vai ei.
+ */
+Server.prototype.login = function (client) {
   var data = client.data
-    , msgType = data.getByte()
-    , currentPlayerId
-    , player
-    , reply
-    , sendNames = false
-    , txtMessage = "";
-  
-  // Jos oli uusi pelaaja
-  if (msgType === NET.LOGIN) {
-    server.login(client);
-    return;
+    , replyData
+    , version = data.getString()
+    , nickname
+    , playerIds;
+
+  // Täsmääkö clientin ja serverin versiot
+  if (version !== Server.VERSION) {
+    // Eivät täsmää, lähetetään virheilmoitus
+    replyData = new Packet(3);
+    replyData.putByte(NET.LOGIN);
+    replyData.putByte(NET.LOGINFAILED);
+    replyData.putByte(NET.WRONGVERSION);
+    replyData.putString(Server.VERSION);
+    client.reply(replyData);
+    return false;
   }
-  
-  // Luetaan lähetetty pelaajan ID, joka on pelaajan järjestysnumero ja aina väliltä 1...MAX_PLAYERS
-  currentPlayerId = data.getByte();
-  
-  if (currentPlayerId < 1 || currentPlayerId > server.gameState.maxPlayers) {
-    // Pelaajatunnus on väärä
-    log.notice('Possible hack attempt from ' + client.address + ' Invalid player ID (' + currentPlayerId + ')');
-    return;
-  }
-  
-  // Haetaan pelaajan instanssi Player-luokasta
-  player = this.players[currentPlayerId];
-  
-  
-  // Tarkistetaan onko pelaaja potkittu
-  if (player.kicked && player.clientId == client.id) {
-    reply = new Packet(7);
-    reply.putByte(NET.KICKED);
-    reply.putByte(player.kickerId);
-    reply.putByte(currentPlayerId);
-    reply.putString(player.kickReason);
-    client.reply(reply);
-    return;
-  }
-  
-  if (player.clientId != client.id || !player.active) {
-    //log.notice("Possible hack attempt from " + client.address + " Not logged in (" + currentPlayerId + ")");
-    reply = new Packet(1);
-    reply.putByte(NET.NOLOGIN);
-    client.reply(reply);
-    return;
-  }
-  
-  // Pelaaja poistuu pelistä
-  if (msgType = NET.LOGOUT) {
-    server.logout(client, currentPlayerId);
-    return;
-  }
-  
-  // Lasketaan pelaajan ja serverin välinen lagi
-  player.lag = timer() - player.lastActivity;
-  
-  // Päivitetään pelaajan olemassaolo
-  player.lastActivity = timer();
-  
-  return;
-  
-  // Luetaan saapuneita viestejä
-  while (msgType) {
-    if (msgType === NET.PLAYER) {
-      // Pelaajan dataa
-      var x     = client.getShort()   // x-position
-        , y     = client.getShort()   // y-position
-        , angle = client.getShort()   // kulma
-        , b     = client.getByte()    // Tämä tavu sisältää useamman muuttujan (alempana)
-      
-      // Puretaan b-tavu muuttujiin
-      // Jos halutaan esim. lukea 4 bittiä kohdasta 0, menee lauseke seuraavasti:
-      // var value = (b << (32-0-4)) >> (32-4)
-      var weapon   = (b << 28) >> 28  // Valittuna oleva ase (bitit 0-3)
-        , hasAmmo  = (b << 27) >> 31  // Onko valitussa aseessa ammuksia (bitti 4)
-        , shooting = (b << 26) >> 31; // Ampuuko (bitti 5)
-      
-      var picked  = client.getByte(); // Poimitun itemin id (0, jos ei poimittu)
-      
-      // Arvot päivitetään vain jos pelaaja on hengissä
-      if (!player.isDead) {
-        player.x        = x;
-        player.y        = y;
-        player.angle    = angle;
-        player.weapon   = weapon;
-        player.hasAmmos = hasAmmo;
-        
-        // UNIMPLEMENTED
-        // PositionObject, RotateObject
-        
-        // UNIMPLEMENTED
-        // speedhack
-        
-        if (shoot === 1) {
-          // UNIMPLEMENTED
-          // CreateServerBullet
-        }
-        
-        // Poimittiinko jotain
-        if (picked > 0) {
-          // UNIMPLEMENTED
-        }
+
+  // Versio on OK, luetaan pelaajan nimi
+  nickname = data.getString().trim();
+  log.info('Player "' + nickname + '" (' + client.address + ') is trying to connect...');
+
+  // Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa
+  playerIds = Object.keys(this.players);
+  for (var i = playerIds.length; i--;) {
+    var player = this.players[playerIds[i]];
+    if (player.name.toLowerCase() === nickname.toLowerCase()) {
+      if (player.kicked || !player.active) {
+        player.name = "";
+      } else {
+        // Nimimerkki oli jo käytössä.
+        log.notice('Nickname "' + nickname + '" already in use.');
+        replyData = new Packet(3);
+        replyData.putByte(NET.LOGIN);
+        replyData.putByte(NET.LOGINFAILED);
+        replyData.putByte(NET.NICKNAMEINUSE);
+        client.reply(replyData);
+        return false;
       }
-      if (player.health > 0) {
-        player.isDead = false;
-      }
-      if (!player.loggedIn) {
-        player.loggedIn = true;
-      }
-      
-    } else if (msgType === NET.PLAYERNAME) {
-      // jotain
-    } else if (msgType === NET.TEXTMESSAGE) {
-      // jotain
-    } else if (msgType === NET.MAPCHANGE) {
-      // jotain
-    } else {
-      break;
     }
-    msgType = data.getByte();
   }
-});
+
+  // Etsitään vapaa "pelipaikka"
+  for (var i = playerIds.length; i--;) {
+    var player = this.players[playerIds[i]];
+    if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
+      // Tyhjä paikka löytyi
+      player.clientId = client.id;
+      player.active = true;
+      player.loggedIn = false;
+      player.name = nickname;
+      // UNIMPLEMENTED
+      player.x = Math.round(-100 + Math.random() * 200);
+      player.y = Math.round(-100 + Math.random() * 200);
+      player.hackTestX = player.x;
+      player.hackTestY = player.y;
+      player.angle = Math.floor(Math.random() * 360 + 1);
+      player.zombie = false;
+      player.health = 100;
+      player.kills = 0;
+      player.deaths = 0;
+      player.weapon = WPN.PISTOL;
+      player.lastActivity = new Date().getTime();
+      player.spawnTime = player.lastActivity;
+      player.admin = false;
+      player.kicked = false;
+      player.kickReason = "";
+      if (this.gameState.gameMode === "TDM") {
+        // UNIMPLEMENTED
+        // Tasainen jako joukkueihin
+        player.team = Math.floor(Math.random()*2 + 1) + 1; // Rand(1,2)
+      }
+
+      // Lähetetään vastaus clientille
+      replyData = new Packet(16);
+      replyData.putByte(NET.LOGIN);
+      replyData.putByte(NET.LOGINOK);
+      replyData.putByte(player.playerId);
+      replyData.putByte(this.gameState.gameMode);
+      replyData.putString(this.gameState.map.name);
+      replyData.putInt(this.gameState.map.crc32);
+      // UNIMPLEMENTED
+      replyData.putString(" "); // Kartan URL josta sen voi ladata, mikäli se puuttuu
+      client.reply(replyData);
+      log.info(player.name + " logged in, assigned ID " + String(player.playerId).magenta);
+
+      // Lisätään viestijonoon ilmoitus uudesta pelaajasta
+      var msgData = {
+        msgType: NET.LOGIN,
+        msgText: nickname,
+        playerId: player.playerId,
+        playerId2: player.zombie
+      };
+      for (var j = playerIds.length; j--;) {
+        var plr = this.players[playerIds[j]];
+        // Lähetetään viesti kaikille muille paitsi boteille ja itselle
+        if (plr.active && !plr.zombie && (plr.playerId !== player.playerId)) {
+          this.messages.add(plr.playerId, msgData);
+        }
+      }
+      return true;
+    }
+  }
+
+  // Vapaita paikkoja ei ollut
+  log.notice('No free slots.');
+  replyData = new Packet(3);
+  replyData.putByte(NET.LOGIN);
+  replyData.putByte(NET.LOGINFAILED);
+  replyData.putByte(NET.TOOMANYPLAYERS);
+  client.reply(replyData);
+  return false;
+}
+
+/**
+ * Kirjaa pelaajan ulos pelistä.
+ * @param {Integer} playerId  Pelaajan ID.
+ */
+Server.prototype.logout = function (playerId) {
+  var player = this.players[playerId]
+    , playerIds = Object.keys(this.players);
+
+  player.active = false;
+  player.loggedIn = false;
+  player.admin = false;
+  log.info(player.name + ' logged out.');
+
+  // Lähetetään viesti kaikille muille paitsi boteille
+  for (var i = playerIds.length; i--;) {
+    var plr = this.players[playerIds[i]];
+    // Lähetetään viesti kaikille muille paitsi boteille ja itselle
+    if (plr.active && !plr.zombie && (plr.playerId !== playerId)) {
+      this.messages.add(plr.playerId, { msgType: NET.LOGOUT, playerId: playerId });
+    }
+  }
+}
+
+/**
+ * Sammuttaa palvelimen. Emittoi eventit {@link Server#closing} ja {@link Server#closed}
+ */
+Server.prototype.close = function () {
+  if (this.gameState.closing) {
+    // Ollaan jo sulkemassa, ei aloiteta samaa prosessia uudelleen.
+    return;
+  }
+  this.emit('closing');
+  log.info('Closing server...');
+  this.gameState.closing = true;
+
+  // Pysäytetään Game-moduulin päivitys
+  clearInterval(this.game.interval);
+
+  var self = this;
+  setTimeout(function closeServer() {
+    self.server.close();
+    log.info('Server closed!');
+    self.emit('closed');
+  }, 1000);
+}
+
+exports = module.exports = Server;
+
