@@ -14,18 +14,18 @@ var log = require('./Utils').log
 /**
  * @namespace Sisältää aseet ja niiden ominaisuudet. Jokaisella aseella on alla olevat kentät:
  * <table>
- * <tr><td>reloadTime</td><td>Latausaika</td></tr>
- * <tr><td>bulletSpeed</td><td>Paljonko ammus liikkuu yhdessä sekunnissa</td></tr>
- * <tr><td>bulletForth</td><td>Ammuksen lähtöpaikka pelaajan etupuolella</td></tr>
- * <tr><td>bulletYaw</td><td>Ammuksen lähtöpaikka sivusuunnassa</td></tr>
- * <tr><td>damage</td><td>Ammuksen aiheuttama tuho</td></tr>
- * <tr><td>damageRange</td><td>Tuhoalueen laajuus</td></tr>
- * <tr><td>spread</td><td>Hajonta asteina</td></tr>
- * <tr><td>maxAmmo</td><td>Ammusten maksimimäärä</td></tr>
- * <tr><td>pickCount</td><td>Kuinka paljon tavaraa saa poimittaessa</td></tr>
- * <tr><td>safeRange</td><td>Etäisyys jonka alle kohteesta oleva botti ei ammu</td></tr>
- * <tr><td>shootRange</td><td>Etäisyys jonka alle kohteesta oleva botti ampuu</td></tr>
- * <tr><td>weight</td><td>Aseen paino, vaikuttaa liikkumisen nopeuteen. 100 = normaali</td></tr>
+ * <tr><td> reloadTime   </td><td>  Latausaika  </td></tr>
+ * <tr><td> bulletSpeed  </td><td>  Paljonko ammus liikkuu yhdessä sekunnissa  </td></tr>
+ * <tr><td> bulletForth  </td><td>  Ammuksen lähtöpaikka pelaajan etupuolella  </td></tr>
+ * <tr><td> bulletYaw    </td><td>  Ammuksen lähtöpaikka sivusuunnassa  </td></tr>
+ * <tr><td> damage       </td><td>  Ammuksen aiheuttama tuho  </td></tr>
+ * <tr><td> damageRange  </td><td>  Tuhoalueen laajuus  </td></tr>
+ * <tr><td> spread       </td><td>  Hajonta asteina  </td></tr>
+ * <tr><td> maxAmmo      </td><td>  Ammusten maksimimäärä  </td></tr>
+ * <tr><td> pickCount    </td><td>  Kuinka paljon tavaraa saa poimittaessa  </td></tr>
+ * <tr><td> safeRange    </td><td>  Etäisyys jonka alle kohteesta oleva botti ei ammu  </td></tr>
+ * <tr><td> shootRange   </td><td>  Etäisyys jonka alle kohteesta oleva botti ampuu  </td></tr>
+ * <tr><td> weight       </td><td>  Aseen paino, vaikuttaa liikkumisen nopeuteen. 100 = normaali  </td></tr>
  * </table>
  */
 var Weapons = [
@@ -169,10 +169,7 @@ function Bullet(server, playerId, extraBullet) {
     , weaponConfig
     , bPos
     , spread
-    , randomSpread
-    , msgData
-    , playerIds
-    , plr;
+    , randomSpread;
 
   // UNIMPLEMENTED
   // Ei tehdä ammusta jos erä on päättynyt
@@ -244,7 +241,7 @@ function Bullet(server, playerId, extraBullet) {
   server.bullets.push(this);
 
   // Lisätään ammusviesti lähetettäväksi jokaiselle pelaajalle
-  msgData = {
+  server.messages.addToAll({
     msgType: NET.NEWBULLET,
     bulletId: this.bulletId,
     sndPlay: !extraBullet,
@@ -253,14 +250,7 @@ function Bullet(server, playerId, extraBullet) {
     x: this.x,
     y: this.y,
     handShooted: player.handShooted
-  };
-  playerIds = Object.keys(server.players);
-  for (var i = playerIds.length; i--;) {
-    plr = server.players[playerIds[i]];
-    if (plr.active && !plr.zombie) {
-      server.messages.add(plr.playerId, msgData);
-    }
-  }
+  });
 
   if (player.weapon === WPN.LAUNCHER && !extraBullet) {
     // Jos tämä on ammuttu kranaatinheittimellä niin tehdään vielä toinen ammus koska 2 kranaattia

@@ -18,15 +18,14 @@ function Input(server) {
     // Suljetaan palvelin kun tulee SIGINT
     console.log();
     log.warn('Received SIGINT');
+
+    // Lakataan kuuntelemasta stdin-syötettä.
+    // Noden pitäisi sulkeutua jahka kaikki skriptit ovat valmistuneet.
+    process.stdin.destroySoon();
+
+    // Suljetaan palvelin
     server.close();
   });
-
-  server.on('closed', function () {
-    // Nyt ollaan suljettu, voidaan sulkea koko prosessi. Mutta odotetaan toki puoli sekuntia,
-    // että muut funktiot jotka kuuntelevat closed-eventtiä voisivat toimia.
-    process.stdin.destroySoon();
-  });
-
 
   process.stdin.on('data', function (chunk) {
     // Lähetetään data pelaajille
@@ -34,18 +33,10 @@ function Input(server) {
 
     log.write('<Server>'.blue + ' %0', chunk);
 
-    var msgData = {
+    server.messages.addToAll({
       msgType: NET.SERVERMSG,
       msgText: chunk
-    };
-
-    var playerIds = Object.keys(server.players);
-    for (var i = playerIds.length; i--;) {
-      var plr = server.players[playerIds[i]];
-      if (plr.active && !plr.zombie) {
-        server.messages.add(plr.playerId, msgData);
-      }
-    }
+    });
   });
 }
 

@@ -6,18 +6,15 @@
 var log = require('./Utils').log
   , rand = require('./Utils').rand
   , path = require('path')
-  , cjson = require('cjson')
-  , argv = require('optimist')
-    .default({p : 1337, a : undefined})
-    .alias({'p' : 'port', 'a' : 'address', 'd' : 'debug'})
-    .argv;
+  , cjson = require('cjson');
 /**#nocode-*/
 
 /**
  * Lataa uuden kartan.
  * @class Karttaluokka
  *
- * @param {String} name  Kartan nimi, joka ladataan (esim. Luna)
+ * @param {Server} server  Tämän kartan NetMatch-palvelin
+ * @param {String} name    Kartan nimi, joka ladataan (esim. Luna)
  *
  * @property {Boolean} loaded                 Ladattiinko kartta onnistuneesti
  * @property {String}  name                   Kartan nimi
@@ -42,10 +39,11 @@ var log = require('./Utils').log
  * @property {Integer} height                 Kartan korkeus
  * @property {Array}   data                   Törmäyskerroksen data kaksiulotteisessa xy-taulukossa
 */
-function Map(name) {
+function Map(server, name) {
   var filePath = path.resolve(__dirname, '..', 'maps', name + '.json')
     , data;
 
+  this.server = server;
   this.loaded = false;
 
   if (!path.existsSync(filePath)) {
@@ -76,7 +74,7 @@ Map.prototype.isColliding = function (x, y) {
     return true;
   }
 
-  if (argv.d) {
+  if (this.server.debug) {
     if ('undefined' === typeof this.data ||
         'undefined' === typeof this.data[tileY] ||
         'undefined' === typeof this.data[tileY][tileX] ) {

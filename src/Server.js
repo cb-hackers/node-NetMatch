@@ -139,7 +139,7 @@ function Server(port, address, debug) {
   this.gameState.maxPlayers = this.config.maxPlayers;
 
   // Ladataan kartta
-  this.gameState.map = new Map(this.config.map);
+  this.gameState.map = new Map(this, this.config.map);
   if (!this.gameState.map.loaded) {
     log.fatal('Could not load map "%0"', this.config.map);
     this.close();
@@ -236,7 +236,13 @@ function Server(port, address, debug) {
 // emittoida viestejä.
 Server.prototype.__proto__ = EventEmitter.prototype;
 
-
+/**
+ * Hoitaa datan lähetyksen.
+ *
+ * @param {Client} client  cbNetworkin Client-luokan instanssi
+ * @param {Player} player  Pelaaja, keneltä on saatu dataa ja kenelle lähetetään vastaus tässä.
+ * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html" target="_blank">cbNetwork.Client</a>
+ */
 Server.prototype.sendData = function (client, player) {
   var reply = new Packet()
     , playerIds = Object.keys(this.players)
@@ -455,7 +461,8 @@ Server.prototype.login = function (client) {
     , replyData
     , version = data.getString()
     , nickname
-    , playerIds;
+    , playerIds
+    , randomPlace;
 
   // Täsmääkö clientin ja serverin versiot
   if (version !== Server.VERSION) {
@@ -502,9 +509,9 @@ Server.prototype.login = function (client) {
       player.active = true;
       player.loggedIn = false;
       player.name = nickname;
-      // UNIMPLEMENTED
-      player.x = Math.round(-100 + Math.random() * 200);
-      player.y = Math.round(-100 + Math.random() * 200);
+      randomPlace = this.gameState.map.findSpot();
+      player.x = randomPlace.x;
+      player.y = randomPlace.y;
       player.hackTestX = player.x;
       player.hackTestY = player.y;
       player.angle = Math.floor(Math.random() * 360 + 1);
@@ -518,9 +525,9 @@ Server.prototype.login = function (client) {
       player.admin = false;
       player.kicked = false;
       player.kickReason = "";
-      if (this.gameState.gameMode === "TDM") {
+      if (this.gameState.gameMode === 2) {
         // UNIMPLEMENTED
-        // Tasainen jako joukkueihin
+        // Tasainen jako joukkueihin TDM-pelimoodissa
         player.team = Math.floor(Math.random()*2 + 1) + 1; // Rand(1,2)
       }
 
@@ -537,20 +544,13 @@ Server.prototype.login = function (client) {
       client.reply(replyData);
       log.info(player.name + " logged in, assigned ID " + String(player.playerId).magenta);
 
-      // Lisätään viestijonoon ilmoitus uudesta pelaajasta
-      var msgData = {
+      // Lisätään viestijonoon ilmoitus uudesta pelaajasta, kaikille muille paitsi boteille ja itselle.
+      this.messages.addToAll({
         msgType: NET.LOGIN,
         msgText: nickname,
         playerId: player.playerId,
         playerId2: player.zombie
-      };
-      for (var j = playerIds.length; j--;) {
-        var plr = this.players[playerIds[j]];
-        // Lähetetään viesti kaikille muille paitsi boteille ja itselle
-        if (plr.active && !plr.zombie && (plr.playerId !== player.playerId)) {
-          this.messages.add(plr.playerId, msgData);
-        }
-      }
+      }, player.playerId);
       return true;
     }
   }
@@ -578,14 +578,8 @@ Server.prototype.logout = function (playerId) {
   player.admin = false;
   log.info(player.name + ' logged out.');
 
-  // Lähetetään viesti kaikille muille paitsi boteille
-  for (var i = playerIds.length; i--;) {
-    var plr = this.players[playerIds[i]];
-    // Lähetetään viesti kaikille muille paitsi boteille ja itselle
-    if (plr.active && !plr.zombie && (plr.playerId !== playerId)) {
-      this.messages.add(plr.playerId, { msgType: NET.LOGOUT, playerId: playerId });
-    }
-  }
+  // Lähetetään viesti kaikille muille paitsi boteille ja itselle
+  this.messages.addToAll({msgType: NET.LOGOUT, playerId: playerId}, playerId);
 }
 
 /**
@@ -596,9 +590,9 @@ Server.prototype.close = function () {
     // Ollaan jo sulkemassa, ei aloiteta samaa prosessia uudelleen.
     return;
   }
-  this.emit('closing');
-  log.info('Closing server...');
   this.gameState.closing = true;
+  log.info('Closing server...');
+  this.emit('closing');
 
   // Pysäytetään Game-moduulin päivitys
   clearInterval(this.game.interval);
