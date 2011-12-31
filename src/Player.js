@@ -3,7 +3,8 @@
  */
 
 /**#nocode+*/
-var log = require('./Utils').log;
+var log = require('./Utils').log
+  , Obj = require('./Object');
 /**#nocode-*/
 
 /**
@@ -76,13 +77,10 @@ var log = require('./Utils').log;
  * @property {Byte}    handShooted   Kummalla kädellä on viimeksi ammuttu (pistooli) 0=vasen 1=oikea
  * @property {Boolean} sendNames     Pelaaja pyysi palvelimelta pelaajien nimilistauksen, lähetään kivasti myös itemien tiedot ":D"
  */
-function Player(attr) {
-  // Jeejee, luodaan client.
-  for (var prop in attr) {
-    if (attr.hasOwnProperty(prop)) {
-      this[prop] = attr.prop;
-    }
-  }
+function Player() {
+  Obj.call(this, 0, 0, 0);
 }
+Player.prototype = new Obj();
+Player.prototype.constructor = Player;
 
 exports = module.exports = Player;

@@ -41,6 +41,16 @@ var Utils = {
   rand: function (minVal, maxVal, floatVal) {
     var randVal = minVal + (Math.random() * (maxVal - minVal));
     return typeof floatVal === 'undefined' ? Math.round(randVal) : randVal.toFixed(floatVal);
+  },
+  
+  /**
+   * Pitää kulman välillä 0-360
+   * @param {Number} angle  Kulma
+   * @returns {Number}
+   */
+  wrapAngle: function (a) {
+    a = a / 360;
+    return (a - Math.floor(a)) * 360;
   }
 };
 

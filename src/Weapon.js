@@ -8,7 +8,8 @@ var log = require('./Utils').log
   , rand = require('./Utils').rand
   , NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
-  , WPNF = require('./Constants').WPNF;
+  , WPNF = require('./Constants').WPNF
+  , Obj = require('./Object');
 /**#nocode-*/
 
 /**
@@ -162,14 +163,18 @@ var Weapons = [
  * @property {Integer} timeShooted  Milloin ammus on ammuttu
  */
 function Bullet(server, playerId, extraBullet) {
-  if ('undefined' === typeof extraBullet) {
-    extraBullet = 0;
-  }
+  Obj.call(this, 0, 0, 0);
   var player
     , weaponConfig
     , bPos
     , spread
     , randomSpread;
+
+  this.server = server;
+
+  if ('undefined' === typeof extraBullet) {
+    extraBullet = 0;
+  }
 
   // UNIMPLEMENTED
   // Ei tehdä ammusta jos erä on päättynyt
@@ -261,6 +266,23 @@ function Bullet(server, playerId, extraBullet) {
   if (player.weapon === WPN.SHOTGUN && extraBullet < 6) {
     new Bullet(server, playerId, extraBullet + 1);
   }
+}
+Bullet.prototype = new Obj();
+Bullet.prototype.constructor = Bullet;
+
+/**
+ * Päivittää yksittäisen ammuksen.
+ */
+Bullet.prototype.update = function () {
+  var mps = this.server.game.movePerSec
+    , weaponConfig = Weapons[this.weapon]
+    , speed = weaponConfig.speed; // Nopeus riippuu siitä, millä aseella ammus on ammuttu
+
+  if (!this.moved) {
+    this.moved = 1;
+    speed = 0;
+  }
+
 }
 
 

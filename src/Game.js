@@ -16,7 +16,8 @@ var log = require('./Utils').log
  */
 function Game(server) {
   this.server = server;
-  this.lastUpdate = timer();
+  this.lastUpdate = 0;
+  this.frameTime = 0;
   this.interval = setInterval(this.update, 1000 / server.gameState.updatesPerSecond, this);
 }
 
@@ -51,7 +52,12 @@ Game.prototype.update = function (self) {
  * @private
  */
 Game.prototype.updateFrameTimer = function () {
-
+  var curTime = timer();
+  if (!this.lastUpdate) {
+    this.lastUpdate = curTime;
+  }
+  this.frameTime = (curTime - this.lastUpdate) / 1000;
+  this.lastUpdate = curTime;
 }
 
 /**
@@ -115,7 +121,23 @@ Game.prototype.updateRegistration = function () {
  * @private
  */
 Game.prototype.updateBullets = function () {
+  var bulletIds = Object.keys(this.server.bullets)
+    , bullet;
 
+  // Käydään kaikki ammukset läpi
+  for (var i = bulletIds.length; i--;) {
+    bullet = this.server.bullets[bulletIds[i]];
+    bullet.update();
+  }
+}
+
+/**
+ * Palauttaa siirtymän tai kääntymän (pikseliä tai astetta sekunnissa)
+ * @param {Number} amount  Pikselimäärä tai astemäärä joka siirrytään/käännytään yhden sekunnin aikana
+ * @returns {Number}
+ */
+Game.prototype.movePerSec = function (amount) {
+  return amount * this.frameTime;
 }
 
 exports = module.exports = Game;
