@@ -97,7 +97,7 @@ NetMessages.prototype.addToTeam = function (team, data) {
 
 /**
  * Lisää data-pakettiin yksittäiselle pelaajalle kuuluvat viestit oikein jäsenneltynä.
- * Kts. cbNetwork-node toteutus luokasta <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Packet.html" target="_blank">Packet</a>.
+ * Kts. cbNetwork-node toteutus luokasta <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Packet.html">Packet</a>.
  *
  * @param {Byte} toPlayer  Kenen viestit haetaan
  * @param {Packet} data    Mihin pakettiin tiedot lisätään

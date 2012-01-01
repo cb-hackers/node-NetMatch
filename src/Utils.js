@@ -1,7 +1,9 @@
 /**
  * @fileOverview Sisältää hyödyllisiä funktioita, eli {@link Utils}-nimiavaruuden toteutuksen.
  */
-var colors = require('colors')
+var argv = require('optimist')
+  .default({d: false}).alias({'d' : 'debug'}).argv
+  , colors = require('colors')
   , Logger = require('cbNetwork').Logger;
 
 /**
@@ -10,7 +12,7 @@ var colors = require('colors')
 var Utils = {
   /**
    * Yleinen funktio lokiin/konsoliin (stdout) kirjoittamista varteen. Tämä on instanssi cbNetwork-noden
-   * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Logger.html" target="_blank">Logger</a>-luokasta.
+   * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Logger.html">Logger</a>-luokasta.
    * Voit käyttää tätä näin:
    * @example
    * var log = Utils.log;
@@ -22,13 +24,13 @@ var Utils = {
    * log.error('VIRHE! Tulostuu punaisena ja lihavoituna.');
    * log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');
    */
-  log: new Logger('[NetMatch %t] '.grey),
+  log: new Logger('[NetMatch %t] '.grey, argv.d),
 
   /**
    * Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().
    */
   timer: function () {
-    return new Date().getTime();
+    return Date.now();
   },
 
   /**
