@@ -98,7 +98,7 @@ function Server(port, address, debug) {
   // Alustetaan palvelin (esim. kartta, pelaajat, tavarat)
   this.initialize();
 
-  log.info('Server initialized successfully. :O)');
+  log.info('Server initialized successfully.');
 }
 
 Server.prototype.__proto__ = process.EventEmitter.prototype;
