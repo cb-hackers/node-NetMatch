@@ -316,6 +316,9 @@ Bullet.prototype.update = function () {
     var playerIds = Object.keys(this.server.players);
     for (var i = playerIds.length; i--;) {
       hit = this.checkPlayerHit(this.server.players[playerIds[i]]);
+      if (hit) {
+        break;
+      }
     }
 
   }
