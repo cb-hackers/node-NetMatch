@@ -1,7 +1,9 @@
 /**
  * @fileOverview Sisältää hyödyllisiä funktioita, eli {@link Utils}-nimiavaruuden toteutuksen.
  */
-var colors = require('colors')
+var argv = require('optimist')
+  .default({d: false}).alias({'d' : 'debug'}).argv
+  , colors = require('colors')
   , Logger = require('cbNetwork').Logger;
 
 /**
@@ -22,13 +24,13 @@ var Utils = {
    * log.error('VIRHE! Tulostuu punaisena ja lihavoituna.');
    * log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');
    */
-  log: new Logger('[NetMatch %t] '.grey),
+  log: new Logger('[NetMatch %t] '.grey, argv.d),
 
   /**
    * Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().
    */
   timer: function () {
-    return new Date().getTime();
+    return Date.now();
   },
 
   /**

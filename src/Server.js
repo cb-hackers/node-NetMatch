@@ -14,13 +14,14 @@ var cbNetwork = require('cbNetwork')
   , timer  = require('./Utils').timer
   , colors = require('colors')
   // Serverin moduulit
-  , NetMsgs = require('./NetMessage')
-  , Player  = require('./Player')
-  , Map     = require('./Map').Map
-  , Input   = require('./Input')
-  , Item    = require('./Item')
-  , Game    = require('./Game')
-  , Config  = require('./Config');
+  , NetMsgs  = require('./NetMessage')
+  , Player   = require('./Player')
+  , Map      = require('./Map').Map
+  , Input    = require('./Input')
+  , Item     = require('./Item')
+  , Game     = require('./Game')
+  , Config   = require('./Config')
+  , Commands = require('./Command');
 /**#nocode-*/
 
 Server.VERSION = "v2.4";
@@ -61,9 +62,9 @@ function Server(port, address, debug) {
 
   /** Sisältää palvelimella maassa olevat tavarat, kts. {@link Item}. */
   this.items = {};
-  
+
   // Alustetaan moduulit
-  
+
   /**
    * Pelaajille lähetettävät viestit. Tämä on instanssi {@link NetMessages}-luokasta.
    * @type NetMessages
@@ -83,6 +84,12 @@ function Server(port, address, debug) {
   this.game = new Game(this);
 
   /**
+   * Sisältää palvelimen komennot, joita voidaan kutsua joko palvelimen konsolista tai klientiltä
+   * @type Input
+   */
+  this.commands = new Commands(this);
+
+  /**
    * Sisältää palvelimen konsoli-io:n käsittelyyn käytettävän {@link Input}-luokan instanssin
    * @type Input
    */
@@ -100,8 +107,17 @@ Server.prototype.__proto__ = process.EventEmitter.prototype;
 Server.prototype.initialize = function () {
   // Kuunnellaan klinuja
   var self = this;
-  this.server.on('message', function recvPacket(client) {
+  this.server.on('message', function recvMsg(client) {
     self.handlePacket(client);
+  });
+
+  this.server.on('close', function onClose() {
+    if (!self.gameState.closing) {
+      // Hups! cbNetwork serveri kaatui alta.
+      log.fatal('cbNetwork kohtasi odottamattoman virheen.');
+      self.close(true);
+    }
+    // Muussa tapauksessa sulkeutuminen oli odotettavissa
   });
 
   // Alustetaan pelitilanne
@@ -124,22 +140,15 @@ Server.prototype.initialize = function () {
   for (var i = 1; i <= this.config.maxPlayers; ++i) {
     var pl = new Player();
     pl.playerId = i;
-    pl.active = false;
     pl.team = 1;
-    pl.botName = "Bot_" + i;
+    pl.botName = this.gameState.map.config.botNames[i];
     pl.clientId = "";
-    pl.active = false;
-    pl.loggedIn = false;
     pl.name = "";
     var skill = 21 - pl.playerId; // Botteja hieman eritasoisiksi vissiinkin?
     pl.fightRotate = 1.5 + (skill / 1.5);
     pl.shootingAngle = 4.0 + (pl.playerId * 1.5);
     pl.fov = 100 + (skill * 3.5);
-    pl.hasAmmos = false;
-    pl.admin = false;
-    pl.kicked = false;
     pl.kickReason = "";
-    pl.sendNames = false;
     this.players[i] = pl;
   }
 
@@ -176,6 +185,7 @@ Server.prototype.handlePacket = function (client) {
   var data = client.data
     , msgType = data.getByte()
     , currentPlayerId;
+
   // Onko servu sammumassa?
   if (this.gameState.closing) {
     reply = new Packet(2);
@@ -233,11 +243,6 @@ Server.prototype.handlePacket = function (client) {
 
   // Luupataan kaikkien pakettien läpi
   while (msgType) {
-    /*log.info(NET[msgType]);
-    // Tuli outoa dataa, POIS!
-    if (!NET[msgType]) {
-      break;
-    }*/
     // Lähetetään tietoa paketista käsiteltäväksi
     this.emit(msgType, client, player);
     msgType = data.getByte();
@@ -277,14 +282,11 @@ Server.prototype.sendReply = function (client, player) {
 
     // Lähetetään niiden pelaajien tiedot jotka ovat hengissä ja näkyvissä
     if (plr.active) {
-      var visible = true
-        , x1 = player.x
+      var x1 = player.x
         , y1 = player.y
         , x2 = plr.x
-        , y2 = plr.y;
-      if ((Math.abs(x1 - x2) > 450) || (Math.abs(y1 - y2) > 350)) {
-        visible = false;
-      }
+        , y2 = plr.y
+        , visible = !((Math.abs(x1 - x2) > 450) || (Math.abs(y1 - y2) > 350));
 
       // Onko näkyvissä vai voidaanko muuten lähettää
       if (player.sendNames || visible || plr.health <= 0) {
@@ -440,7 +442,7 @@ Server.prototype.login = function (client) {
       if (this.gameState.gameMode === 2) {
         // UNIMPLEMENTED
         // Tasainen jako joukkueihin TDM-pelimoodissa
-        player.team = Math.floor(Math.random()*2 + 1) + 1; // Rand(1,2)
+        player.team = Math.floor(Math.random() * 2 + 1) + 1; // Rand(1,2)
       }
 
       // Lähetetään vastaus clientille
@@ -479,7 +481,7 @@ Server.prototype.login = function (client) {
 
 /**
  * Kirjaa pelaajan ulos pelistä.
- * @param {Integer} playerId  Pelaajan ID.
+ * @param {Integer} playerId  Pelaajan ID
  */
 Server.prototype.logout = function (playerId) {
   var player = this.players[playerId]
@@ -488,22 +490,48 @@ Server.prototype.logout = function (playerId) {
   player.active = false;
   player.loggedIn = false;
   player.admin = false;
-  log.info(player.name + ' logged out.');
+  log.info('"%0" logged out.', player.name.green);
 
   // Lähetetään viesti kaikille muille paitsi boteille ja itselle
   this.messages.addToAll({msgType: NET.LOGOUT, playerId: playerId}, playerId);
 }
 
+/** 
+ * Palvelimelta potkaiseminen
+ * 
+ * @param {Integer} playerId    Pelaajan ID
+ * @param {Integer} kickerId    Potkijan ID
+ * @param {String} [reason=""]  Potkujen syy
+ */
+Server.prototype.kickPlayer = function (playerId, kickerId, reason) {
+  log.info(playerId);
+  var player = this.players[playerId];
+  player.kicked = true,
+  player.kickReason = reason || '';
+  player.kickerId = kickerId;
+  player.loggedIn = false;
+  player.active = false;
+  player.admin = false;
+  // Lähetään viesti kaikille
+  this.messages.addToAll({
+    msgType: NET.KICKED,
+    playerId: playerId,
+    playerId2: kickerId,
+    msgText: reason
+  });
+}
+
+
 /**
  * Sammuttaa palvelimen. Emittoi eventit {@link Server#closing} ja {@link Server#closed}
  */
-Server.prototype.close = function () {
+Server.prototype.close = function (now) {
   if (this.gameState.closing) {
     // Ollaan jo sulkemassa, ei aloiteta samaa prosessia uudelleen.
     return;
   }
   this.gameState.closing = true;
-  log.info('Closing server...');
+  log.info('Server going down...');
   this.emit('closing');
 
   // Pysäytetään Game-moduulin päivitys
@@ -512,9 +540,9 @@ Server.prototype.close = function () {
   var self = this;
   setTimeout(function closeServer() {
     self.server.close();
-    log.info('Server closed!');
     self.emit('closed');
-  }, 1000);
+    process.exit();
+  }, now ? 0 : 1000);
 };
 
 // Tapahtumien dokumentaatio
