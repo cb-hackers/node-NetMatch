@@ -392,7 +392,7 @@ Server.prototype.login = function (client) {
 
   // Versio on OK, luetaan pelaajan nimi
   nickname = data.getString().trim();
-  log.info('Player "%0" is trying to login...', nickname.green);
+  log.info('Player %0 is trying to login...', nickname.green);
 
   // Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa
   playerIds = Object.keys(this.players);
@@ -403,7 +403,7 @@ Server.prototype.login = function (client) {
         player.name = "";
       } else {
         // Nimimerkki oli jo käytössä.
-        log.info(' -> Nickname "%0" already in use.', nickname.green);
+        log.info(' -> Nickname %0 already in use.', nickname.green);
         replyData = new Packet(3);
         replyData.putByte(NET.LOGIN);
         replyData.putByte(NET.LOGINFAILED);
@@ -490,15 +490,15 @@ Server.prototype.logout = function (playerId) {
   player.active = false;
   player.loggedIn = false;
   player.admin = false;
-  log.info('"%0" logged out.', player.name.green);
+  log.info('%0 logged out.', player.name.green);
 
   // Lähetetään viesti kaikille muille paitsi boteille ja itselle
   this.messages.addToAll({msgType: NET.LOGOUT, playerId: playerId}, playerId);
 }
 
-/** 
+/**
  * Palvelimelta potkaiseminen
- * 
+ *
  * @param {Integer} playerId    Pelaajan ID
  * @param {Integer} kickerId    Potkijan ID
  * @param {String} [reason=""]  Potkujen syy

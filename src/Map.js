@@ -48,11 +48,11 @@ function Map(server, name) {
   this.loaded = false;
 
   if (!path.existsSync(filePath)) {
-    log.error('Map "%0" doesn\'t exist in "%1"', name.green, filePath.green);
+    log.error('Map %0 doesn\'t exist in %1', name.green, filePath.green);
     return;
   }
 
-  log.info('Loading map "%0" from "%1"', name.green, filePath.green);
+  log.info('Loading map %0 from %1', name.green, filePath.green);
   data = cjson.load(filePath);
   // Laajennetaan tämän kartan ominaisuuksia ladatulla json-tiedostolla
   cjson.extend(this, data);

@@ -44,7 +44,7 @@ var Utils = {
     var randVal = minVal + (Math.random() * (maxVal - minVal));
     return typeof floatVal === 'undefined' ? Math.round(randVal) : randVal.toFixed(floatVal);
   },
-  
+
   /**
    * Pitää kulman välillä 0-360
    * @param {Number} angle  Kulma

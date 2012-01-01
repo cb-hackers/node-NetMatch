@@ -6,7 +6,8 @@
 /**#nocode+*/
 var log = require('./Utils').log
   , cjson = require('cjson')
-  , path = require('path');
+  , path = require('path')
+  , colors = require('colors');
 /**#nocode-*/
 
 /**
@@ -99,11 +100,11 @@ Config.prototype.load = function (config) {
     , loadedConfig;
 
   if (!path.existsSync(filePath)) {
-    log.error('Config "%0" doesn\'t exist in "%1"', config, filePath);
+    log.error('Config %0 doesn\'t exist in %1', config.green, filePath.green);
     return;
   }
 
-  log.info('Loading config "%0" from "%1"', config, filePath);
+  log.info('Loading config %0" from %1', config.green, filePath.green);
   loadedConfig = cjson.load(filePath);
   // Laajennetaan tämän Configin ominaisuuksia ladatulla json-tiedostolla
   cjson.extend(this, loadedConfig);
