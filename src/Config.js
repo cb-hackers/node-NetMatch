@@ -64,6 +64,12 @@ Config.defaults = {
    */
   spawnProtection: 15000,
   /**
+   * Kuinka kauan kestää (millisekunteina) että pelaajat heräävät henkiin uudelleen
+   * @type Number
+   * @default 3000
+   */
+  deathDelay: 3000,
+  /**
    * Ovatko tutkanuolet käytössä vai ei
    * @type Boolean
    * @default true

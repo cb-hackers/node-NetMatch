@@ -6,6 +6,7 @@
 var log = require('./Utils').log
   , timer = require('./Utils').timer
   , rand = require('./Utils').rand
+  , distance = require('./Utils').distance
   , NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
   , WPNF = require('./Constants').WPNF
@@ -242,8 +243,8 @@ function Bullet(server, playerId, extraBullet) {
     return;
   }
 
-  // Lisätään palvelimen bullets-listaan tämä ammus
-  server.bullets.push(this);
+  // Lisätään palvelimen bullets-kokoelmaan tämä ammus
+  server.bullets[this.bulletId] = this;
 
   // Lisätään ammusviesti lähetettäväksi jokaiselle pelaajalle
   server.messages.addToAll({
@@ -274,17 +275,210 @@ Bullet.prototype.constructor = Bullet;
  * Päivittää yksittäisen ammuksen.
  */
 Bullet.prototype.update = function () {
-  var mps = this.server.game.movePerSec
-    , weaponConfig = Weapons[this.weapon]
-    , speed = weaponConfig.speed; // Nopeus riippuu siitä, millä aseella ammus on ammuttu
+  var weaponConfig = Weapons[this.weapon]
+    , speed = weaponConfig.bulletSpeed // Nopeus riippuu siitä, millä aseella ammus on ammuttu
+    , hit = false;
 
   if (!this.moved) {
     this.moved = 1;
     speed = 0;
   }
+  this.move(this.server.game.movePerSec(speed));
 
+  // Jos on ammuttu kranaatinlaukaisimella niin tutkitaan aikaviive (1 sekunti)
+  if (this.weapon === WPN.LAUNCHER && this.timeShooted + 1000 < timer()) {
+    hit = true;
+
+    // Lisätään viestijonoon ilmoitus osumasta.
+    this.server.messages.addToAll({
+      msgType: NET.BULLETHIT,  // Mikä viesti
+      bulletId: this.bulletId, // Ammuksen tunnus
+      playerId: 0,             // Keneen osui
+      x: this.x,               // Missä osui
+      y: this.y,               // Missä osui
+      weapon: this.weapon      // Millä aseella ammus ammuttiin
+    });
+
+    // Tarkistetaan räjähdysalue ja vahingoitetaan pelaajia
+    this.checkExplosion();
+  }
+
+  // Osuiko seinään, menikö kartalta ulos tai onko moottorisaha
+  if (!hit && (this.server.gameState.map.isColliding(this.x, this.y) || this.weapon === WPN.CHAINSAW)) {
+    hit = true;
+    // Tarkistetaan räjähdysalue ja vahingoitetaan pelaajia
+    this.checkExplosion();
+  } else if (!hit) {
+    // Ei osunut seinään mutta osuiko pelaajaan
+    // UNIMPLEMENTED
+    // Ei tarkisteta jos kierros on päättynyt
+
+    var playerIds = Object.keys(this.server.players);
+    for (var i = playerIds.length; i--;) {
+      hit = this.checkPlayerHit(this.server.players[playerIds[i]]);
+    }
+
+  }
+
+  if (hit) {
+    // Jos ollaan törmätty johonkin, poistetaan ammus.
+    delete this.server.bullets[this.bulletId];
+    delete this;
+  } else {
+    this.prevPosX = this.x;
+    this.prevPosY = this.y;
+  }
 }
 
+/**
+ * Tutkii onko pelaajia räjähdyksen vaikutusalueella. Tai moottorisahan (lol?).
+ *
+ * @param {Number} [x=this.x]  Tarkistuspisteen x-koordinaatti
+ * @param {Number} [y=this.y]  Tarkistuspisteen y-koordinaatti
+ *
+ * @returns {Boolean} Räjähtikö ammus
+ */
+Bullet.prototype.checkExplosion = function (x, y) {
+  var damageRange = Weapons[this.weapon].damageRange;
+
+  // Poistutaan jos ammus ei ole räjähtävää mallia
+  if (!damageRange) {
+    return false;
+  }
+
+  // Tarkistetaan, onko annettu x- ja y-koordinaatit parametreina
+  if ('number' !== typeof x || 'number' !== typeof y) {
+    x = this.x;
+    y = this.y;
+  }
+
+  if (this.server.debug) {
+    log.write('Checking explosion from weapon %0 at (%1, %2). Shooter: %3',
+      this.weapon, this.x.toPrecision(2), this.y.toPrecision(2),
+      this.server.players[this.playerId].name.green);
+  }
+
+  var playerIds = Object.keys(this.server.players);
+  for (var i = playerIds.length; i--;) {
+    var player = this.server.players[playerIds[i]]
+      , isProtected = (player.spawnTime + this.server.gameState.spawnProtection > Date.now());
+    // Onko pelaaja aktiivinen, hengissä eikä suojattu
+    if (player.active && player.health > 0 && !isProtected) {
+      var dist = distance(x, y, player.x, player.y)
+        , checkRange = true;
+
+      if (this.weapon === WPN.CHAINSAW && this.playerId === player.playerId) {
+        // Moottorisahalla ei voi osua itseensä
+        checkRange = false;
+      }
+
+      // Onko etäisyys pienempi kuin räjähdyksen vaikutusalue
+      if (dist <= damageRange && checkRange) {
+        this.applyExplosion(player, dist);
+      }
+    }
+  }
+}
+
+/**
+ * Vahingoittaa pelaajaa räjähdyksen etäisyyden arvoisesti
+ *
+ * @param {Player} victim  Pelaaja, kehen räjähdys vaikuttaa
+ * @param {Number} dist    Räjähdyksen etäisyys pelaajasta
+ */
+Bullet.prototype.applyExplosion = function (victim, dist) {
+  var damageRange = Weapons[this.weapon].damageRange;
+
+  if (this.server.debug) {
+    log.write('Applying explosion to %0', victim.name.green);
+  }
+
+  // Uhrille tieto ampujasta
+  victim.shootedBy = this.playerId;
+
+  // Lasketaan vahingon määrä, joka riippuu etäisyydestä räjähdykseen, räjähdyksen laajuudesta ja
+  // räjähtäneen ammuksen damage-kentän arvosta.
+  victim.health -= ((damageRange - dist) / damageRange) * Weapons[this.weapon].damage;
+
+  // Tarkistetaan kuolema
+  if (victim.health <= 0) {
+    victim.kill(this);
+  }
+}
+
+/**
+ * Tutkii osuiko ammus pelaajaan.
+ * @param {Player} player  Pelaaja, kehen tarkistus kohdistuu.
+ * @returns {Boolean} Osuiko vai eikö
+ */
+Bullet.prototype.checkPlayerHit = function (player) {
+  var isProtected = (player.spawnTime + this.server.spawnProtection > timer())
+    , move
+    , xMove
+    , yMove;
+  // Osuma tutkitaan vain jos pelaaja on aktiivinen ja hengissä
+  if (!isProtected && player.active && player.health > 0) {
+    move = distance(this.prevPosX, this.prevPosY, this.x, this.y);
+    xMove = (this.x - this.prevPosX) / move;
+    yMove = (this.y - this.prevPosY) / move;
+
+    // Ammus on voinut kulkea yhden framen aikana paljonkin joten tutkitaan siirtymää vähitellen.
+    var steps = Math.ceil(move / 5);
+    if (steps > 0) {
+      // Tutkitaan välipisteet
+      var stp = move / steps;
+      for (var i = 1; i <= steps; i++) {
+        var bPos = i * stp
+          , bx = this.prevPoxX + (xMove * bPos)
+          , by = this.prevPosY + (yMove * bPos);
+
+        // Nyt tarkistetaan osuma. Osumaa itseensä ei tarkisteta
+        if (player.playerId !== this.playerId && distance(player.x, player.y, bx, by) < 20) {
+          // Osui
+          this.playerHit(player, bx, by);
+          return true;
+        }
+      }
+    }
+  }
+
+  // Jos tänne asti päästiin, ei ammus osunut.
+  return false;
+}
+
+/**
+ * Tätä funktiota kutsutaan kun ammus osuu suoraan pelaajaan
+ * @param {Player} player  Pelaaja, kehen ammus osui.
+ * @param {Number} x       Osumakohta
+ * @param {Number} y       Osumakohta
+ */
+Bullet.prototype.playerHit = function (player, x, y) {
+  // Talletetaan tieto ampujasta
+  player.shootedBy = this.playerId;
+
+  // Lisätään viestijonoon ilmoitus osumasta
+  this.server.messages.addToAll({
+    msgType: NET.BULLETHIT,     // Mikä viesti
+    bulletId: this.bulletId,    // Ammuksen tunnus
+    playerId: player.playerId,  // Keneen osui
+    x: x,                       // Missä osui
+    y: y,                       // Missä osui
+    weapon: this.weapon         // Millä aseella ammus ammuttiin
+  });
+
+  // Tutkitaan oliko räjähdys ja jos oli, niin meillä ei ole täällä enää muuta tehtävää.
+  if (this.checkExplosion(x, y)) {
+    return;
+  }
+
+  // Ei ollut räjähdys, tiputetaan pelaajan health-kentän arvoa
+  player.health -= Weapons[this.weapon].damage;
+
+  // Kuolema?
+  if (player.health <= 0) {
+    player.kill(this);
+  }
+}
 
 exports.Bullet = Bullet;
 exports.Weapons = Weapons;

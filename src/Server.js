@@ -56,7 +56,7 @@ function Server(port, address, debug) {
   this.players = {};
 
   /** Sisältää palvelimen ammukset, eli luokan {@link Weapon} jäsenet. */
-  this.bullets = [];
+  this.bullets = {};
   /** @private */
   this.lastBulletId = 0;
 
@@ -138,18 +138,7 @@ Server.prototype.initialize = function () {
 
   // Alustetaan pelaajat
   for (var i = 1; i <= this.config.maxPlayers; ++i) {
-    var pl = new Player();
-    pl.playerId = i;
-    pl.team = 1;
-    pl.botName = this.gameState.map.config.botNames[i];
-    pl.clientId = "";
-    pl.name = "";
-    var skill = 21 - pl.playerId; // Botteja hieman eritasoisiksi vissiinkin?
-    pl.fightRotate = 1.5 + (skill / 1.5);
-    pl.shootingAngle = 4.0 + (pl.playerId * 1.5);
-    pl.fov = 100 + (skill * 3.5);
-    pl.kickReason = "";
-    this.players[i] = pl;
+    new Player(this, i);
   }
 
   // Alustetaan itemit
@@ -165,13 +154,13 @@ Server.prototype.initialize = function () {
     new Item(this, ++itemId, ITM.ROCKET);
   }
   for (var i = mapConfig.shotgunItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.FUEL);
-  }
-  for (var i = mapConfig.launcherItems - 1; i--;) {
     new Item(this, ++itemId, ITM.SHOTGUN);
   }
-  for (var i = mapConfig.chainsawItems - 1; i--;) {
+  for (var i = mapConfig.launcherItems - 1; i--;) {
     new Item(this, ++itemId, ITM.LAUNCHER);
+  }
+  for (var i = mapConfig.chainsawItems - 1; i--;) {
+    new Item(this, ++itemId, ITM.FUEL);
   }
 };
 

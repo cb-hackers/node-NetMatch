@@ -121,7 +121,7 @@ Commands.prototype.initialize = function () {
       if (!/\D/.test(args[0])) {
         plr = this.players[args[0]];
         if (plr && plr.active && !plr.zombie) {
-          this.kickPlayer(plr.playerId, plr.playerId, args[1]);
+          this.kickPlayer(plr.playerId, 0, args[1]);
           log.info('Player kicked!');
           return;
         } else {
@@ -136,7 +136,7 @@ Commands.prototype.initialize = function () {
         for (var i = playerIds.length; i--;) {
           plr = this.players[playerIds[i]];
           if (plr.name === args[0] && plr.active && ! plr.zombie) {
-            this.kickPlayer(plr.playerId, plr.playerId, args[1]);
+            this.kickPlayer(plr.playerId, 0, args[1]);
             log.info('Player kicked!');
             return;
           }
@@ -144,7 +144,7 @@ Commands.prototype.initialize = function () {
       }
     }
   );
-  
+
 };
 
 Commands.prototype.add = function (names, args, help, action) {
@@ -180,7 +180,7 @@ Commands.prototype.call = function (name, args) {
       return;
     }
   }
-  
+
   c.action.call(this.server, args);
 };
 

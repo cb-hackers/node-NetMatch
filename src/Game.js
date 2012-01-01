@@ -89,7 +89,31 @@ Game.prototype.updateStats = function () {
  * @private
  */
 Game.prototype.updatePlayers = function () {
+  var playerIds = Object.keys(this.server.players);
+  for (var i = playerIds.length; i--;) {
+    var player = this.server.players[playerIds[i]];
 
+    // Jos pelaaja on kuollut ja kuolemasta on kulunut tarpeeksi aikaa, herätetään henkiin.
+    if (player.health <= 0 && player.timeToDeath + this.server.config.deathDelay < Date.now()) {
+      if (this.server.debug) {
+        log.write('Reviving player %0 from the deads.', player.name);
+      }
+      var randomPlace = this.server.gameState.map.findSpot();
+      player.x = randomPlace.x;
+      player.y = randomPlace.y;
+      player.health = 100;
+      player.lastValidX = player.x;
+      player.lastValidY = player.y;
+      player.hackTestX = player.x;
+      player.hackTestY = player.y;
+      player.spawnTime = Date.now();
+      // UNIMPLEMENTED
+      // Jos tämä on botti niin arvotaan ase
+    }
+
+    // UNIMPLEMENTED
+    // Onko pelajaa kartalla
+  }
 }
 
 /**

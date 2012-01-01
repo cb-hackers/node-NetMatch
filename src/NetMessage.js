@@ -151,13 +151,7 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
           data.putShort(0);  // Ammuksen kulma, mutta koska moottirisahalla ei ole kulmaa, on tämä 0
         } else {
           // Jokin muu kuin moottorisaha
-          var bullet;
-          for (var i = this.server.bullets.length; i--;) {
-            if (this.server.bullets[i].bulletId === d.bulletId) {
-              bullet = this.server.bullets[i];
-              break;
-            }
-          }
+          var bullet = this.server.bullets[d.bulletId];
           if ('undefined' !== typeof bullet) {
             data.putByte(d.msgType);
             data.putShort(d.bulletId);
@@ -195,8 +189,8 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
         data.putByte(d.msgType);
         data.putShort(d.bulletId);  // Ammuksen tunnus
         data.putByte(d.playerId);   // Keneen osui
-        data.putShort(d.x);          // Missä osui
-        data.putShort(d.y);          // Missä osui
+        data.putShort(d.x);         // Missä osui
+        data.putShort(d.y);         // Missä osui
         data.putByte(d.weapon);     // Mistä aseesta ammus on
         break;
 

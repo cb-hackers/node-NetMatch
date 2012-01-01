@@ -53,6 +53,20 @@ var Utils = {
   wrapAngle: function (a) {
     a = a / 360;
     return (a - Math.floor(a)) * 360;
+  },
+
+  /**
+   * Palauttaa kahden pisteen välisen etäisyyden
+   * @param {Number} x1  Ensimmäisen pisteen x-koordinaatti
+   * @param {Number} y1  Ensimmäisen pisteen y-koordinaatti
+   * @param {Number} x2  Toisen pisteen x-koordinaatti
+   * @param {Number} y2  Toisen pisteen y-koordinaatti
+   * @returns {Number}   Pisteiden välinen etäisyys
+   */
+  distance: function (x1, y1, x2, y2) {
+    var dx = x1 - x2; // Vaakasuuntainen etäisyys
+    var dy = y1 - y2; // Pystysuuntainen etäisyys
+    return Math.sqrt( dx*dx + dy*dy );
   }
 };
 
