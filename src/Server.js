@@ -302,7 +302,13 @@ Server.prototype.sendReply = function (client, player) {
               + ((isProtected << 7));     // Haavoittumaton (bitti 7)
         reply.putByte(b);
 
-        reply.putByte(plr.health);      // Terveys
+        if (plr.health <= 0) {
+          // Client-puolella health-arvo lasketaan seuraavasta tavusta niin, että jos se ylittää
+          // 128, on oikea health-määrä vastaanotettu tavu - 256.
+          reply.putByte(Math.min(255, Math.max(0, plr.health + 256)));
+        } else {
+          reply.putByte(plr.health);      // Terveys
+        }
         reply.putShort(plr.kills);      // Tapot
         reply.putShort(plr.deaths);     // Kuolemat
       } else if (this.gameState.radarArrows || this.gameState.playMode === 2) {

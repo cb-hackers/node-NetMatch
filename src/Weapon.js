@@ -322,6 +322,7 @@ Bullet.prototype.update = function () {
 
   if (hit) {
     // Jos ollaan törmätty johonkin, poistetaan ammus.
+    this.server.bullets[this.bulletId] = undefined;
     delete this.server.bullets[this.bulletId];
     delete this;
   } else {
@@ -361,7 +362,7 @@ Bullet.prototype.checkExplosion = function (x, y) {
   var playerIds = Object.keys(this.server.players);
   for (var i = playerIds.length; i--;) {
     var player = this.server.players[playerIds[i]]
-      , isProtected = (player.spawnTime + this.server.gameState.spawnProtection > Date.now());
+      , isProtected = (player.spawnTime + this.server.config.spawnProtection > Date.now());
     // Onko pelaaja aktiivinen, hengissä eikä suojattu
     if (player.active && player.health > 0 && !isProtected) {
       var dist = distance(x, y, player.x, player.y)
@@ -387,6 +388,9 @@ Bullet.prototype.checkExplosion = function (x, y) {
  * @param {Number} dist    Räjähdyksen etäisyys pelaajasta
  */
 Bullet.prototype.applyExplosion = function (victim, dist) {
+  if (player.health <= 0 || player.isDead) {
+    return;
+  }
   var damageRange = Weapons[this.weapon].damageRange;
 
   if (this.server.debug) {
@@ -412,7 +416,7 @@ Bullet.prototype.applyExplosion = function (victim, dist) {
  * @returns {Boolean} Osuiko vai eikö
  */
 Bullet.prototype.checkPlayerHit = function (player) {
-  var isProtected = (player.spawnTime + this.server.spawnProtection > timer())
+  var isProtected = (player.spawnTime + this.server.config.spawnProtection > timer())
     , move
     , xMove
     , yMove;
@@ -429,7 +433,7 @@ Bullet.prototype.checkPlayerHit = function (player) {
       var stp = move / steps;
       for (var i = 1; i <= steps; i++) {
         var bPos = i * stp
-          , bx = this.prevPoxX + (xMove * bPos)
+          , bx = this.prevPosX + (xMove * bPos)
           , by = this.prevPosY + (yMove * bPos);
 
         // Nyt tarkistetaan osuma. Osumaa itseensä ei tarkisteta
@@ -453,6 +457,9 @@ Bullet.prototype.checkPlayerHit = function (player) {
  * @param {Number} y       Osumakohta
  */
 Bullet.prototype.playerHit = function (player, x, y) {
+  if (player.health <= 0 || player.isDead) {
+    return;
+  }
   // Talletetaan tieto ampujasta
   player.shootedBy = this.playerId;
 

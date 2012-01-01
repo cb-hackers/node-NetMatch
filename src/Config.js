@@ -60,9 +60,9 @@ Config.defaults = {
   /**
    * Kuinka pitkän ajan pelaajilla on suoja spawnauksen jälkeen. Aika millisekunteissa
    * @type Number
-   * @default 15000
+   * @default 3000
    */
-  spawnProtection: 15000,
+  spawnProtection: 3000,
   /**
    * Kuinka kauan kestää (millisekunteina) että pelaajat heräävät henkiin uudelleen
    * @type Number
