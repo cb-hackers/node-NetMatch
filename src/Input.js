@@ -13,7 +13,7 @@ var log = require('./Utils').log
 function Input(server) {
   var self = this
     , rli = readline.createInterface(process.stdin, process.stdout, function (partial) {
-      // Luodaan automaattinen täydennys komentojen ensimmäisen aliaksen perusteella
+      // Luodaan automaattinen täydennys komentojen nimien perusteella
       var suggestions = [], prefix = '';
       // Jos rivi alkaa help komennolla
       if (partial.substr(0, 5) === 'help ') {
@@ -50,17 +50,17 @@ function Input(server) {
     server.close();
   });
 
-	rli.on('close', function rliClose() {
+  rli.on('close', function rliClose() {
     process.stdin.destroy();
     server.close();
   });
 
-	rli.on('line', function(input){
+  rli.on('line', function(input){
     msg = input.trim();
     if (!msg) { return; }
     // Käsitellään serverikomennot
     server.commands.call(msg.split(' ')[0], msg.split(' ').splice(1));
-	});
+  });
 }
 
 exports = module.exports = Input;
