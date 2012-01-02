@@ -2,8 +2,11 @@
  * @fileOverview Ajettava palvelin
  */
 
-// Vaatii cbNetwork ja node-optimist-paketin: https://github.com/substack/node-optimist
+// Tämän filun sisältämiä funktiota yms. ei dokumentoida.
 /**#nocode+*/
+
+// Vaatii cbNetwork ja node-optimist-paketin: https://github.com/substack/node-optimist
+
 var argv = require('optimist')
     .default({p : 1337, a : undefined, d: false})
     .alias({'p' : 'port', 'a' : 'address', 'd' : 'debug'})
@@ -16,12 +19,10 @@ var argv = require('optimist')
   , colors = require('colors')
   , timer = require('./Utils').timer
   , Bullet = require('./Weapon').Bullet;
-/**#nocode-*/
 
 process.title = "NetMatch server";
 
 // Tehdään uusi palvelin.
-/** @ignore */
 var server = new Server(argv.p, argv.a, argv.d);
 
 server.on(NET.LOGIN, function NetLogin(client) {
@@ -63,13 +64,7 @@ server.on(NET.PLAYER, function NetPlayer(client, player) {
     // speedhack
 
     if (shooting === 1) {
-      if (server.debug) {
-        log.info('Player %0 is shooting a new bullet from weapon %1'
-          , player.name.yellow
-          , player.weapon);
-      }
       new Bullet(server, player.playerId);
-      //console.dir(this.bullets);
     }
 
     // Poimittiinko jotain

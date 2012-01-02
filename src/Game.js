@@ -96,7 +96,7 @@ Game.prototype.updatePlayers = function () {
     // Jos pelaaja on kuollut ja kuolemasta on kulunut tarpeeksi aikaa, herätetään henkiin.
     if (player.health <= 0 && player.timeToDeath + this.server.config.deathDelay < Date.now()) {
       if (this.server.debug) {
-        log.write('Reviving player %0 from the deads.', player.name);
+        log.write('Reviving %0 from the deads.', player.name.green);
       }
       var randomPlace = this.server.gameState.map.findSpot();
       player.x = randomPlace.x;

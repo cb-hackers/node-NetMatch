@@ -9,7 +9,6 @@ var log = require('./Utils').log
   , distance = require('./Utils').distance
   , NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
-  , WPNF = require('./Constants').WPNF
   , Obj = require('./Object');
 /**#nocode-*/
 
@@ -28,6 +27,7 @@ var log = require('./Utils').log
  * <tr><td> safeRange    </td><td>  Etäisyys jonka alle kohteesta oleva botti ei ammu  </td></tr>
  * <tr><td> shootRange   </td><td>  Etäisyys jonka alle kohteesta oleva botti ampuu  </td></tr>
  * <tr><td> weight       </td><td>  Aseen paino, vaikuttaa liikkumisen nopeuteen. 100 = normaali  </td></tr>
+ * <tr><td> name         </td><td>  Aseen nimi merkkijonona, debuggailua varten  </td></tr>
  * </table>
  */
 var Weapons = [
@@ -49,7 +49,8 @@ var Weapons = [
     pickCount: undefined,
     safeRange: 100,
     shootRange: 500,
-    weight: 100
+    weight: 100,
+    name: "pistol"
   },
   /**
    * Konekivääri, <code>Weapons[WPN.MGUN]</code>
@@ -67,7 +68,8 @@ var Weapons = [
     pickCount: 50,
     safeRange: 200,
     shootRange: 500,
-    weight: 100
+    weight: 100,
+    name: "machinegun"
   },
   /**
    * Sinko, <code>Weapons[WPN.BAZOOKA]</code>
@@ -85,7 +87,8 @@ var Weapons = [
     pickCount: 5,
     safeRange: 300,
     shootRange: 500,
-    weight: 115
+    weight: 115,
+    name: "bazooka"
   },
   /**
    * Haulikko, <code>Weapons[WPN.SHOTGUN]</code>
@@ -103,7 +106,8 @@ var Weapons = [
     pickCount: 10,
     safeRange: 150,
     shootRange: 300,
-    weight: 100
+    weight: 100,
+    name: "shotgun"
   },
   /**
    * Kranaatinlaukaisin, <code>Weapons[WPN.LAUNCHER]</code>
@@ -121,7 +125,8 @@ var Weapons = [
     pickCount: 2,
     safeRange: 300,
     shootRange: 400,
-    weight: 110
+    weight: 110,
+    name: "launcher"
   },
   /**
    * Moottorisaha, <code>Weapons[WPN.CHAINSAW]</code>
@@ -139,7 +144,8 @@ var Weapons = [
     pickCount: 50,
     safeRange: 60,
     shootRange: 150,
-    weight: 90
+    weight: 90,
+    name: "chainsaw"
   }
 ];
 
@@ -193,6 +199,12 @@ function Bullet(server, playerId, extraBullet) {
   this.angle = player.angle;
 
   weaponConfig = Weapons[player.weapon];
+
+  // Debugataan
+  if (server.debug) {
+    log.info('Created a new bullet %0 (%1), shot by %2',
+      String(this.bulletId).magenta, weaponConfig.name.yellow, player.name.green);
+  }
 
   // Mistä ammus lähtee pelaajaan nähden
   bPos = weaponConfig.bulletYaw;
@@ -325,7 +337,9 @@ Bullet.prototype.update = function () {
 
   if (hit) {
     // Jos ollaan törmätty johonkin, poistetaan ammus.
-    this.server.bullets[this.bulletId] = undefined;
+    if (this.server.debug) {
+      log.info('Deleted bullet %0 (%1).', String(this.bulletId).magenta, weaponConfig.name.yellow);
+    }
     delete this.server.bullets[this.bulletId];
     delete this;
   } else {
@@ -357,9 +371,9 @@ Bullet.prototype.checkExplosion = function (x, y) {
   }
 
   if (this.server.debug) {
-    log.write('Checking explosion from weapon %0 at (%1, %2). Shooter: %3',
-      this.weapon, this.x.toPrecision(2), this.y.toPrecision(2),
-      this.server.players[this.playerId].name.green);
+    log.info('Checking explosion from %0 (%1) at (%2, %3).',
+      String(this.bulletId).magenta, Weapons[this.weapon].name.yellow,
+      this.x.toFixed(2).blue, this.y.toFixed(2).blue);
   }
 
   var playerIds = Object.keys(this.server.players);
@@ -378,38 +392,9 @@ Bullet.prototype.checkExplosion = function (x, y) {
 
       // Onko etäisyys pienempi kuin räjähdyksen vaikutusalue
       if (dist <= damageRange && checkRange) {
-        this.applyExplosion(player, dist);
+        player.applyExplosion(this, dist);
       }
     }
-  }
-}
-
-/**
- * Vahingoittaa pelaajaa räjähdyksen etäisyyden arvoisesti
- *
- * @param {Player} victim  Pelaaja, kehen räjähdys vaikuttaa
- * @param {Number} dist    Räjähdyksen etäisyys pelaajasta
- */
-Bullet.prototype.applyExplosion = function (victim, dist) {
-  if (player.health <= 0 || player.isDead) {
-    return;
-  }
-  var damageRange = Weapons[this.weapon].damageRange;
-
-  if (this.server.debug) {
-    log.write('Applying explosion to %0', victim.name.green);
-  }
-
-  // Uhrille tieto ampujasta
-  victim.shootedBy = this.playerId;
-
-  // Lasketaan vahingon määrä, joka riippuu etäisyydestä räjähdykseen, räjähdyksen laajuudesta ja
-  // räjähtäneen ammuksen damage-kentän arvosta.
-  victim.health -= ((damageRange - dist) / damageRange) * Weapons[this.weapon].damage;
-
-  // Tarkistetaan kuolema
-  if (victim.health <= 0) {
-    victim.kill(this);
   }
 }
 

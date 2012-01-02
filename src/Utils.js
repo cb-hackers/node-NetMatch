@@ -24,7 +24,7 @@ var Utils = {
    * log.error('VIRHE! Tulostuu punaisena ja lihavoituna.');
    * log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');
    */
-  log: new Logger('[NetMatch %t] '.grey, argv.d),
+  log: new Logger('[NetMatch %t] '.grey, (argv.d > 1) ? true : false),
 
   /**
    * Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().

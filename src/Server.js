@@ -360,7 +360,7 @@ Server.prototype.sendReply = function (client, player) {
 };
 
 Server.prototype.serverMessage = function (msg, to) {
-  
+
   if (!to) {
     log.write('<Server>'.blue + ' %0', msg);
     this.messages.addToAll({

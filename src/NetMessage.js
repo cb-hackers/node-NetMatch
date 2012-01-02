@@ -5,8 +5,6 @@
 /**#nocode+*/
 var NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
-  , WPNF = require('./Constants').WPNF
-  , OBJ = require('./Constants').OBJ
   , log = require('./Utils').log
   , colors = require('colors');
 /**#nocode-*/

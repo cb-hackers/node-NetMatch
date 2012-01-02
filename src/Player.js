@@ -6,7 +6,8 @@
 var log = require('./Utils').log
   , Obj = require('./Object')
   , WPN = require('./Constants').WPN
-  , NET = require('./Constants').NET;
+  , NET = require('./Constants').NET
+  , Weapons = require('./Weapon').Weapons;
 /**#nocode-*/
 
 /**
@@ -117,8 +118,9 @@ Player.prototype.kill = function (bullet) {
     if (!bullet) {
       log.write('Player %0 committed suicide.', this.name);
     } else {
-      log.write('Player %0 was killed by player %1 with weapon %2', this.name,
-        this.server.players[bullet.playerId].name.green, bullet.weapon);
+      log.write('Player %0 was killed by player %1 with bullet %2 (%3)', this.name.green,
+        this.server.players[bullet.playerId].name.green, String(bullet.bulletId).magenta,
+        Weapons[bullet.weapon].name.yellow);
     }
   }
 
@@ -155,5 +157,34 @@ Player.prototype.kill = function (bullet) {
   }
 }
 
+/**
+ * Vahingoittaa pelaajaa räjähdyksen etäisyyden arvoisesti
+ *
+ * @param {Bullet} bullet  Ammus, joka räjähtää pelaajan lähellä
+ * @param {Number} dist    Räjähdyksen etäisyys pelaajasta
+ */
+Player.prototype.applyExplosion = function (bullet, dist) {
+  if (this.health <= 0 || this.isDead) {
+    return;
+  }
+  var damageRange = Weapons[bullet.weapon].damageRange;
+
+  if (this.server.debug) {
+    log.info('Applying explosion from bullet %0 (%1) to %2',
+      String(bullet.bulletId).magenta, Weapons[bullet.weapon].name.yellow, this.name.green);
+  }
+
+  // Uhrille tieto ampujasta
+  this.shootedBy = bullet.playerId;
+
+  // Lasketaan vahingon määrä, joka riippuu etäisyydestä räjähdykseen, räjähdyksen laajuudesta ja
+  // räjähtäneen ammuksen damage-kentän arvosta.
+  this.health -= ((damageRange - dist) / damageRange) * Weapons[bullet.weapon].damage;
+
+  // Tarkistetaan kuolema
+  if (this.health <= 0) {
+    this.kill(bullet);
+  }
+}
 
 exports = module.exports = Player;

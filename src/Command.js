@@ -13,14 +13,14 @@ var log = require('./Utils').log
  * @namespace Sisältää serverikomennot, joihin pääsee käsiksi {@link Command}-luokan call-metodilla.
  *
  * Komennot muodostuvat seuraavasti:
- * @property {Array}    params           Parametrit
- * @property {String}   params.name      Parametrin nimi
- * @property {String}   params.type      Parametrin tyyppi
- * @property {Boolean}  params.optional  Onko parametri vapaaehtoinen
- * @property {String}   params.help      Mihin parametriä käytetään
- * @property {String}   help             Mihin komentoa käytetään
- * @property {Boolean}  remote           Voiko komentoa kutsua klientillä
- * @property {Function} action           Komennon logiikka
+ * @property {Object[]} params  Parametrit listassa. Jokaisella parametrilla on seuraavat kentät:<br>
+ *                                - name: Parametrin nimi<br>
+ *                                - type: Parametrin tyyppi (esim. string)<br>
+ *                                - optional: Voiko parametrin jättää antamatta<br>
+ *                                - help: Parametrin ohje, mitä tämä parametri tekee
+ * @property {String}   help    Mihin komentoa käytetään
+ * @property {Boolean}  remote  Voiko komentoa kutsua klientillä
+ * @property {Function} action  Komennon logiikka
  */
 var Commands = {};
 
@@ -183,6 +183,7 @@ Commands.login = {
   }
 };
 
+/**#nocode+*/
 // Ladataan lisää komentoja Commands-kansiosta, jos semmoisia löytyy.
 files = fs.readdirSync(__dirname + '/Commands');
 log.info('Found and loaded %0 command-modules: %1', String(files.length).magenta,
@@ -192,11 +193,14 @@ log.info('Found and loaded %0 command-modules: %1', String(files.length).magenta
     return cmd;
   }).join(', ').green
 );
+/**#nocode-*/
 
 
 /**
  * Hoitaa komentojen sisäisen käsittelyn ja toteutuksen
  * @class Komentojen käsittely
+ *
+ * @param {Server} server  NetMatch-palvelin, johon tämä instanssi kuuluu
  */
 function Command(server) {
   this.server = server;
@@ -259,6 +263,11 @@ Command.prototype.getHelpString = function (name) {
   return h;
 };
 
+/**
+ * Hoitaa komentojen ja pelaajien nimimerkkien täydentämisen annetun parametrin perusteella
+ * @param {String}  partial
+ * @returns {Array}  Löydetyt ehdotukset
+ */
 Command.prototype.suggest = function (partial) {
   var suggestions = [], plr
     , server = this.server
@@ -305,11 +314,13 @@ Command.prototype.suggest = function (partial) {
   return suggestions;
 };
 
+/** @ignore */
 function startsWith(str1, str) {
   return str1.slice(0, str.length) === str;
 }
 
 // Thanks for benvie at #node for help!
+/** @ignore */
 function padString(s, l, r) {
   if (r) {
     return Array(Math.max(l - s.length + 1, 0)).join(' ') + s;
