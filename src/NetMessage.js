@@ -5,14 +5,15 @@
 /**#nocode+*/
 var NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
-  , WPNF = require('./Constants').WPNF
-  , OBJ = require('./Constants').OBJ
   , log = require('./Utils').log
   , colors = require('colors');
 /**#nocode-*/
 
 /**
+ * Alustaa uuden viestisäilön.
  * @class Viestien säilytys
+ *
+ * @param {Server} server  Tämän viestisäilön {@link Server}-instanssi
  */
 var NetMessages = function (server) {
   this.server = server;
@@ -67,6 +68,26 @@ NetMessages.prototype.addToAll = function (data, butNotTo) {
   while (iterator--) {
     plr = this.server.players[playerIds[iterator]];
     if (plr.active && !plr.zombie && (plr.playerId !== butNotTo)) {
+      this.add(plr.playerId, data);
+    }
+  }
+}
+
+/**
+ * Lähettää kaikille annetun joukkueen jäsenille.
+ * @see NetMessages#add
+ *
+ * @param {Byte} team    Joukkue jonka jäsenille lähetetään viesti
+ * @param {Object} data  Pelaajalle lähetettävä data
+ */
+NetMessages.prototype.addToTeam = function (team, data) {
+  var playerIds = Object.keys(this.server.players)
+    , plr
+    , iterator = playerIds.length;
+
+  while (iterator--) {
+    plr = this.server.players[playerIds[iterator]];
+    if (plr.active && !plr.zombie && (plr.team === team)) {
       this.add(plr.playerId, data);
     }
   }
@@ -128,13 +149,7 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
           data.putShort(0);  // Ammuksen kulma, mutta koska moottirisahalla ei ole kulmaa, on tämä 0
         } else {
           // Jokin muu kuin moottorisaha
-          var bullet;
-          for (var i = this.server.bullets.length; i--;) {
-            if (this.server.bullets[i].bulletId === d.bulletId) {
-              bullet = this.server.bullets[i];
-              break;
-            }
-          }
+          var bullet = this.server.bullets[d.bulletId];
           if ('undefined' !== typeof bullet) {
             data.putByte(d.msgType);
             data.putShort(d.bulletId);
@@ -172,8 +187,8 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
         data.putByte(d.msgType);
         data.putShort(d.bulletId);  // Ammuksen tunnus
         data.putByte(d.playerId);   // Keneen osui
-        data.putShort(d.x);          // Missä osui
-        data.putShort(d.y);          // Missä osui
+        data.putShort(d.x);         // Missä osui
+        data.putShort(d.y);         // Missä osui
         data.putByte(d.weapon);     // Mistä aseesta ammus on
         break;
 

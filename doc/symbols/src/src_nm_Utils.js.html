@@ -8,48 +8,74 @@
 	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
 <span class='line'>  2</span>  * @fileOverview Sisältää hyödyllisiä funktioita, eli {@link Utils}-nimiavaruuden toteutuksen.
 <span class='line'>  3</span>  */</span><span class="WHIT">
-<span class='line'>  4</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">colors</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'colors'</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>  5</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">Logger</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'cbNetwork'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">Logger</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>  6</span> 
-<span class='line'>  7</span> </span><span class="COMM">/**
-<span class='line'>  8</span>  * @namespace Sisältää hyödyllisiä funktioita.
-<span class='line'>  9</span>  */</span><span class="WHIT">
-<span class='line'> 10</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">Utils</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 11</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 12</span>    * Yleinen funktio lokiin/konsoliin (stdout) kirjoittamista varteen. Tämä on instanssi cbNetwork-noden
-<span class='line'> 13</span>    * &lt;a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Logger.html">Logger&lt;/a>-luokasta.
-<span class='line'> 14</span>    * Voit käyttää tätä näin:
-<span class='line'> 15</span>    * @example
-<span class='line'> 16</span>    * var log = Utils.log;
-<span class='line'> 17</span>    *
-<span class='line'> 18</span>    * log.write('Perusviesti, tämä on ilman värejä.');
-<span class='line'> 19</span>    * log.info('Jotain tiedotettavaa tapahtui. Tulostuu vihreänä.');
-<span class='line'> 20</span>    * log.warn('Varoitus! Tulostuu keltaisena.');
-<span class='line'> 21</span>    * log.notice('Ilmoitus! Tulostuu keltaisena.');
-<span class='line'> 22</span>    * log.error('VIRHE! Tulostuu punaisena ja lihavoituna.');
-<span class='line'> 23</span>    * log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');
-<span class='line'> 24</span>    */</span><span class="WHIT">
-<span class='line'> 25</span> </span><span class="WHIT">  </span><span class="NAME">log</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Logger</span><span class="PUNC">(</span><span class="STRN">'[NetMatch %t] '</span><span class="PUNC">.</span><span class="NAME">grey</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 26</span> 
-<span class='line'> 27</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 28</span>    * Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().
-<span class='line'> 29</span>    */</span><span class="WHIT">
-<span class='line'> 30</span> </span><span class="WHIT">  </span><span class="NAME">timer</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 31</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getTime</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 32</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 33</span> 
-<span class='line'> 34</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 35</span>    * Palauttaa satunnaisen luvun väliltä minVal...maxVal tarkkuudella floatVal
-<span class='line'> 36</span>    * @param {Number} minVal      Pienin mahdollinen luku
-<span class='line'> 37</span>    * @param {Number} maxVal      Suurin mahdollinen luku
-<span class='line'> 38</span>    * @param {Number} [floatVal]  Palautettavan satunnaisen luvun tarkkuus. Mikäli tätä ei anneta,
-<span class='line'> 39</span>    *                             palautetaan kokonaisluku.
-<span class='line'> 40</span>    */</span><span class="WHIT">
-<span class='line'> 41</span> </span><span class="WHIT">  </span><span class="NAME">rand</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">minVal</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">maxVal</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">floatVal</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 42</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">randVal</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">minVal</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">Math.random</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">maxVal</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">minVal</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">floatVal</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">Math.round</span><span class="PUNC">(</span><span class="NAME">randVal</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">randVal.toFixed</span><span class="PUNC">(</span><span class="NAME">floatVal</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 44</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 45</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 46</span> 
-<span class='line'> 47</span> </span><span class="NAME">exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">module.exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Utils</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 48</span> </span></pre></body></html>
+<span class='line'>  4</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">argv</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'optimist'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>  5</span> </span><span class="WHIT">  </span><span class="PUNC">.</span><span class="KEYW">default</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="NAME">d</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">alias</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="STRN">'d'</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'debug'</span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">argv</span><span class="WHIT">
+<span class='line'>  6</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">colors</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'colors'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>  7</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">Logger</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'cbNetwork'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">Logger</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  8</span> 
+<span class='line'>  9</span> </span><span class="COMM">/**
+<span class='line'> 10</span>  * @namespace Sisältää hyödyllisiä funktioita.
+<span class='line'> 11</span>  */</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">Utils</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 13</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 14</span>    * Yleinen funktio lokiin/konsoliin (stdout) kirjoittamista varteen. Tämä on instanssi cbNetwork-noden
+<span class='line'> 15</span>    * &lt;a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Logger.html">Logger&lt;/a>-luokasta.
+<span class='line'> 16</span>    * Voit käyttää tätä näin:
+<span class='line'> 17</span>    * @example
+<span class='line'> 18</span>    * var log = Utils.log;
+<span class='line'> 19</span>    *
+<span class='line'> 20</span>    * log.write('Perusviesti, tämä on ilman värejä.');
+<span class='line'> 21</span>    * log.info('Jotain tiedotettavaa tapahtui. Tulostuu vihreänä.');
+<span class='line'> 22</span>    * log.warn('Varoitus! Tulostuu keltaisena.');
+<span class='line'> 23</span>    * log.notice('Ilmoitus! Tulostuu keltaisena.');
+<span class='line'> 24</span>    * log.error('VIRHE! Tulostuu punaisena ja lihavoituna.');
+<span class='line'> 25</span>    * log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');
+<span class='line'> 26</span>    */</span><span class="WHIT">
+<span class='line'> 27</span> </span><span class="WHIT">  </span><span class="NAME">log</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Logger</span><span class="PUNC">(</span><span class="STRN">'[NetMatch %t] '</span><span class="PUNC">.</span><span class="NAME">grey</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">argv.d</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 28</span> 
+<span class='line'> 29</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 30</span>    * Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().
+<span class='line'> 31</span>    */</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="WHIT">  </span><span class="NAME">timer</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">Date.now</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 35</span> 
+<span class='line'> 36</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 37</span>    * Palauttaa satunnaisen luvun väliltä minVal...maxVal tarkkuudella floatVal
+<span class='line'> 38</span>    * @param {Number} minVal      Pienin mahdollinen luku
+<span class='line'> 39</span>    * @param {Number} maxVal      Suurin mahdollinen luku
+<span class='line'> 40</span>    * @param {Number} [floatVal]  Palautettavan satunnaisen luvun tarkkuus. Mikäli tätä ei anneta,
+<span class='line'> 41</span>    *                             palautetaan kokonaisluku.
+<span class='line'> 42</span>    */</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">  </span><span class="NAME">rand</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">minVal</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">maxVal</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">floatVal</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">randVal</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">minVal</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">Math.random</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">maxVal</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">minVal</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">floatVal</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'undefined'</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">Math.round</span><span class="PUNC">(</span><span class="NAME">randVal</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">randVal.toFixed</span><span class="PUNC">(</span><span class="NAME">floatVal</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 47</span> 
+<span class='line'> 48</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 49</span>    * Pitää kulman välillä 0-360
+<span class='line'> 50</span>    * @param {Number} angle  Kulma
+<span class='line'> 51</span>    * @returns {Number}
+<span class='line'> 52</span>    */</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="WHIT">  </span><span class="NAME">wrapAngle</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">a</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="WHIT">    </span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">360</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">a</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">Math.floor</span><span class="PUNC">(</span><span class="NAME">a</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NUMB">360</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 57</span> 
+<span class='line'> 58</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 59</span>    * Palauttaa kahden pisteen välisen etäisyyden
+<span class='line'> 60</span>    * @param {Number} x1  Ensimmäisen pisteen x-koordinaatti
+<span class='line'> 61</span>    * @param {Number} y1  Ensimmäisen pisteen y-koordinaatti
+<span class='line'> 62</span>    * @param {Number} x2  Toisen pisteen x-koordinaatti
+<span class='line'> 63</span>    * @param {Number} y2  Toisen pisteen y-koordinaatti
+<span class='line'> 64</span>    * @returns {Number}   Pisteiden välinen etäisyys
+<span class='line'> 65</span>    */</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">  </span><span class="NAME">distance</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">x1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">y1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">x2</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">y2</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">dx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">x1</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">x2</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Vaakasuuntainen etäisyys</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">dy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">y1</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">y2</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Pystysuuntainen etäisyys</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">Math.sqrt</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">dx</span><span class="PUNC">*</span><span class="NAME">dx</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">dy</span><span class="PUNC">*</span><span class="NAME">dy</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 72</span> 
+<span class='line'> 73</span> </span><span class="NAME">exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">module.exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Utils</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 74</span> </span></pre></body></html>

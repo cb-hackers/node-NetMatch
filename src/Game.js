@@ -16,8 +16,16 @@ var log = require('./Utils').log
  */
 function Game(server) {
   this.server = server;
-  this.lastUpdate = timer();
+  this.lastUpdate = 0;
+  this.frameTime = 0;
   this.interval = setInterval(this.update, 1000 / server.gameState.updatesPerSecond, this);
+}
+
+/**
+ * Pysäyttää pelimekaniikan päivityksen.
+ */
+Game.prototype.stop = function () {
+  clearInterval(this.interval);
 }
 
 /**
@@ -44,7 +52,12 @@ Game.prototype.update = function (self) {
  * @private
  */
 Game.prototype.updateFrameTimer = function () {
-
+  var curTime = timer();
+  if (!this.lastUpdate) {
+    this.lastUpdate = curTime;
+  }
+  this.frameTime = (curTime - this.lastUpdate) / 1000;
+  this.lastUpdate = curTime;
 }
 
 /**
@@ -76,7 +89,31 @@ Game.prototype.updateStats = function () {
  * @private
  */
 Game.prototype.updatePlayers = function () {
+  var playerIds = Object.keys(this.server.players);
+  for (var i = playerIds.length; i--;) {
+    var player = this.server.players[playerIds[i]];
 
+    // Jos pelaaja on kuollut ja kuolemasta on kulunut tarpeeksi aikaa, herätetään henkiin.
+    if (player.health <= 0 && player.timeToDeath + this.server.config.deathDelay < Date.now()) {
+      if (this.server.debug) {
+        log.write('Reviving %0 from the deads.', player.name.green);
+      }
+      var randomPlace = this.server.gameState.map.findSpot();
+      player.x = randomPlace.x;
+      player.y = randomPlace.y;
+      player.health = 100;
+      player.lastValidX = player.x;
+      player.lastValidY = player.y;
+      player.hackTestX = player.x;
+      player.hackTestY = player.y;
+      player.spawnTime = Date.now();
+      // UNIMPLEMENTED
+      // Jos tämä on botti niin arvotaan ase
+    }
+
+    // UNIMPLEMENTED
+    // Onko pelajaa kartalla
+  }
 }
 
 /**
@@ -108,7 +145,23 @@ Game.prototype.updateRegistration = function () {
  * @private
  */
 Game.prototype.updateBullets = function () {
+  var bulletIds = Object.keys(this.server.bullets)
+    , bullet;
 
+  // Käydään kaikki ammukset läpi
+  for (var i = bulletIds.length; i--;) {
+    bullet = this.server.bullets[bulletIds[i]];
+    bullet.update();
+  }
+}
+
+/**
+ * Palauttaa siirtymän tai kääntymän (pikseliä tai astetta sekunnissa)
+ * @param {Number} amount  Pikselimäärä tai astemäärä joka siirrytään/käännytään yhden sekunnin aikana
+ * @returns {Number}
+ */
+Game.prototype.movePerSec = function (amount) {
+  return amount * this.frameTime;
 }
 
 exports = module.exports = Game;

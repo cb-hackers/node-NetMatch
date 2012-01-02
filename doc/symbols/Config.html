@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
-		<title>Item | JsDoc Reference</title>
+		<title>Config | JsDoc Reference</title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta name="mobileoptimized" content="0" />
@@ -94,12 +94,12 @@
 			<header>
 				<h1 class="classTitle">
 					
-					Class <span>Item</span>
+					Class <span>Config</span>
 				</h1>
 				
 				<div class="intro">
 					<p class="description summary">
-						Tavaroiden toteutus
+						Asetukset
 					</p>
 						
 					
@@ -107,7 +107,7 @@
 							
 							
 							
-								<li>Defined in: <a href="../symbols/src/src_nm_Item.js.html">Item.js</a></li>
+								<li>Defined in: <a href="../symbols/src/src_nm_Config.js.html">Config.js</a></li>
 							
 							
 						</ul>
@@ -118,7 +118,7 @@
 			
 				<section>
 					<div class="props">
-						<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Item.">
+						<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Config.">
 							<caption class="sectionTitle">Class Summary</caption>
 							<thead>
 								<tr>
@@ -131,9 +131,9 @@
 									<td class="attributes">&nbsp;</td>
 									<td class="nameDescription" >
 										<div class="fixedFont">
-											<b><a href="../symbols/Item.html#constructor">Item</a></b>(server, itemId, itemType)
+											<b><a href="../symbols/Config.html#constructor">Config</a></b>(server)
 										</div>
-										<div class="description">Luo uuden tavaran ja etsii sille paikan.</div>
+										<div class="description">Alustaa luokan käyttöä varten, lataa <a href="../symbols/Config.defaults.html">Config.defaults</a> kentät tämän instanssin kentiksi</div>
 									</td>
 								</tr>
 							</tbody>
@@ -145,65 +145,6 @@
 			
 				
 				<section>
-					
-						<nav>
-							<div class="props">
-								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Item.">
-									<caption class="sectionTitle">Field Summary</caption>
-									
-									<thead>
-										<tr>
-											<th scope="col">Field Attributes</th>
-											<th scope="col">Field Name and Description</th>
-										</tr>
-									</thead>
-									
-									<tbody>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#id">id</a></b>
-													</div>
-													<div class="description">Tavaran tunnus</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#type">type</a></b>
-													</div>
-													<div class="description">Tavaran tyyppi, kts.</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#x">x</a></b>
-													</div>
-													<div class="description">Tavaran sijainti</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#y">y</a></b>
-													</div>
-													<div class="description">Tavaran sijainti</div>
-												</td>
-											</tr>
-										
-									</tbody>
-								</table>
-							</div>
-						</nav>
 					
 					
 					
@@ -221,7 +162,7 @@
 						
 						
 							<nav>
-								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Item.">
+								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Config.">
 									<thead>
 										<tr>
 											<th scope="col">Method Attributes</th>
@@ -237,9 +178,9 @@
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Item.html#pick">pick</a></b>()
+													<div class="fixedFont"><b><a href="../symbols/Config.html#load">load</a></b>(config)
 													</div>
-													<div class="description">Siirtää tavaran toiseen paikkaan ja palauttaa siirretyn tavaran tyypin.</div>
+													<div class="description">Lataa asetukset annetusta tiedostosta.</div>
 												</td>
 											</tr>
 										
@@ -269,11 +210,11 @@
 							</h2>
 							
 							<div class="fixedFont">
-								<b>Item</b>(server, itemId, itemType)
+								<b>Config</b>(server)
 							</div>
 							
 							<div class="description">
-								Luo uuden tavaran ja etsii sille paikan. Lisää tavaran Server.items listaan
+								Alustaa luokan käyttöä varten, lataa <a href="../symbols/Config.defaults.html">Config.defaults</a> kentät tämän instanssin kentiksi
 								
 							</div>
 							
@@ -287,19 +228,7 @@
 											<span class="light fixedFont">{<a href="../symbols/Server.html">Server</a>}</span>  <b>server</b>
 											
 										</dt>
-										<dd>Käynnissä oleva NetMatch-palvelin</dd>
-									
-										<dt>
-											<span class="light fixedFont">{Byte}</span>  <b>itemId</b>
-											
-										</dt>
-										<dd>Tavaran tunnus</dd>
-									
-										<dt>
-											<span class="light fixedFont">{Byte}</span>  <b>itemType</b>
-											
-										</dt>
-										<dd>Tavaran tyyppi, kts. <a href="../symbols/ITM.html">ITM</a></dd>
+										<dd>NetMatch-palvelin, joka kutsuu tätä konstruktoria</dd>
 									
 								</dl>
 							
@@ -312,106 +241,6 @@
 	<!--
 	#### FIELD DETAILS
 	-->
-			
-				<section>
-					<div class="details props">
-						<div class="innerProps">
-							<h2 class="sectionTitle">
-								Field Detail
-							</h2>
-							
-							
-								<div class="fixedFont heading" id="id">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Byte}</span>
-									
-									<b>id</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran tunnus
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="type">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Byte}</span>
-									
-									<b>type</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran tyyppi, kts. <a href="../symbols/ITM.html">ITM</a>
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="x">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Number}</span>
-									
-									<b>x</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran sijainti
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="y">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Number}</span>
-									
-									<b>y</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran sijainti
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								
-							
-						</div>
-					</div>
-				</section>
 			
 	<!--
 	#### METHOD DETAILS
@@ -430,19 +259,18 @@
 									<li 
 										 class='item0'
 									>
-										<div class="fixedFont heading" id="pick">
+										<div class="fixedFont heading" id="load">
 											<span class='lighter'>
 											
 											</span>
 											
-											<span class="light">{Byte}</span>
 											
-											<b>pick</b>()
+											
+											<b>load</b>(config)
 										</div>
 										
 										<div class="description">
-											Siirtää tavaran toiseen paikkaan ja palauttaa siirretyn tavaran tyypin.
-Lähettää kaikille clienteille tiedon uudesta sijainnista.
+											Lataa asetukset annetusta tiedostosta. Tämä metodi hakee tiedostoa node-NetMatchin juuresta.
 											
 											
 											
@@ -452,33 +280,18 @@ Lähettää kaikille clienteille tiedon uudesta sijainnista.
 										
 										
 										
-										
-										
-											<dl class="detailList nomargin">
-											
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
 												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>config</b>
+														<i>Optional, Default: "config"</i>
+													</dt>
+													<dd>Asetustiedoston nimi, ilman .json päätettä.</dd>
 												
-												
-												
-												
-												
-												
-													<dt class="heading">Returns:</dt>
-													
-														<dd><span class="light fixedFont">{Byte}</span> Siirretyn tavaran tyyppi</dd>
-													
-												
-												
-												
-												
-												
-													<dt class="heading">See:</dt>
-													
-														<dd><a href="../symbols/ITM.html">ITM</a></dd>
-													
-												
-											
 											</dl>
+										
+										
 										
 										
 									</li>

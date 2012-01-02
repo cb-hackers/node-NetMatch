@@ -1,7 +1,9 @@
 /**
  * @fileOverview Sisältää hyödyllisiä funktioita, eli {@link Utils}-nimiavaruuden toteutuksen.
  */
-var colors = require('colors')
+var argv = require('optimist')
+  .default({d: false}).alias({'d' : 'debug'}).argv
+  , colors = require('colors')
   , Logger = require('cbNetwork').Logger;
 
 /**
@@ -22,13 +24,13 @@ var Utils = {
    * log.error('VIRHE! Tulostuu punaisena ja lihavoituna.');
    * log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');
    */
-  log: new Logger('[NetMatch %t] '.grey),
+  log: new Logger('[NetMatch %t] '.grey, (argv.d > 1) ? true : false),
 
   /**
    * Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().
    */
   timer: function () {
-    return new Date().getTime();
+    return Date.now();
   },
 
   /**
@@ -41,6 +43,30 @@ var Utils = {
   rand: function (minVal, maxVal, floatVal) {
     var randVal = minVal + (Math.random() * (maxVal - minVal));
     return typeof floatVal === 'undefined' ? Math.round(randVal) : randVal.toFixed(floatVal);
+  },
+
+  /**
+   * Pitää kulman välillä 0-360
+   * @param {Number} angle  Kulma
+   * @returns {Number}
+   */
+  wrapAngle: function (a) {
+    a = a / 360;
+    return (a - Math.floor(a)) * 360;
+  },
+
+  /**
+   * Palauttaa kahden pisteen välisen etäisyyden
+   * @param {Number} x1  Ensimmäisen pisteen x-koordinaatti
+   * @param {Number} y1  Ensimmäisen pisteen y-koordinaatti
+   * @param {Number} x2  Toisen pisteen x-koordinaatti
+   * @param {Number} y2  Toisen pisteen y-koordinaatti
+   * @returns {Number}   Pisteiden välinen etäisyys
+   */
+  distance: function (x1, y1, x2, y2) {
+    var dx = x1 - x2; // Vaakasuuntainen etäisyys
+    var dy = y1 - y2; // Pystysuuntainen etäisyys
+    return Math.sqrt( dx*dx + dy*dy );
   }
 };
 

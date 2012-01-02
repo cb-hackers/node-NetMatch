@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
-		<title>Item | JsDoc Reference</title>
+		<title>Command | JsDoc Reference</title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta name="mobileoptimized" content="0" />
@@ -94,12 +94,12 @@
 			<header>
 				<h1 class="classTitle">
 					
-					Class <span>Item</span>
+					Class <span>Command</span>
 				</h1>
 				
 				<div class="intro">
 					<p class="description summary">
-						Tavaroiden toteutus
+						Komentojen käsittely
 					</p>
 						
 					
@@ -107,7 +107,7 @@
 							
 							
 							
-								<li>Defined in: <a href="../symbols/src/src_nm_Item.js.html">Item.js</a></li>
+								<li>Defined in: <a href="../symbols/src/src_nm_Command.js.html">Command.js</a></li>
 							
 							
 						</ul>
@@ -118,7 +118,7 @@
 			
 				<section>
 					<div class="props">
-						<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Item.">
+						<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Command.">
 							<caption class="sectionTitle">Class Summary</caption>
 							<thead>
 								<tr>
@@ -131,9 +131,9 @@
 									<td class="attributes">&nbsp;</td>
 									<td class="nameDescription" >
 										<div class="fixedFont">
-											<b><a href="../symbols/Item.html#constructor">Item</a></b>(server, itemId, itemType)
+											<b><a href="../symbols/Command.html#constructor">Command</a></b>(server)
 										</div>
-										<div class="description">Luo uuden tavaran ja etsii sille paikan.</div>
+										<div class="description">Hoitaa komentojen sisäisen käsittelyn ja toteutuksen</div>
 									</td>
 								</tr>
 							</tbody>
@@ -142,72 +142,6 @@
 				</section>
 			
 			
-			
-				
-				<section>
-					
-						<nav>
-							<div class="props">
-								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Item.">
-									<caption class="sectionTitle">Field Summary</caption>
-									
-									<thead>
-										<tr>
-											<th scope="col">Field Attributes</th>
-											<th scope="col">Field Name and Description</th>
-										</tr>
-									</thead>
-									
-									<tbody>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#id">id</a></b>
-													</div>
-													<div class="description">Tavaran tunnus</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#type">type</a></b>
-													</div>
-													<div class="description">Tavaran tyyppi, kts.</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#x">x</a></b>
-													</div>
-													<div class="description">Tavaran sijainti</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#y">y</a></b>
-													</div>
-													<div class="description">Tavaran sijainti</div>
-												</td>
-											</tr>
-										
-									</tbody>
-								</table>
-							</div>
-						</nav>
-					
-					
-					
-				</section>
 			
 	<!--
 	#### METHODS SUMMARY
@@ -221,7 +155,7 @@
 						
 						
 							<nav>
-								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Item.">
+								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Command.">
 									<thead>
 										<tr>
 											<th scope="col">Method Attributes</th>
@@ -237,9 +171,31 @@
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Item.html#pick">pick</a></b>()
+													<div class="fixedFont"><b><a href="../symbols/Command.html#call">call</a></b>(name, args, player)
 													</div>
-													<div class="description">Siirtää tavaran toiseen paikkaan ja palauttaa siirretyn tavaran tyypin.</div>
+													<div class="description">Kutstuu haluttua komentoa halutuilla parametreillä.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item1'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Command.html#getHelpString">getHelpString</a></b>(name)
+													</div>
+													<div class="description">Luo merkkijonon, joka kertoo komennon tiedot hienosti muotoiltuna.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item2'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Command.html#suggest">suggest</a></b>(partial)
+													</div>
+													<div class="description">Hoitaa komentojen ja pelaajien nimimerkkien täydentämisen annetun parametrin perusteella</div>
 												</td>
 											</tr>
 										
@@ -269,11 +225,11 @@
 							</h2>
 							
 							<div class="fixedFont">
-								<b>Item</b>(server, itemId, itemType)
+								<b>Command</b>(server)
 							</div>
 							
 							<div class="description">
-								Luo uuden tavaran ja etsii sille paikan. Lisää tavaran Server.items listaan
+								Hoitaa komentojen sisäisen käsittelyn ja toteutuksen
 								
 							</div>
 							
@@ -287,19 +243,7 @@
 											<span class="light fixedFont">{<a href="../symbols/Server.html">Server</a>}</span>  <b>server</b>
 											
 										</dt>
-										<dd>Käynnissä oleva NetMatch-palvelin</dd>
-									
-										<dt>
-											<span class="light fixedFont">{Byte}</span>  <b>itemId</b>
-											
-										</dt>
-										<dd>Tavaran tunnus</dd>
-									
-										<dt>
-											<span class="light fixedFont">{Byte}</span>  <b>itemType</b>
-											
-										</dt>
-										<dd>Tavaran tyyppi, kts. <a href="../symbols/ITM.html">ITM</a></dd>
+										<dd>NetMatch-palvelin, johon tämä instanssi kuuluu</dd>
 									
 								</dl>
 							
@@ -312,106 +256,6 @@
 	<!--
 	#### FIELD DETAILS
 	-->
-			
-				<section>
-					<div class="details props">
-						<div class="innerProps">
-							<h2 class="sectionTitle">
-								Field Detail
-							</h2>
-							
-							
-								<div class="fixedFont heading" id="id">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Byte}</span>
-									
-									<b>id</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran tunnus
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="type">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Byte}</span>
-									
-									<b>type</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran tyyppi, kts. <a href="../symbols/ITM.html">ITM</a>
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="x">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Number}</span>
-									
-									<b>x</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran sijainti
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="y">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Number}</span>
-									
-									<b>y</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran sijainti
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								
-							
-						</div>
-					</div>
-				</section>
 			
 	<!--
 	#### METHOD DETAILS
@@ -430,19 +274,18 @@
 									<li 
 										 class='item0'
 									>
-										<div class="fixedFont heading" id="pick">
+										<div class="fixedFont heading" id="call">
 											<span class='lighter'>
 											
 											</span>
 											
-											<span class="light">{Byte}</span>
 											
-											<b>pick</b>()
+											
+											<b>call</b>(name, args, player)
 										</div>
 										
 										<div class="description">
-											Siirtää tavaran toiseen paikkaan ja palauttaa siirretyn tavaran tyypin.
-Lähettää kaikille clienteille tiedon uudesta sijainnista.
+											Kutstuu haluttua komentoa halutuilla parametreillä. Komentojen konteksti (this) on aina serveri.
 											
 											
 											
@@ -451,6 +294,109 @@ Lähettää kaikille clienteille tiedon uudesta sijainnista.
 										
 										
 										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>name</b>
+														
+													</dt>
+													<dd>Mitä komentoa kutsutaan</dd>
+												
+													<dt>
+														<span class="light fixedFont">{Array}</span> <b>args</b>
+														<i>Optional</i>
+													</dt>
+													<dd>Millä parametreillä kutsutaan</dd>
+												
+													<dt>
+														<span class="light fixedFont">{<a href="../symbols/Player.html">Player</a>}</span> <b>player</b>
+														<i>Optional</i>
+													</dt>
+													<dd>Kuka kutsui komentoa (undefined mikäli konsolista)</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item1'
+									>
+										<div class="fixedFont heading" id="getHelpString">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>getHelpString</b>(name)
+										</div>
+										
+										<div class="description">
+											Luo merkkijonon, joka kertoo komennon tiedot hienosti muotoiltuna.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>name</b>
+														
+													</dt>
+													<dd>Komento, jonka tiedot haluat</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item2'
+									>
+										<div class="fixedFont heading" id="suggest">
+											<span class='lighter'>
+											
+											</span>
+											
+											<span class="light">{Array}</span>
+											
+											<b>suggest</b>(partial)
+										</div>
+										
+										<div class="description">
+											Hoitaa komentojen ja pelaajien nimimerkkien täydentämisen annetun parametrin perusteella
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>partial</b>
+														
+													</dt>
+													<dd></dd>
+												
+											</dl>
 										
 										
 										
@@ -465,17 +411,12 @@ Lähettää kaikille clienteille tiedon uudesta sijainnista.
 												
 													<dt class="heading">Returns:</dt>
 													
-														<dd><span class="light fixedFont">{Byte}</span> Siirretyn tavaran tyyppi</dd>
+														<dd><span class="light fixedFont">{Array}</span> Löydetyt ehdotukset</dd>
 													
 												
 												
 												
 												
-												
-													<dt class="heading">See:</dt>
-													
-														<dd><a href="../symbols/ITM.html">ITM</a></dd>
-													
 												
 											
 											</dl>

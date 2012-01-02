@@ -38,8 +38,9 @@ function Item(server, itemId, itemType) {
 }
 
 /**
- * Siirtää tavaran toiseen paikkaan ja palauttaa siirretyn tavaran tyypin, kts. {@link ITM}.
+ * Siirtää tavaran toiseen paikkaan ja palauttaa siirretyn tavaran tyypin.
  * Lähettää kaikille clienteille tiedon uudesta sijainnista.
+ * @see ITM
  *
  * @returns {Byte}  Siirretyn tavaran tyyppi
  */

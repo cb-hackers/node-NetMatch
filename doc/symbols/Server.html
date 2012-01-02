@@ -38,7 +38,17 @@
 				
 					<li><a href="../symbols/Bullet.html">Bullet</a></li>
 				
+					<li><a href="../symbols/Command.html">Command</a></li>
+				
+					<li><a href="../symbols/Commands.html">Commands</a></li>
+				
+					<li><a href="../symbols/Config.html">Config</a></li>
+				
+					<li><a href="../symbols/Config.defaults.html">Config<span class='break'> </span>.<span class='break'> </span>defaults</a></li>
+				
 					<li><a href="../symbols/Game.html">Game</a></li>
+				
+					<li><a href="../symbols/Input.html">Input</a></li>
 				
 					<li><a href="../symbols/Item.html">Item</a></li>
 				
@@ -50,21 +60,17 @@
 				
 					<li><a href="../symbols/NetMessages.html">NetMessages</a></li>
 				
-					<li><a href="../symbols/OBJ.html">OBJ</a></li>
+					<li><a href="../symbols/Obj.html">Obj</a></li>
 				
 					<li><a href="../symbols/Player.html">Player</a></li>
 				
 					<li><a href="../symbols/Server.html">Server</a></li>
-				
-					<li><a href="../symbols/Server.config.html">Server<span class='break'> </span>.<span class='break'> </span>config</a></li>
 				
 					<li><a href="../symbols/Utils.html">Utils</a></li>
 				
 					<li><a href="../symbols/Weapons.html">Weapons</a></li>
 				
 					<li><a href="../symbols/WPN.html">WPN</a></li>
-				
-					<li><a href="../symbols/WPNF.html">WPNF</a></li>
 				
 			</ul>
 		</nav>
@@ -75,7 +81,7 @@
 			Documentation generator: <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0<br />
 			Template: <a href="http://www.thebrightlines.com/2010/05/06/new-template-for-jsdoctoolkit-codeview/" target="_blank">Codeview</a> 1.2<br />
 			Generated on:
-			<time datetime='2011-11-31' pubdate>2011-11-31 2:54</time>
+			<time datetime='2012-0-2' pubdate>2012-0-2 22:02</time>
 		</footer>
 	</div>
 </div>
@@ -125,7 +131,7 @@
 									<td class="attributes">&nbsp;</td>
 									<td class="nameDescription" >
 										<div class="fixedFont">
-											<b><a href="../symbols/Server.html#constructor">Server</a></b>(c)
+											<b><a href="../symbols/Server.html#constructor">Server</a></b>(port, address, debug)
 										</div>
 										<div class="description">Luo uuden palvelimen annettuun porttiin ja osoitteeseen.</div>
 									</td>
@@ -168,6 +174,16 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
+													<b><a href="../symbols/Server.html#commands">commands</a></b>
+													</div>
+													<div class="description">Sisältää palvelimen komennot, joita voidaan kutsua joko palvelimen konsolista tai klientiltä</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
 													<b><a href="../symbols/Server.html#config">config</a></b>
 													</div>
 													<div class="description">Asetukset tälle palvelimelle</div>
@@ -191,6 +207,16 @@
 													<b><a href="../symbols/Server.html#gameState">gameState</a></b>
 													</div>
 													<div class="description">Sisältää pelin nykyisestä tilanteesta kertovat muuttujat.</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													<b><a href="../symbols/Server.html#input">input</a></b>
+													</div>
+													<div class="description">Sisältää palvelimen konsoli-io:n käsittelyyn käytettävän <a href="../symbols/Input.html">Input</a>-luokan instanssin</div>
 												</td>
 											</tr>
 										
@@ -291,7 +317,7 @@
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Server.html#close">close</a></b>()
+													<div class="fixedFont"><b><a href="../symbols/Server.html#close">close</a></b>(now)
 													</div>
 													<div class="description">Sammuttaa palvelimen.</div>
 												</td>
@@ -300,16 +326,49 @@
 											<tr
 												 class='item1'
 											>
-												<td class="attributes">&lt;inner&gt; &nbsp;</td>
+												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Server.html#-emitMessage">emitMessage</a></b>(client)
+													<div class="fixedFont"><b><a href="../symbols/Server.html#getPlayer">getPlayer</a></b>(name)
 													</div>
-													<div class="description"></div>
+													<div class="description">Etsii pelaajan nimen perusteella</div>
 												</td>
 											</tr>
 										
 											<tr
 												 class='item2'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Server.html#handlePacket">handlePacket</a></b>(cbNetwork-noden)
+													</div>
+													<div class="description">Hoitaa saapuneiden viestien käsittelyn.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item3'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Server.html#initialize">initialize</a></b>()
+													</div>
+													<div class="description">Alustaa palvelimen</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item4'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Server.html#kickPlayer">kickPlayer</a></b>(playerId, kickerId, reason)
+													</div>
+													<div class="description">Palvelimelta potkaiseminen</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item5'
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
@@ -320,13 +379,35 @@
 											</tr>
 										
 											<tr
-												 class='item3'
+												 class='item6'
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont"><b><a href="../symbols/Server.html#logout">logout</a></b>(playerId)
 													</div>
 													<div class="description">Kirjaa pelaajan ulos pelistä.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item7'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Server.html#sendReply">sendReply</a></b>(client, player)
+													</div>
+													<div class="description">Hoitaa datan lähetyksen.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item8'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Server.html#serverMessage">serverMessage</a></b>(msg, to)
+													</div>
+													<div class="description"></div>
 												</td>
 											</tr>
 										
@@ -379,15 +460,6 @@
 												</td>
 											</tr>
 										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Server.html#event:message">message</a></b>()
-													</div>
-													<div class="description">NetMatch-palvelin emittoi tämän eventin aina kun palvelimeen tulee dataa.</div>
-												</td>
-											</tr>
-										
 									</tbody>
 								</table>
 							</div>
@@ -409,12 +481,12 @@
 							</h2>
 							
 							<div class="fixedFont">
-								<b>Server</b>(c)
+								<b>Server</b>(port, address, debug)
 							</div>
 							
 							<div class="description">
 								Luo uuden palvelimen annettuun porttiin ja osoitteeseen. Kun palvelimeen tulee dataa, emittoi
-se <i>message</i> eventin, kts. <a href="../symbols/Server.html#event:message">Server#event:message</a>
+se siihen kuuluvan eventin paketin ensimmäisen tavun perusteella. esim. NET.LOGIN
 								
 							</div>
 							
@@ -425,23 +497,23 @@ se <i>message</i> eventin, kts. <a href="../symbols/Server.html#event:message">S
 									<dt class="heading">Parameters:</dt>
 									
 										<dt>
-											<span class="light fixedFont">{Object}</span>  <b>c</b>
-											
-										</dt>
-										<dd>Asetukset, kts. <a href="../symbols/Server.config.html">Server.config</a></dd>
-									
-										<dt>
-											<span class="light fixedFont">{Number}</span>  <b>c.port</b>
+											<span class="light fixedFont">{Number}</span>  <b>port</b>
 											
 										</dt>
 										<dd>Portti, jota palvelin kuuntelee.</dd>
 									
 										<dt>
-											<span class="light fixedFont">{String}</span>  <b>c.address</b>
+											<span class="light fixedFont">{String}</span>  <b>address</b>
 											<i>Optional</i>
 										</dt>
 										<dd>IP-osoite, jota palvelin kuuntelee. Jos tätä ei anneta, järjestelmä
-                             yrittää kuunnella kaikkia osoitteita.</dd>
+                                yrittää kuunnella kaikkia osoitteita (0.0.0.0).</dd>
+									
+										<dt>
+											<span class="light fixedFont">{Boolean}</span>  <b>debug</b>
+											<i>Optional, Default: false</i>
+										</dt>
+										<dd>Spämmitäänkö konsoliin paljon "turhaa" tietoa?</dd>
 									
 								</dl>
 							
@@ -485,12 +557,34 @@ se <i>message</i> eventin, kts. <a href="../symbols/Server.html#event:message">S
 								
 								<div class="hr"></div>
 							
+								<div class="fixedFont heading" id="commands">
+									<span class='lighter'>
+									
+									</span>
+									
+									<span class="light">{<a href="../symbols/Commands.html">Commands</a>}</span>
+									
+									<b>commands</b>							
+								</div>
+								
+								<div class="description">
+									Sisältää palvelimen komennot, joita voidaan kutsua joko palvelimen konsolista tai klientiltä
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
 								<div class="fixedFont heading" id="config">
 									<span class='lighter'>
 									
 									</span>
 									
-									<span class="light">{Object}</span>
+									<span class="light">{<a href="../symbols/Config.html">Config</a>}</span>
 									
 									<b>config</b>							
 								</div>
@@ -504,19 +598,6 @@ se <i>message</i> eventin, kts. <a href="../symbols/Server.html#event:message">S
 								
 								
 									
-									<dl class="detailList nomargin">
-									
-										
-										
-										
-											<dt class="heading">See:</dt>
-											
-												<dd><a href="../symbols/Server.config.html">Server.config</a></dd>
-											
-										
-										
-									</dl>
-								
 								
 								<div class="hr"></div>
 							
@@ -525,7 +606,7 @@ se <i>message</i> eventin, kts. <a href="../symbols/Server.html#event:message">S
 									
 									</span>
 									
-									
+									<span class="light">{<a href="../symbols/Game.html">Game</a>}</span>
 									
 									<b>game</b>							
 								</div>
@@ -554,6 +635,28 @@ se <i>message</i> eventin, kts. <a href="../symbols/Server.html#event:message">S
 								
 								<div class="description">
 									Sisältää pelin nykyisestä tilanteesta kertovat muuttujat.
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="input">
+									<span class='lighter'>
+									
+									</span>
+									
+									<span class="light">{<a href="../symbols/Input.html">Input</a>}</span>
+									
+									<b>input</b>							
+								</div>
+								
+								<div class="description">
+									Sisältää palvelimen konsoli-io:n käsittelyyn käytettävän <a href="../symbols/Input.html">Input</a>-luokan instanssin
 									
 									
 									
@@ -635,7 +738,7 @@ se <i>message</i> eventin, kts. <a href="../symbols/Server.html#event:message">S
 									
 									</span>
 									
-									
+									<span class="light">{<a href="../symbols/NetMessages.html">NetMessages</a>}</span>
 									
 									<b>messages</b>							
 								</div>
@@ -649,19 +752,6 @@ se <i>message</i> eventin, kts. <a href="../symbols/Server.html#event:message">S
 								
 								
 									
-									<dl class="detailList nomargin">
-									
-										
-										
-										
-											<dt class="heading">See:</dt>
-											
-												<dd><a href="../symbols/NetMessages.html">NetMessages</a></dd>
-											
-										
-										
-									</dl>
-								
 								
 								<div class="hr"></div>
 							
@@ -677,19 +767,11 @@ se <i>message</i> eventin, kts. <a href="../symbols/Server.html#event:message">S
 								
 								<div class="description">
 									Sisältää palvelimen pelaajat, eli luokan <a href="../symbols/Player.html">Player</a> jäsenet.
-Pääset yksittäisen pelaajan dataan näin:
 									
 									
 									
 								</div>
 								
-								
-									
-										<pre class="code">// Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
-
-// Tulostaa konsoliin ID:n 4 pelaajan nimen.
-console.log( server.players[4].name );</pre>
-									
 								
 									
 								
@@ -758,7 +840,7 @@ console.log( server.players[4].name );</pre>
 											
 											
 											
-											<b>close</b>()
+											<b>close</b>(now)
 										</div>
 										
 										<div class="description">
@@ -772,6 +854,17 @@ console.log( server.players[4].name );</pre>
 										
 										
 										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<b>now</b>
+														
+													</dt>
+													<dd></dd>
+												
+											</dl>
+										
 										
 										
 										<div class="hr"></div>
@@ -780,18 +873,18 @@ console.log( server.players[4].name );</pre>
 									<li 
 										 class='item1'
 									>
-										<div class="fixedFont heading" id="-emitMessage">
+										<div class="fixedFont heading" id="getPlayer">
 											<span class='lighter'>
-											&lt;inner&gt; 
+											
 											</span>
 											
+											<span class="light">{<a href="../symbols/Player.html">Player</a>}</span>
 											
-											
-											<b>emitMessage</b>(client)
+											<b>getPlayer</b>(name)
 										</div>
 										
 										<div class="description">
-											
+											Etsii pelaajan nimen perusteella
 											
 											
 											
@@ -805,10 +898,173 @@ console.log( server.players[4].name );</pre>
 												<dt class="heading">Parameters:</dt>
 												
 													<dt>
-														<b>client</b>
+														<span class="light fixedFont">{String}</span> <b>name</b>
 														
 													</dt>
-													<dd></dd>
+													<dd>Pelaajan nimimerkki</dd>
+												
+											</dl>
+										
+										
+										
+											<dl class="detailList nomargin">
+											
+												
+												
+												
+												
+												
+												
+												
+													<dt class="heading">Returns:</dt>
+													
+														<dd><span class="light fixedFont">{<a href="../symbols/Player.html">Player</a>}</span> Haluttu pelaaja</dd>
+													
+												
+												
+												
+												
+												
+											
+											</dl>
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item2'
+									>
+										<div class="fixedFont heading" id="handlePacket">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>handlePacket</b>(cbNetwork-noden)
+										</div>
+										
+										<div class="description">
+											Hoitaa saapuneiden viestien käsittelyn.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{cbNetwork.Client}</span> <b>cbNetwork-noden</b>
+														
+													</dt>
+													<dd>Client-luokan instanssi, jolta dataa tulee.</dd>
+												
+											</dl>
+										
+										
+										
+											<dl class="detailList nomargin">
+											
+												
+												
+												
+												
+												
+												
+												
+												
+												
+												
+												
+													<dt class="heading">See:</dt>
+													
+														<dd><a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a></dd>
+													
+												
+											
+											</dl>
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item3'
+									>
+										<div class="fixedFont heading" id="initialize">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>initialize</b>()
+										</div>
+										
+										<div class="description">
+											Alustaa palvelimen
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item4'
+									>
+										<div class="fixedFont heading" id="kickPlayer">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>kickPlayer</b>(playerId, kickerId, reason)
+										</div>
+										
+										<div class="description">
+											Palvelimelta potkaiseminen
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Integer}</span> <b>playerId</b>
+														
+													</dt>
+													<dd>Pelaajan ID</dd>
+												
+													<dt>
+														<span class="light fixedFont">{Integer}</span> <b>kickerId</b>
+														
+													</dt>
+													<dd>Potkijan ID</dd>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>reason</b>
+														<i>Optional, Default: ""</i>
+													</dt>
+													<dd>Potkujen syy</dd>
 												
 											</dl>
 										
@@ -818,7 +1074,7 @@ console.log( server.players[4].name );</pre>
 									</li>
 								
 									<li 
-										 class='item2'
+										 class='item5'
 									>
 										<div class="fixedFont heading" id="login">
 											<span class='lighter'>
@@ -845,7 +1101,7 @@ console.log( server.players[4].name );</pre>
 												<dt class="heading">Parameters:</dt>
 												
 													<dt>
-														<span class="light fixedFont">{Client}</span> <b>client</b>
+														<span class="light fixedFont">{cbNetwork.Client}</span> <b>client</b>
 														
 													</dt>
 													<dd>cbNetworkin Client-luokan jäsen.</dd>
@@ -872,6 +1128,11 @@ console.log( server.players[4].name );</pre>
 												
 												
 												
+													<dt class="heading">See:</dt>
+													
+														<dd><a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a></dd>
+													
+												
 											
 											</dl>
 										
@@ -879,7 +1140,7 @@ console.log( server.players[4].name );</pre>
 									</li>
 								
 									<li 
-										 class='item3'
+										 class='item6'
 									>
 										<div class="fixedFont heading" id="logout">
 											<span class='lighter'>
@@ -909,7 +1170,120 @@ console.log( server.players[4].name );</pre>
 														<span class="light fixedFont">{Integer}</span> <b>playerId</b>
 														
 													</dt>
-													<dd>Pelaajan ID.</dd>
+													<dd>Pelaajan ID</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item7'
+									>
+										<div class="fixedFont heading" id="sendReply">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>sendReply</b>(client, player)
+										</div>
+										
+										<div class="description">
+											Hoitaa datan lähetyksen.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{cbNetwork.Client}</span> <b>client</b>
+														
+													</dt>
+													<dd>cbNetworkin Client-luokan instanssi</dd>
+												
+													<dt>
+														<span class="light fixedFont">{<a href="../symbols/Player.html">Player</a>}</span> <b>player</b>
+														
+													</dt>
+													<dd>Pelaaja, keneltä on saatu dataa ja kenelle lähetetään vastaus tässä.</dd>
+												
+											</dl>
+										
+										
+										
+											<dl class="detailList nomargin">
+											
+												
+												
+												
+												
+												
+												
+												
+												
+												
+												
+												
+													<dt class="heading">See:</dt>
+													
+														<dd><a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a></dd>
+													
+												
+											
+											</dl>
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item8'
+									>
+										<div class="fixedFont heading" id="serverMessage">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>serverMessage</b>(msg, to)
+										</div>
+										
+										<div class="description">
+											
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<b>msg</b>
+														
+													</dt>
+													<dd></dd>
+												
+													<dt>
+														<b>to</b>
+														
+													</dt>
+													<dd></dd>
 												
 											</dl>
 										
@@ -999,47 +1373,6 @@ console.log( server.players[4].name );</pre>
 									
 								</div>
 								
-								
-								
-								
-								
-								
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="event:message">
-									<span class='lighter'>
-									
-									</span>
-									
-									
-									
-									<b>message</b>()
-								</div>
-								
-								<div class="description">
-									NetMatch-palvelin emittoi tämän eventin aina kun palvelimeen tulee dataa. Tätä täytyy käyttää,
-mikäli haluat saada palvelimen tekemäänkin jotain. Parametrina tämä antaa cbNetwork-noden
-<a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">Client</a>-luokan
-instanssin. Katso alla oleva esimerkki, niin saat tietää lisää:
-									
-									
-									
-									
-								</div>
-								
-								
-									
-										<pre class="code">// Oletetaan että muuttujaan server on luotu NetMatch-palvelin.
-
-server.on('message', function (client) {
-  // Tulostetaan clientin ID ja osoite cbNetworkin tapaan CoolBasicissa
-  console.log(client.address + ':' + client.id);
-
-  // Lähetetään clientille sen lähettämä data takaisin
-  client.reply(client.data);
-});</pre>
-									
 								
 								
 								

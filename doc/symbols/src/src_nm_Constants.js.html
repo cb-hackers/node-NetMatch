@@ -131,266 +131,29 @@
 <span class='line'>124</span> </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>125</span> 
 <span class='line'>126</span> </span><span class="COMM">/**
-<span class='line'>127</span>  * @namespace Aseiden ominaisuudet
+<span class='line'>127</span>  * @namespace Itemit omana kokoelmanaan eroteltuna OBJ kokoelmasta.
 <span class='line'>128</span>  */</span><span class="WHIT">
-<span class='line'>129</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">WPNF</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>130</span> </span><span class="WHIT">  </span><span class="COMM">/** Pelihahmon objekti */</span><span class="WHIT">
-<span class='line'>131</span> </span><span class="WHIT">  </span><span class="NAME">CHARACTER</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ITM</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">  </span><span class="COMM">/** Healthpack */</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">  </span><span class="NAME">HEALTH</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">18</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>132</span> 
-<span class='line'>133</span> </span><span class="WHIT">  </span><span class="COMM">/** Aseen latausaika */</span><span class="WHIT">
-<span class='line'>134</span> </span><span class="WHIT">  </span><span class="NAME">RELOADTIME</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">  </span><span class="COMM">/** Konekiväärin ammuksia */</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">  </span><span class="NAME">AMMO</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">19</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>135</span> 
-<span class='line'>136</span> </span><span class="WHIT">  </span><span class="COMM">/** Ammusobjekti */</span><span class="WHIT">
-<span class='line'>137</span> </span><span class="WHIT">  </span><span class="NAME">BULLET</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">3</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">  </span><span class="COMM">/** Singon ammuksia */</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">  </span><span class="NAME">ROCKET</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">20</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>138</span> 
-<span class='line'>139</span> </span><span class="WHIT">  </span><span class="COMM">/** Ampumisen ääni */</span><span class="WHIT">
-<span class='line'>140</span> </span><span class="WHIT">  </span><span class="NAME">SHOOTSOUND</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">  </span><span class="COMM">/** Moottorisahan bensaa */</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">  </span><span class="NAME">FUEL</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">21</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>141</span> 
-<span class='line'>142</span> </span><span class="WHIT">  </span><span class="COMM">/** Osuman ääni */</span><span class="WHIT">
-<span class='line'>143</span> </span><span class="WHIT">  </span><span class="NAME">HITSOUND</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">5</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">  </span><span class="COMM">/** Haulikon ammuksia */</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">  </span><span class="NAME">SHOTGUN</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">33</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>144</span> 
-<span class='line'>145</span> </span><span class="WHIT">  </span><span class="COMM">/** Ammuksen lentonopeus */</span><span class="WHIT">
-<span class='line'>146</span> </span><span class="WHIT">  </span><span class="NAME">BULLETSPEED</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">6</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>147</span> 
-<span class='line'>148</span> </span><span class="WHIT">  </span><span class="COMM">/** Ammuksen lähtöpaikka pelaajan etupuolella */</span><span class="WHIT">
-<span class='line'>149</span> </span><span class="WHIT">  </span><span class="NAME">BULLET_FORTH</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">7</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>150</span> 
-<span class='line'>151</span> </span><span class="WHIT">  </span><span class="COMM">/** Ammuksen lähtöpaikka sivusuunnassa */</span><span class="WHIT">
-<span class='line'>152</span> </span><span class="WHIT">  </span><span class="NAME">BULLET_YAW</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">8</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>153</span> 
-<span class='line'>154</span> </span><span class="WHIT">  </span><span class="COMM">/** Ammuksen aiheuttama tuho */</span><span class="WHIT">
-<span class='line'>155</span> </span><span class="WHIT">  </span><span class="NAME">DAMAGE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">9</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>156</span> 
-<span class='line'>157</span> </span><span class="WHIT">  </span><span class="COMM">/** Tuhoalueen laajuus */</span><span class="WHIT">
-<span class='line'>158</span> </span><span class="WHIT">  </span><span class="NAME">DAMAGERANGE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>159</span> 
-<span class='line'>160</span> </span><span class="WHIT">  </span><span class="COMM">/** Hajonta asteina */</span><span class="WHIT">
-<span class='line'>161</span> </span><span class="WHIT">  </span><span class="NAME">SPREAD</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">11</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>162</span> 
-<span class='line'>163</span> </span><span class="WHIT">  </span><span class="COMM">/** Animaatiokuva kun osuu */</span><span class="WHIT">
-<span class='line'>164</span> </span><span class="WHIT">  </span><span class="NAME">ANIM_IMAGE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">12</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>165</span> 
-<span class='line'>166</span> </span><span class="WHIT">  </span><span class="COMM">/** Animaation pituus */</span><span class="WHIT">
-<span class='line'>167</span> </span><span class="WHIT">  </span><span class="NAME">ANIM_LENGTH</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">13</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>168</span> 
-<span class='line'>169</span> </span><span class="WHIT">  </span><span class="COMM">/** Animaation viive */</span><span class="WHIT">
-<span class='line'>170</span> </span><span class="WHIT">  </span><span class="NAME">ANIM_DELAY</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">14</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>171</span> 
-<span class='line'>172</span> </span><span class="WHIT">  </span><span class="COMM">/** Aseen infokuva */</span><span class="WHIT">
-<span class='line'>173</span> </span><span class="WHIT">  </span><span class="NAME">IMAGE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">15</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>174</span> 
-<span class='line'>175</span> </span><span class="WHIT">  </span><span class="COMM">/** Aseessa olevat ammukset */</span><span class="WHIT">
-<span class='line'>176</span> </span><span class="WHIT">  </span><span class="NAME">AMMO</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">16</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>177</span> 
-<span class='line'>178</span> </span><span class="WHIT">  </span><span class="COMM">/** Ammusten maksimimäärä */</span><span class="WHIT">
-<span class='line'>179</span> </span><span class="WHIT">  </span><span class="NAME">AMMO_MAX</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">17</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>180</span> 
-<span class='line'>181</span> </span><span class="WHIT">  </span><span class="COMM">/** Suuliekkianimaatio */</span><span class="WHIT">
-<span class='line'>182</span> </span><span class="WHIT">  </span><span class="NAME">FIRE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">18</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>183</span> 
-<span class='line'>184</span> </span><span class="WHIT">  </span><span class="COMM">/** Missä kohdassa suuliekki näytetään (pituussuunnassa) */</span><span class="WHIT">
-<span class='line'>185</span> </span><span class="WHIT">  </span><span class="NAME">FIREPOS</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">19</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>186</span> 
-<span class='line'>187</span> </span><span class="WHIT">  </span><span class="COMM">/** Pieni ikoni tappoviesteihin */</span><span class="WHIT">
-<span class='line'>188</span> </span><span class="WHIT">  </span><span class="NAME">ICON</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">20</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>189</span> 
-<span class='line'>190</span> </span><span class="WHIT">  </span><span class="COMM">/** Kuinka paljon tavaraa saa poimittaessa */</span><span class="WHIT">
-<span class='line'>191</span> </span><span class="WHIT">  </span><span class="NAME">PICKCOUNT</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">21</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>192</span> 
-<span class='line'>193</span> </span><span class="WHIT">  </span><span class="COMM">/** Näppäin jolla tämä ase valitaan */</span><span class="WHIT">
-<span class='line'>194</span> </span><span class="WHIT">  </span><span class="NAME">KEY</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">22</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>195</span> 
-<span class='line'>196</span> </span><span class="WHIT">  </span><span class="COMM">/** Etäisyys jonka alle kohteesta oleva botti ei ammu */</span><span class="WHIT">
-<span class='line'>197</span> </span><span class="WHIT">  </span><span class="NAME">SAFERANGE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">23</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>198</span> 
-<span class='line'>199</span> </span><span class="WHIT">  </span><span class="COMM">/** Etäisyys jonka alle kohteesta oleva botti ampuu */</span><span class="WHIT">
-<span class='line'>200</span> </span><span class="WHIT">  </span><span class="NAME">SHOOTRANGE</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">24</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>201</span> 
-<span class='line'>202</span> </span><span class="WHIT">  </span><span class="COMM">/** Pelihahmon objekti (tiimi 2) */</span><span class="WHIT">
-<span class='line'>203</span> </span><span class="WHIT">  </span><span class="NAME">CHARACTER2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">25</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>204</span> 
-<span class='line'>205</span> </span><span class="WHIT">  </span><span class="COMM">/** Aseen paino, vaikuttaa liikkumisen nopeuteen. 100=normaali */</span><span class="WHIT">
-<span class='line'>206</span> </span><span class="WHIT">  </span><span class="NAME">WEIGHT</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">26</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>207</span> 
-<span class='line'>208</span> </span><span class="WHIT">  </span><span class="COMM">/** Tietoalkioiden lukumäärä */</span><span class="WHIT">
-<span class='line'>209</span> </span><span class="WHIT">  </span><span class="NAME">COUNT</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">26</span><span class="WHIT">
-<span class='line'>210</span> </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>211</span> 
-<span class='line'>212</span> </span><span class="COMM">/**
-<span class='line'>213</span>  * @namespace Objektit. Näistä on varmaan moni turhia palvelinpuolella.
-<span class='line'>214</span>  */</span><span class="WHIT">
-<span class='line'>215</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">OBJ</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>216</span> </span><span class="WHIT">  </span><span class="COMM">/** Pistoolimies */</span><span class="WHIT">
-<span class='line'>217</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER1</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>218</span> 
-<span class='line'>219</span> </span><span class="WHIT">  </span><span class="COMM">/** Konekiväärimier */</span><span class="WHIT">
-<span class='line'>220</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>221</span> 
-<span class='line'>222</span> </span><span class="WHIT">  </span><span class="COMM">/** Sinkomies */</span><span class="WHIT">
-<span class='line'>223</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER3</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">3</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>224</span> 
-<span class='line'>225</span> </span><span class="WHIT">  </span><span class="COMM">/** Pistoolin ammus */</span><span class="WHIT">
-<span class='line'>226</span> </span><span class="WHIT">  </span><span class="NAME">AMMO1</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>227</span> 
-<span class='line'>228</span> </span><span class="WHIT">  </span><span class="COMM">/** Konekiväärin ammus */</span><span class="WHIT">
-<span class='line'>229</span> </span><span class="WHIT">  </span><span class="NAME">AMMO2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">5</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>230</span> 
-<span class='line'>231</span> </span><span class="WHIT">  </span><span class="COMM">/** Singon ammus */</span><span class="WHIT">
-<span class='line'>232</span> </span><span class="WHIT">  </span><span class="NAME">AMMO3</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">6</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>233</span> 
-<span class='line'>234</span> </span><span class="WHIT">  </span><span class="COMM">/** Vasen jalka */</span><span class="WHIT">
-<span class='line'>235</span> </span><span class="WHIT">  </span><span class="NAME">FOOT_LEFT</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">7</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>236</span> 
-<span class='line'>237</span> </span><span class="WHIT">  </span><span class="COMM">/** Oikea jalka */</span><span class="WHIT">
-<span class='line'>238</span> </span><span class="WHIT">  </span><span class="NAME">FOOT_RIGHT</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">8</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>239</span> 
-<span class='line'>240</span> </span><span class="WHIT">  </span><span class="COMM">/** Tutka */</span><span class="WHIT">
-<span class='line'>241</span> </span><span class="WHIT">  </span><span class="NAME">RADAR</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">9</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>242</span> 
-<span class='line'>243</span> </span><span class="WHIT">  </span><span class="COMM">/** Ruumiinosia */</span><span class="WHIT">
-<span class='line'>244</span> </span><span class="WHIT">  </span><span class="NAME">PART1</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>245</span> 
-<span class='line'>246</span> </span><span class="WHIT">  </span><span class="COMM">/** Ruumiinosia */</span><span class="WHIT">
-<span class='line'>247</span> </span><span class="WHIT">  </span><span class="NAME">PART2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">11</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>248</span> 
-<span class='line'>249</span> </span><span class="WHIT">  </span><span class="COMM">/** Ruumiinosia */</span><span class="WHIT">
-<span class='line'>250</span> </span><span class="WHIT">  </span><span class="NAME">PART3</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">12</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>251</span> 
-<span class='line'>252</span> </span><span class="WHIT">  </span><span class="COMM">/** Ruumiinosia */</span><span class="WHIT">
-<span class='line'>253</span> </span><span class="WHIT">  </span><span class="NAME">PART4</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">13</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>254</span> 
-<span class='line'>255</span> </span><span class="WHIT">  </span><span class="COMM">/** Ruumiinosia */</span><span class="WHIT">
-<span class='line'>256</span> </span><span class="WHIT">  </span><span class="NAME">PART5</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">14</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>257</span> 
-<span class='line'>258</span> </span><span class="WHIT">  </span><span class="COMM">/** Suuliekki */</span><span class="WHIT">
-<span class='line'>259</span> </span><span class="WHIT">  </span><span class="NAME">FIRE1</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">15</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>260</span> 
-<span class='line'>261</span> </span><span class="WHIT">  </span><span class="COMM">/** Suuliekki */</span><span class="WHIT">
-<span class='line'>262</span> </span><span class="WHIT">  </span><span class="NAME">FIRE2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">16</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>263</span> 
-<span class='line'>264</span> </span><span class="WHIT">  </span><span class="COMM">/** Suuliekki */</span><span class="WHIT">
-<span class='line'>265</span> </span><span class="WHIT">  </span><span class="NAME">FIRE3</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">17</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>266</span> 
-<span class='line'>267</span> </span><span class="WHIT">  </span><span class="COMM">/** Healthpack */</span><span class="WHIT">
-<span class='line'>268</span> </span><span class="WHIT">  </span><span class="NAME">ITEM_HEALTH</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">18</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>269</span> 
-<span class='line'>270</span> </span><span class="WHIT">  </span><span class="COMM">/** Kk:n ammuksia */</span><span class="WHIT">
-<span class='line'>271</span> </span><span class="WHIT">  </span><span class="NAME">ITEM_AMMO</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">19</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>272</span> 
-<span class='line'>273</span> </span><span class="WHIT">  </span><span class="COMM">/** Singon ammuksia */</span><span class="WHIT">
-<span class='line'>274</span> </span><span class="WHIT">  </span><span class="NAME">ITEM_ROCKET</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">20</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>275</span> 
-<span class='line'>276</span> </span><span class="WHIT">  </span><span class="COMM">/** Moottorisahan bensaa */</span><span class="WHIT">
-<span class='line'>277</span> </span><span class="WHIT">  </span><span class="NAME">ITEM_FUEL</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">21</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>278</span> 
-<span class='line'>279</span> </span><span class="WHIT">  </span><span class="COMM">/** Verta */</span><span class="WHIT">
-<span class='line'>280</span> </span><span class="WHIT">  </span><span class="NAME">BLOOD1</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">22</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>281</span> 
-<span class='line'>282</span> </span><span class="WHIT">  </span><span class="COMM">/** Verta */</span><span class="WHIT">
-<span class='line'>283</span> </span><span class="WHIT">  </span><span class="NAME">BLOOD2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">23</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>284</span> 
-<span class='line'>285</span> </span><span class="WHIT">  </span><span class="COMM">/** Verta */</span><span class="WHIT">
-<span class='line'>286</span> </span><span class="WHIT">  </span><span class="NAME">BLOOD3</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">24</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>287</span> 
-<span class='line'>288</span> </span><span class="WHIT">  </span><span class="COMM">/** Verta */</span><span class="WHIT">
-<span class='line'>289</span> </span><span class="WHIT">  </span><span class="NAME">BLOOD4</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">25</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>290</span> 
-<span class='line'>291</span> </span><span class="WHIT">  </span><span class="COMM">/** Verta */</span><span class="WHIT">
-<span class='line'>292</span> </span><span class="WHIT">  </span><span class="NAME">BLOOD5</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">26</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>293</span> 
-<span class='line'>294</span> </span><span class="WHIT">  </span><span class="COMM">/** Verta */</span><span class="WHIT">
-<span class='line'>295</span> </span><span class="WHIT">  </span><span class="NAME">BLOOD6</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">27</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>296</span> 
-<span class='line'>297</span> </span><span class="WHIT">  </span><span class="COMM">/** Verta */</span><span class="WHIT">
-<span class='line'>298</span> </span><span class="WHIT">  </span><span class="NAME">BLOOD7</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">28</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>299</span> 
-<span class='line'>300</span> </span><span class="WHIT">  </span><span class="COMM">/** Verta */</span><span class="WHIT">
-<span class='line'>301</span> </span><span class="WHIT">  </span><span class="NAME">BLOOD8</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">29</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>302</span> 
-<span class='line'>303</span> </span><span class="WHIT">  </span><span class="COMM">/** Moottorisahamies */</span><span class="WHIT">
-<span class='line'>304</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER4</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">30</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>305</span> 
-<span class='line'>306</span> </span><span class="WHIT">  </span><span class="COMM">/** Haulikkomies */</span><span class="WHIT">
-<span class='line'>307</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER5</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">31</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>308</span> 
-<span class='line'>309</span> </span><span class="WHIT">  </span><span class="COMM">/** Kranaattimies */</span><span class="WHIT">
-<span class='line'>310</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER6</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">32</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>311</span> 
-<span class='line'>312</span> </span><span class="WHIT">  </span><span class="COMM">/** Haulikon ammuksia */</span><span class="WHIT">
-<span class='line'>313</span> </span><span class="WHIT">  </span><span class="NAME">ITEM_SHOTGUN</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">33</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>314</span> 
-<span class='line'>315</span> </span><span class="WHIT">  </span><span class="COMM">/** Kranaatteja */</span><span class="WHIT">
-<span class='line'>316</span> </span><span class="WHIT">  </span><span class="NAME">ITEM_LAUNCHER</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">34</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>317</span> 
-<span class='line'>318</span> </span><span class="WHIT">  </span><span class="COMM">/** Kranaatti */</span><span class="WHIT">
-<span class='line'>319</span> </span><span class="WHIT">  </span><span class="NAME">AMMO6</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">35</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>320</span> 
-<span class='line'>321</span> </span><span class="WHIT">  </span><span class="COMM">/** Tyhjä */</span><span class="WHIT">
-<span class='line'>322</span> </span><span class="WHIT">  </span><span class="NAME">NULL</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">36</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>323</span> 
-<span class='line'>324</span> </span><span class="WHIT">  </span><span class="COMM">/** Ruumiinosia */</span><span class="WHIT">
-<span class='line'>325</span> </span><span class="WHIT">  </span><span class="NAME">PART2_2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">37</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>326</span> 
-<span class='line'>327</span> </span><span class="WHIT">  </span><span class="COMM">/** Ruumiinosia */</span><span class="WHIT">
-<span class='line'>328</span> </span><span class="WHIT">  </span><span class="NAME">PART3_2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">38</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>329</span> 
-<span class='line'>330</span> </span><span class="WHIT">  </span><span class="COMM">/** Ruumiinosia */</span><span class="WHIT">
-<span class='line'>331</span> </span><span class="WHIT">  </span><span class="NAME">PART4_2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">39</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>332</span> 
-<span class='line'>333</span> </span><span class="WHIT">  </span><span class="COMM">/** Ruumiinosia */</span><span class="WHIT">
-<span class='line'>334</span> </span><span class="WHIT">  </span><span class="NAME">PART5_2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">40</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>335</span> 
-<span class='line'>336</span> </span><span class="WHIT">  </span><span class="COMM">/** Pistoolimies */</span><span class="WHIT">
-<span class='line'>337</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER1_2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">41</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>338</span> 
-<span class='line'>339</span> </span><span class="WHIT">  </span><span class="COMM">/** Konekiväärimier */</span><span class="WHIT">
-<span class='line'>340</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER2_2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">42</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>341</span> 
-<span class='line'>342</span> </span><span class="WHIT">  </span><span class="COMM">/** Sinkomies */</span><span class="WHIT">
-<span class='line'>343</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER3_2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">43</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>344</span> 
-<span class='line'>345</span> </span><span class="WHIT">  </span><span class="COMM">/** Moottorisahamies */</span><span class="WHIT">
-<span class='line'>346</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER4_2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">44</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>347</span> 
-<span class='line'>348</span> </span><span class="WHIT">  </span><span class="COMM">/** Haulikkomies */</span><span class="WHIT">
-<span class='line'>349</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER5_2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">45</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>350</span> 
-<span class='line'>351</span> </span><span class="WHIT">  </span><span class="COMM">/** Kranaattimies */</span><span class="WHIT">
-<span class='line'>352</span> </span><span class="WHIT">  </span><span class="NAME">PLAYER6_2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">46</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>353</span> 
-<span class='line'>354</span> </span><span class="WHIT">  </span><span class="COMM">/** Tutka */</span><span class="WHIT">
-<span class='line'>355</span> </span><span class="WHIT">  </span><span class="NAME">RADAR2</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">47</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>356</span> 
-<span class='line'>357</span> </span><span class="WHIT">  </span><span class="COMM">/** Objektien lukumäärä */</span><span class="WHIT">
-<span class='line'>358</span> </span><span class="WHIT">  </span><span class="NAME">COUNT</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">47</span><span class="WHIT">
-<span class='line'>359</span> </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>360</span> 
-<span class='line'>361</span> </span><span class="COMM">/**
-<span class='line'>362</span>  * @namespace Itemit omana kokoelmanaan eroteltuna OBJ kokoelmasta.
-<span class='line'>363</span>  */</span><span class="WHIT">
-<span class='line'>364</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ITM</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>365</span> </span><span class="WHIT">  </span><span class="COMM">/** Healthpack */</span><span class="WHIT">
-<span class='line'>366</span> </span><span class="WHIT">  </span><span class="NAME">HEALTH</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">18</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>367</span> 
-<span class='line'>368</span> </span><span class="WHIT">  </span><span class="COMM">/** Konekiväärin ammuksia */</span><span class="WHIT">
-<span class='line'>369</span> </span><span class="WHIT">  </span><span class="NAME">AMMO</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">19</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>370</span> 
-<span class='line'>371</span> </span><span class="WHIT">  </span><span class="COMM">/** Singon ammuksia */</span><span class="WHIT">
-<span class='line'>372</span> </span><span class="WHIT">  </span><span class="NAME">ROCKET</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">20</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>373</span> 
-<span class='line'>374</span> </span><span class="WHIT">  </span><span class="COMM">/** Moottorisahan bensaa */</span><span class="WHIT">
-<span class='line'>375</span> </span><span class="WHIT">  </span><span class="NAME">FUEL</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">21</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>376</span> 
-<span class='line'>377</span> </span><span class="WHIT">  </span><span class="COMM">/** Haulikon ammuksia */</span><span class="WHIT">
-<span class='line'>378</span> </span><span class="WHIT">  </span><span class="NAME">SHOTGUN</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">33</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>379</span> 
-<span class='line'>380</span> </span><span class="WHIT">  </span><span class="COMM">/** Kranaatteja */</span><span class="WHIT">
-<span class='line'>381</span> </span><span class="WHIT">  </span><span class="NAME">LAUNCHER</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">34</span><span class="WHIT">
-<span class='line'>382</span> </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>383</span> 
-<span class='line'>384</span> </span><span class="NAME">exports.NET</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">NET</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>385</span> </span><span class="NAME">exports.WPN</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">WPN</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>386</span> </span><span class="NAME">exports.WPNF</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">WPNF</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>387</span> </span><span class="NAME">exports.OBJ</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">OBJ</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>388</span> </span><span class="NAME">exports.ITM</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ITM</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>389</span> </span></pre></body></html>
+<span class='line'>145</span> </span><span class="WHIT">  </span><span class="COMM">/** Kranaatteja */</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">  </span><span class="NAME">LAUNCHER</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">34</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>148</span> 
+<span class='line'>149</span> </span><span class="NAME">exports.NET</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">NET</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="NAME">exports.WPN</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">WPN</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>151</span> </span><span class="NAME">exports.ITM</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ITM</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>152</span> </span></pre></body></html>

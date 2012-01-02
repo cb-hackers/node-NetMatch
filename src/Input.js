@@ -5,48 +5,50 @@
 /**#nocode+*/
 var log = require('./Utils').log
   , NET = require('./Constants').NET
-  , colors = require('colors');
+  , colors = require('colors')
+  , tty = require('tty')
+  , readline = require('readline');
 /**#nocode-*/
 
+/**
+ * @class Hoitaa konsoliin liittyvät komennot ja toiminnallisuudet.
+ *
+ * @param {Server} server  NetMatch-palvelin, johon tämä instassi kuuluu
+ */
 function Input(server) {
-  this.server = server;
+  // Konstruktorin sisältöä ei dokumentoida
+  /**#nocode+*/
+
+  var self = this
+    , rli = readline.createInterface(process.stdin, process.stdout, function (partial) {
+      return [server.commands.suggest(partial), partial];
+    });
 
   process.stdin.resume();
   process.stdin.setEncoding('utf8');
 
-  process.on('SIGINT', function () {
-    // Suljetaan palvelin kun tulee SIGINT
-    console.log();
-    log.warn('Received SIGINT');
+  process.on('SIGINT', function processSIGINT() {
+    log.notice('Received ' + 'SIGINT'.red);
+    // Lakataan kuuntelemasta stdin-syötettä.
+    // Node sulkeutuu jahka kaikki eventit on kutsuttu, eikä uusia ole lisätty event-luuppiin.
+    process.stdin.destroy();
     server.close();
   });
 
-  server.on('closed', function () {
-    // Nyt ollaan suljettu, voidaan sulkea koko prosessi. Mutta odotetaan toki puoli sekuntia,
-    // että muut funktiot jotka kuuntelevat closed-eventtiä voisivat toimia.
-    process.stdin.destroySoon();
+  rli.on('close', function rliClose() {
+    process.stdin.destroy();
+    server.close();
   });
 
-
-  process.stdin.on('data', function (chunk) {
-    // Lähetetään data pelaajille
-    chunk = chunk.trim();
-
-    log.write('<Server>'.blue + ' %0', chunk);
-
-    var msgData = {
-      msgType: NET.SERVERMSG,
-      msgText: chunk
-    };
-
-    var playerIds = Object.keys(server.players);
-    for (var i = playerIds.length; i--;) {
-      var plr = server.players[playerIds[i]];
-      if (plr.active && !plr.zombie) {
-        server.messages.add(plr.playerId, msgData);
-      }
-    }
+  rli.on('line', function rliLine(input){
+    msg = input.trim();
+    if (!msg) { return; }
+    // Käsitellään serverikomennot
+    server.commands.call(msg.split(' ')[0], msg.split(' ').splice(1));
   });
+
+  // Tästä eteenpäin dokumentoidaan taas jos on jotain dokumentoitavaa
+  /**#nocode-*/
 }
 
 exports = module.exports = Input;
