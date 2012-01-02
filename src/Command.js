@@ -37,10 +37,16 @@ Commands.help = {
   help: 'Shows help about this server\'s commands. See ´commands´ for list of available commands.',
   remote: true,
   action: function commandsHelp() {
-    if (!arguments.length) {
-      console.log(this.commands.getHelpString('help'));
+    var server = this;
+    if (!arguments[1]) {
+      arguments[1] = 'help';
+    }
+    if (arguments[0]) {
+      this.commands.getHelpString(arguments[1]).split('\n').forEach(function (m) {
+      server.serverMessage(m, arguments[0].playerId);
+    });
     } else {
-      console.log(this.commands.getHelpString(arguments[0]));
+      console.log(this.commands.getHelpString(arguments[1]));
     }
   }
 };
@@ -51,14 +57,18 @@ Commands.help = {
  */
 Commands.commands = {
   params: [
-    {name: 'verbose', type: 'boolean', optional: true, help: 'Spam a lot.'}
+    {name: 'verbose', type: 'boolean', optional: true, help: 'Spam a lot. Only serverside'}
   ],
   help: 'Lists available commands.',
   remote: true,
   action: function commandsCommands() {
     var server = this;
-    if (!arguments[0]) {
-      console.log('Commands: '.green + Object.keys(Commands).join(', '));
+    if (!arguments[1]) {
+      if (arguments[0]) {
+        this.serverMessage('Commands: ' + Object.keys(Commands).join(', '), arguments[0].playerId);
+      } else {
+        console.log('Commands: '.green + Object.keys(Commands).join(', '));
+      }
     } else { // Verbose
       Object.keys(Commands).map(function (i) {
         console.log(i.toUpperCase().green);
@@ -79,7 +89,7 @@ Commands.say = {
   help: 'Sends a server message to all players.',
   remote: false,
   action: function commandsSay() {
-    var msg = Array.prototype.slice.call(arguments, 0).join(' ');
+    var msg = Array.prototype.slice.call(arguments, 1).join(' ');
     this.serverMessage(msg);
   }
 };
@@ -123,8 +133,8 @@ Commands.kick = {
   remote: true,
   action: function commandsKick() {
     var player
-      , plrName = arguments[0]
-      , reason  = arguments[1] || '';
+      , plrName = arguments[1]
+      , reason  = arguments[2] || '';
 
     // Jos annettiinkin ID, niin vaihdetaan se nimeksi
     if (this.players[plrName]) {
@@ -135,8 +145,8 @@ Commands.kick = {
     if (!player) {
       log.notice('Sorry, player couldn\'t be found.');
     } else {
-      // Vaihdetaan toinen parametri nollaksi, kun klientti on pätsätty, muuten MAV.
-      this.kickPlayer(player.playerId, player.playerId, reason);
+      // Vaihdetaan toinen parametri nollaksi, jos kutsut tulee palvelimelta, kun klientti on pätsätty, muuten MAV.
+      this.kickPlayer(player.playerId, argument[0] && arguments[0].playerId || player.playerId, reason);
     }
 
   }
@@ -149,13 +159,12 @@ Commands.kick = {
  */
 Commands.login = {
   params: [
-    {name: 'who',  type: 'player',  optional: false, help: 'Player\'s (your) name.'},
     {name: 'pass', type: 'string',  optional: false, help: 'Password'}
   ],
   help: 'Logs a player in.',
   remote: true,
   action: function commandsLogin() {
-    var player = this.getPlayer(arguments[0])
+    var player = arguments[0]
       , pass   = arguments[1];
     if (!player) {
       log.warn('Couldn\'t find player!');
@@ -221,6 +230,7 @@ Command.prototype.call = function (name, args, player) {
     }
   }
   // Kutsutaan funktiota
+  args.unshift(player); // Lisätään pelaaja ensimmäiseksi parametriksi
   c.action.apply(this.server, args);
 };
 
@@ -233,14 +243,14 @@ Command.prototype.getHelpString = function (name) {
   if (!c) {
     return 'Could not find help about "' + name + '". You need ´help´.';
   }
-  var h =                     ' Description: '.yellow + c.help +
-    (c.params.length ?      '\n  Parameters: '.yellow : '');
+  var h =                     ' Description: ' + c.help +
+    (c.params.length ?      '\n  Parameters: ' : '');
   // List parameters
   for (var i = 0; i < c.params.length; i++) {
     var p = c.params[i];
     h += '\n' +
       // Type
-      padString('  {' + p.type + '} ', 15, true).grey +
+      padString('  {' + p.type + '} ', 15, true) +
       // Name
       padString((p.optional ? '[' + p.name + ']' : p.name), 10, false) +
       // Description
@@ -294,7 +304,6 @@ Command.prototype.suggest = function (partial) {
 
   return suggestions;
 };
-
 
 function startsWith(str1, str) {
   return str1.slice(0, str.length) === str;

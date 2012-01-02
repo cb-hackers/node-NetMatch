@@ -105,8 +105,7 @@ server.on(NET.TEXTMESSAGE, function NetTextMessage(client, player) {
       server.commands.call(cmd, txtMessage.split(' ').splice(1), player);
     } else if (cmd === 'login') {
       cmd = txtMessage.split(' ').splice(1);
-      log.notice('Player %0 is trying to login with password ´%1´.', player.name.green, cmd[0].red);
-      cmd.unshift(player.name); // Lisätään pelaajan nimi komennon ensimmäiseksi parametriksi.
+      log.notice('Player %0 is trying to login with password ´%1´.', player.name.green, String(cmd[0]).red);
       server.commands.call('login', cmd, player);
     } else {
       log.warn('Player %0 tried to call ´%1´ without admin rights, access denied.', player.name.green, cmd);

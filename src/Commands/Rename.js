@@ -12,8 +12,8 @@ module.exports = {
   remote: true,
   action: function commandsRename() {
     var plr, playerIds, player
-      , plrName = arguments[0]
-      , newName = arguments[1];
+      , plrName = arguments[1]
+      , newName = arguments[2];
 
     // Jos annettiinkin ID, niin vaihdetaan se nimeksi
     if (this.players[plrName]) {
