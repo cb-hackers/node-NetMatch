@@ -14,14 +14,14 @@ var cbNetwork = require('cbNetwork')
   , timer  = require('./Utils').timer
   , colors = require('colors')
   // Serverin moduulit
-  , NetMsgs  = require('./NetMessage')
-  , Player   = require('./Player')
-  , Map      = require('./Map').Map
-  , Input    = require('./Input')
-  , Item     = require('./Item')
-  , Game     = require('./Game')
-  , Config   = require('./Config')
-  , Commands = require('./Command');
+  , NetMsgs = require('./NetMessage')
+  , Player  = require('./Player')
+  , Map     = require('./Map').Map
+  , Input   = require('./Input')
+  , Item    = require('./Item')
+  , Game    = require('./Game')
+  , Config  = require('./Config')
+  , Command = require('./Command');
 /**#nocode-*/
 
 Server.VERSION = "v2.4";
@@ -85,9 +85,9 @@ function Server(port, address, debug) {
 
   /**
    * Sisältää palvelimen komennot, joita voidaan kutsua joko palvelimen konsolista tai klientiltä
-   * @type Input
+   * @type Commands
    */
-  this.commands = new Commands(this);
+  this.commands = new Command(this);
 
   /**
    * Sisältää palvelimen konsoli-io:n käsittelyyn käytettävän {@link Input}-luokan instanssin
@@ -359,6 +359,23 @@ Server.prototype.sendReply = function (client, player) {
   return;
 };
 
+Server.prototype.serverMessage = function (msg, to) {
+  
+  if (!to) {
+    log.write('<Server>'.blue + ' %0', msg);
+    this.messages.addToAll({
+      msgType: NET.SERVERMSG,
+      msgText: msg
+    });
+  } else {
+    log.write('<Server @%0>'.blue + ' %1', this.players[to].name, msg);
+    this.messages.add(to, {
+      msgType: NET.SERVERMSG,
+      msgText: msg
+    });
+  }
+}
+
 /**
  * Kirjaa pelaajan sisään peliin.
  * @param {cbNetwork.Client} client  cbNetworkin Client-luokan jäsen.
@@ -499,7 +516,6 @@ Server.prototype.logout = function (playerId) {
  * @param {String} [reason=""]  Potkujen syy
  */
 Server.prototype.kickPlayer = function (playerId, kickerId, reason) {
-  log.info(playerId);
   var player = this.players[playerId];
   player.kicked = true,
   player.kickReason = reason || '';
@@ -516,6 +532,21 @@ Server.prototype.kickPlayer = function (playerId, kickerId, reason) {
   });
 }
 
+/**
+ * Etsii pelaajan nimen perusteella
+ *
+ * @param {String} name  Pelaajan nimimerkki
+ * @return {Player}  Haluttu pelaaja
+ */
+Server.prototype.getPlayer = function (name) {
+  var playerIds = Object.keys(this.players), plr;
+  for (var i = playerIds.length; i--;) {
+    plr = this.players[playerIds[i]];
+    if (plr.name === name && !plr.zombie) {
+      return plr;
+    }
+  }
+};
 
 /**
  * Sammuttaa palvelimen. Emittoi eventit {@link Server#closing} ja {@link Server#closed}

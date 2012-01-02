@@ -80,7 +80,13 @@ Config.defaults = {
    * @type Number
    * @default 60
    */
-  updatesPerSec: 60
+  updatesPerSec: 60,
+  /**
+   * Palvelimen salasana
+   * @type String
+   * @default password
+   */
+  password: "password"
 }
 
 /**

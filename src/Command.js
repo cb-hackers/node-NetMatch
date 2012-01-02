@@ -1,196 +1,290 @@
+/**
+ * @fileOverview Serverikomentoihin liittyvät toiminnot
+ */
+
+/**#nocode+*/
 var log = require('./Utils').log
   , NET = require('./Constants').NET;
+/**#nocode-*/
 
+/**
+ * @private
+ * @namespace Sisältää serverikomennot, joihin pääsee käsiksi {@link Command}-luokan call-metodilla.
+ *
+ * Komennot muodostuvat seuraavasti:
+ * @property {Array}    params           Parametrit
+ * @property {String}   params.name      Parametrin nimi
+ * @property {String}   params.type      Parametrin tyyppi
+ * @property {Boolean}  params.optional  Onko parametri vapaaehtoinen
+ * @property {String}   params.help      Mihin parametriä käytetään
+ * @property {String}   help             Mihin komentoa käytetään
+ * @property {Boolean}  remote           Voiko komentoa kutsua klientillä
+ * @property {Function} action           Komennon logiikka
+ */
+var Commands = {};
 
-function Commands(server) {
-  this.server = server;
-  this.commands = [];
-  this.initialize();
-}
-
-Commands.prototype.initialize = function () {
-  // Helppi
-  this.add(['help'], [
-      {name: 'command', type: 'string', optional: true, help: 'Which command\'s help to show'}
-    ], 'Shows help about this server\'s commands. See ´commands´ for list of available commands.', function helpCommand(args) {
-      if (!args.length) {
-        console.log(this.commands.help('help'));
-      } else {
-        console.log(this.commands.help(args[0]));
-      }
-    }
-  );
-
-  // Komentojen listaus
-  this.add(['commands'], [
-      {name: 'verbose', type: 'boolean', optional: true, help: 'Spam a lot.'}
-    ], 'Lists available commands.', function commandsCommand(args) {
-      var server = this;
-      if (!args[0]) {
-        console.log('Commands: '.green + this.commands.commands.map(function (i) { return i.aliases[0]; }).join(', '));
-      } else { // Verbose
-        this.commands.commands.map(function (i) {
-          console.log(i.aliases[0].toUpperCase().green);
-          console.log(server.commands.help(i.aliases[0]));
-        });
-      }
-    }
-  );
-
-  // Serverviestien lähetys
-  this.add(['say', 'msg'], [
-      {name: 'message', type: 'string', optional: false, help: 'Message to send to all players'}
-    ], 'Sends a server message to all players.', function sayCommand(args) {
-      log.write('<Server>'.blue + ' %0', args.join(' '));
-      this.messages.addToAll({
-        msgType: NET.SERVERMSG,
-        msgText: args.join(' ')
-      });
-    }
-  );
-
-  // Servun sulkeminen
-  this.add(['close', 'exit', 'stop'], [], 'Closes the server.', function closeCommand() {
-    this.close();
-  });
-
-  // Uptime
-  this.add(['uptime'], [], 'Shows how long the server has been running.', function uptimeCommand() {
-    var t = secondsToTime(Math.floor(process.uptime()));
-    log.info('This server has been running for %0 days %1 hours %2 minutes and %3 seconds.', t.d, t.h, t.m, t.s);
-  });
-
-  // Pelaajan uudelleennimeäminen >:)
-  this.add(['rename'], [
-      {name: 'player', type: 'string/id', optional: false, help: 'Player who needs to be renamed'},
-      {name: 'name', type: 'string', optional: false, help: 'New name'}
-    ], 'Renames the player', function renameCommand(args) {
-      var plr, playerIds, player;
-      // Hankitaan nimi jos annettiin ID
-      if (!/\D/.test(args[0])) {
-        if (this.players[args[0]]) {
-          args[0] = this.players[args[0]].name;
-        } else {
-          log.notice('Player "%0" doesn\'t seem to exist.', args[0].green);
-          return;
-        }
-      }
-      // Jos nimi löytyi, ...
-      if (args[0]) {
-        // niin luupataan kaikki pelaajat ja etsitään haluamamme pelaaja.
-        playerIds = Object.keys(this.players)
-        for (var i = playerIds.length; i--;) {
-          plr = this.players[playerIds[i]];
-          plr.sendNames = true; // Kaikkien pitää päivittää nimitiedot
-          if (plr.name === args[0]) {
-            player = plr;
-          } else if (plr.name === args[1]) {
-            log.notice('Name "%0" is already in use!', args[1].green);
-            return;
-          }
-        }
-      }
-      if (!player) {
-        log.notice('Player "%0" doesn\'t seem to exist.', args[0].green);
-      } else {
-        player.name = args[1];
-        log.info('Renamed "%0" -> "%1" >:)', args[0].green, args[1].green);
-      }
-    }
-  );
-
-  // Listaa kirjautuneet pelaajat
-  this.add(['list', 'names'], [], 'Lists all connected players.', function listCommand() {
-    var plr, plrs = [], playerIds = Object.keys(this.players)
-    for (var i = playerIds.length; i--;) {
-      plr = this.players[playerIds[i]];
-      if (plr.active) {
-        plrs.push(plr.name);
-      }
-    }
-    log.info('There are %0 players connected: %1', plrs.length, plrs.join(', '));
-  });
-
-    // Pelaajan potkaiseminen.
-  this.add(['kick'], [
-      {name: 'player', type: 'string/id', optional: false, help: 'Player to be kicked'},
-      {name: 'reason', type: 'string', optional: true, help: 'Why would you do such an evil thing?'}
-    ], 'Kicks the player from the server.', function kickCommand(args) {
-      var plr, playerIds;
-      // Hankitaan nimi jos annettiin ID
-      if (!/\D/.test(args[0])) {
-        plr = this.players[args[0]];
-        if (plr && plr.active && !plr.zombie) {
-          this.kickPlayer(plr.playerId, 0, args[1]);
-          log.info('Player kicked!');
-          return;
-        } else {
-          log.notice('Player "%0" doesn\'t seem to exist.', args[0].green);
-          return;
-        }
-      }
-      // Jos nimi löytyi, ...
-      if (args[0]) {
-        // niin luupataan kaikki pelaajat ja etsitään haluamamme pelaaja.
-        playerIds = Object.keys(this.players)
-        for (var i = playerIds.length; i--;) {
-          plr = this.players[playerIds[i]];
-          if (plr.name === args[0] && plr.active && ! plr.zombie) {
-            this.kickPlayer(plr.playerId, 0, args[1]);
-            log.info('Player kicked!');
-            return;
-          }
-        }
-      }
-    }
-  );
-
-};
-
-Commands.prototype.add = function (names, args, help, action) {
-  this.commands.push({
-    aliases: names,
-    params: args,
-    description: help,
-    action: action
-  });
-}
-
-Commands.prototype.get = function (name) {
-  for (var i = this.commands.length; i--;) {
-    var c = this.commands[i];
-    if (c.aliases.indexOf(name) !== -1) {
-      return c;
+/**
+ * Help-komento tulostaa tietoja halutusta komennosta.
+ * @param {String} [command]  Minkä komennot salat paljastetaan
+ */
+Commands.help = {
+  params: [
+    {name: 'command', type: 'string', optional: true, help: 'Which command\'s help to show'}
+  ],
+  help: 'Shows help about this server\'s commands. See ´commands´ for list of available commands.',
+  remote: true,
+  action: function commandsHelp() {
+    if (!arguments.length) {
+      console.log(this.commands.getHelpString('help'));
+    } else {
+      console.log(this.commands.getHelpString(arguments[0]));
     }
   }
 };
 
-Commands.prototype.call = function (name, args) {
-  var c = this.get(name);
+/**
+ * Listaa kaikki komennot.
+ * @param {Boolean} [verbose]  Tulostetaanko samalla helpit.
+ */
+Commands.commands = {
+  params: [
+    {name: 'verbose', type: 'boolean', optional: true, help: 'Spam a lot.'}
+  ],
+  help: 'Lists available commands.',
+  remote: true,
+  action: function commandsCommands() {
+    var server = this;
+    if (!arguments[0]) {
+      console.log('Commands: '.green + Object.keys(Commands).join(', '));
+    } else { // Verbose
+      Object.keys(Commands).map(function (i) {
+        console.log(i.toUpperCase().green);
+        console.log(server.commands.getHelpString(i));
+      });
+    }
+  }
+};
+
+/**
+ * Lähettää NET.SERVERMSG paketin klienteille.
+ * @param {String} [message]  Viesti, joka lähetetään
+ */
+Commands.say = {
+  params: [
+    {name: 'message', type: 'string', optional: false, help: 'Message to send to all players'},
+  ],
+  help: 'Sends a server message to all players.',
+  remote: false,
+  action: function commandsSay() {
+    var msg = Array.prototype.slice.call(arguments, 0).join(' ');
+    this.serverMessage(msg);
+  }
+};
+
+/**
+ * Sulkee palvelimen.
+ */
+Commands.close = {
+  params: [],
+  help: 'Closes the server.',
+  remote: true,
+  action: function commandsClose() {
+    this.close();
+  }
+};
+
+/**
+ * Kertoo kauanko palvelin on ollut päällä.
+ */
+Commands.uptime = {
+  params: [],
+  help: 'Displays how long has the server been running.',
+  remote: true,
+  action: function commandsUptime() {
+    var t = secondsToTime(Math.floor(process.uptime()));
+    this.serverMessage('This server has been running for ' + t.d + 
+      ' days ' + t.h + ' hours ' + t.m + ' minutes and ' + t.s + ' seconds.');
+  }
+};
+
+/**
+ * Uudelleennimeää pelaajan.
+ * @param {Player} who   Pelaaja, joka uudelleennimetään. Nimi tai ID kelpaa
+ * @param {String} name  Uusi nimi
+ */
+Commands.rename = {
+  params: [
+    {name: 'who',  type: 'player', optional: false, help: 'Player who needs to be renamed'},
+    {name: 'name', type: 'string', optional: false, help: 'New name'}
+  ],
+  help: 'Renames a player.',
+  remote: true,
+  action: function commandsRename() {
+    var plr, playerIds, player
+      , plrName = arguments[0]
+      , newName = arguments[1];
+
+    // Jos annettiinkin ID, niin vaihdetaan se nimeksi
+    if (this.players[plrName]) {
+      plrName = this.players[plrName].name;
+    }
+
+    // Luupataan kaikki pelaajat ja etsitään haluamamme pelaaja.
+    playerIds = Object.keys(this.players)
+    for (var i = playerIds.length; i--;) {
+      plr = this.players[playerIds[i]];
+      plr.sendNames = true; // Kaikkien pitää päivittää nimitiedot
+      // Ei anneta vaihtaa nimeä, jos uusi nimi on jo käytössä
+      if (plr.name === newName) {
+        log.notice('Name "%0" is already in use!', newName.green);
+        return;
+      }
+      if (plr.name === plrName && !plr.zombie && plr.active) {
+        player = plr;
+      }
+    }
+
+    // Jos pelaaja löytyi, vaihdetaan nimi.
+    if (!player) {
+      log.notice('Sorry, player couldn\'t be found or you tried to rename a bot.');
+    } else {
+      player.name = newName;
+      log.info('Renamed "%0" -> "%1" >:)', plrName.green, newName.green);
+    }
+  }
+};
+
+/**
+ * Listaa paikalla olevat pelaajat.
+ */
+Commands.list = {
+  params: [],
+  help: 'Lists all connected players.',
+  remote: false,
+  action: function commandsList() {
+    var plr, plrs = [], playerIds = Object.keys(this.players);
+    for (var i = playerIds.length; i--;) {
+      plr = this.players[playerIds[i]];
+      if (plr.active) { plrs.push(plr.name); }
+    }
+    log.info('%0 player(s) connected: %1', plrs.length, plrs.join(', '));
+  }
+};
+
+/**
+ * Heittää pelaajan pellolle
+ * @param {Player} who     Pelaaja, joka potkaistaan. Nimi tai ID kelpaa
+ * @param {String} reason  Selitys tälle hirmuteolle
+ */
+Commands.kick = {
+  params: [
+    {name: 'who',    type: 'player', optional: false, help: 'Player who needs to be kicked'},
+    {name: 'reason', type: 'string', optional: true,  help: 'Message to display for the kicked player'}
+  ],
+  help: 'Removes the player from the server.',
+  remote: true,
+  action: function commandsKick() {
+    var player
+      , plrName = arguments[0]
+      , reason  = arguments[1] || '';
+
+    // Jos annettiinkin ID, niin vaihdetaan se nimeksi
+    if (this.players[plrName]) {
+      plrName = this.players[plrName].name;
+    }
+    
+    player = this.getPlayer(plrName);
+    if (!player) {
+      log.notice('Sorry, player couldn\'t be found.');
+    } else {
+      // Vaihdetaan toinen parametri nollaksi, kun klientti on pätsätty, muuten MAV.
+      this.kickPlayer(player.playerId, player.playerId, reason);
+    }
+    
+  }
+}
+
+/**
+ * Kirjaa pelaajan sisään adminiksi.
+ * @param {Player} who    Pelaaja, joka kirjautuu
+ * @param {String} pass   Salasana
+ */
+Commands.login = {
+  params: [
+    {name: 'who',  type: 'player',  optional: false, help: 'Player\'s (your) name.'},
+    {name: 'pass', type: 'string',  optional: false, help: 'Password'}
+  ],
+  help: 'Logs a player in.',
+  remote: true,
+  action: function commandsLogin() {
+    var player = this.getPlayer(arguments[0])
+      , pass   = arguments[1];
+    if (!player) {
+      log.warn('Couldn\'t find player!');
+      return;
+    }
+    if (player.admin) {
+      this.serverMessage('You are already an admin!', player.playerId);
+      return;
+    }
+    if (pass === this.config.password) {
+      player.admin = true;
+      this.serverMessage('You are now an admin!', player.playerId)
+    } else {
+      log.warn('Incorrect password!');
+    }
+  }
+};
+
+/**
+ * Hoitaa komentojen sisäisen käsittelyn ja toteutuksen
+ * @class Komentojen käsittely
+ */
+function Command(server) {
+  this.server = server;
+}
+
+/**
+ * Kutstuu haluttua komentoa halutuilla parametreillä. Komentojen konteksti (this) on aina serveri.
+ * @param {String} name      Mitä komentoa kutsutaan
+ * @param {Array}  [args]    Millä parametreillä kutsutaan
+ * @param {Player} [player]  Kuka kutsui komentoa (undefined mikäli konsolista)
+ */
+Command.prototype.call = function (name, args, player) {
+  var c = Commands[name];
   if (!c) {
     log.error('Command "%0" not recognized. You need ´help´.', name.yellow);
     return;
   }
+  // Tarkistetaan sallitaanko komento klienteillä
+  if (player && !c.remote) {
+    log.warn('Player %0 tried to call ´%1´, denied.', player.name.green, name);
+    return;
+  }
+  
   // Validoidaan argumentit - parametrien tyyppejä ei tarkasteta tässä vaan se on tehtävä manuaalisesti
   for (var i = 0; i < c.params.length; i++) {
     var p = c.params[i];
     // Jos parametri ei ole valinnainen ja argumentteja on liian vähän
     if (!p.optional && args.length <= i) {
-      log.error('You must give parameter %0 %1. For more information see ´help %2´', ('{' + p.type + '}').grey, p.name.red, c.aliases[0]);
+      log.error('You must give parameter %0 %1. For more information see ´help %2´', ('{' + p.type + '}').grey, p.name.red, name);
       return;
     }
   }
-
-  c.action.call(this.server, args);
+  // Kutsutaan funktiota
+  c.action.apply(this.server, args);
 };
 
-Commands.prototype.help = function (name) {
-  var c = this.get(name)
+/**
+ * Luo merkkijonon, joka kertoo komennon tiedot hienosti muotoiltuna.
+ * @param {String} name  Komento, jonka tiedot haluat
+ */
+Command.prototype.getHelpString = function (name) {
+  var c = Commands[name];
   if (!c) {
     return 'Could not find help about "' + name + '". You need ´help´.';
   }
-  var h =                     ' Description: '.yellow + c.description +
-    (c.aliases.length > 1 ? '\n     Aliases: '.yellow + c.aliases.join(', ') : '') +
+  var h =                     ' Description: '.yellow + c.help +
     (c.params.length ?      '\n  Parameters: '.yellow : '');
   // List parameters
   for (var i = 0; i < c.params.length; i++) {
@@ -205,6 +299,50 @@ Commands.prototype.help = function (name) {
   }
   return h;
 };
+
+Command.prototype.suggest = function (partial) {
+  var suggestions = [], plr
+    , cmds = Object.keys(Commands)
+    , cmdPart = partial.split(' ')[0]
+    , args = partial.split(' ').slice(1)
+    , playerIds = Object.keys(this.server.players)
+    , c = Commands[cmdPart];
+
+  // Jos rivi alkaa komennolla
+  if (c) {
+    // Luupataan sen argumentit
+    for (var i = 0; i < c.params.length; i++) {
+      var p = c.params[i];
+      switch (p.type) {
+      case "player":
+        // Tarkistetaan onko parametrin alku joku pelaajista
+        for (var j = playerIds.length; j--;) {
+          plr = this.server.players[playerIds[j]];
+          if (startsWith(plr.name, args[i]) && !plr.zombie) {
+            // Pelaajan nimi alkaa argumentin alulla.
+            suggestions.push(cmdPart + ' ' + plr.name);
+          }
+        }
+        break;
+        // TODO: Muut + säätö
+      }
+    }
+  }
+  // Se ei ole jo komento
+  if (!c) {
+    Object.keys(Commands).map(function (i) {
+      if (startsWith(i, partial)) {
+        suggestions.push(i + ' ');
+      }
+    });
+  }
+  return suggestions;
+};
+
+
+function startsWith(str1, str) {
+  return str1.slice(0, str.length) === str;
+}
 
 // http://codeaid.net/javascript/convert-seconds-to-hours-minutes-and-seconds-(javascript) Vähän editoituna
 function secondsToTime(secs) {
@@ -227,4 +365,4 @@ function padString(s, l, r) {
   }
 }
 
-module.exports = Commands;
+module.exports = Command;

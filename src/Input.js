@@ -13,30 +13,7 @@ var log = require('./Utils').log
 function Input(server) {
   var self = this
     , rli = readline.createInterface(process.stdin, process.stdout, function (partial) {
-      // Luodaan automaattinen täydennys komentojen nimien perusteella
-      var suggestions = [], prefix = '';
-      // Jos rivi alkaa help komennolla
-      if (partial.substr(0, 5) === 'help ') {
-        // Poistetaan help alusta, jotta täydennys toimii myös helpin komentoparametrissä. :)
-        partial = partial.slice(5);
-        // Lisätään prefiksi, jotta help ei kuitenkaan katoa komennon alusta
-        prefix = 'help ';
-      }
-
-      // TODO: Lisää automaattinen täydennys tyypin perusteella esim. pelaajan nikki tai komento.
-
-      // Käydään kaikki komennot läpi
-      for (var i = server.commands.commands.length; i--;) {
-        var c = server.commands.commands[i];
-        // Käydään kaikki aliakset läpi
-        for (var j = c.aliases.length; j--;) {
-          if (c.aliases[j].substr(0, partial.length) === partial) {
-            // Tämä voisi olla vaihtoehto
-            suggestions.push(prefix + c.aliases[j]);
-          }
-        }
-      }
-      return [suggestions, prefix + partial];
+      return [server.commands.suggest(partial), partial];
     });
 
   process.stdin.resume();

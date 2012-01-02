@@ -96,29 +96,39 @@ server.on(NET.PLAYERNAME, function NetPlayerName(client, player) {
 
 server.on(NET.TEXTMESSAGE, function NetTextMessage(client, player) {
   // Pelaaja lähetti tsättiviestin
-  txtMessage = client.data.getString().trim();
+  var txtMessage = client.data.getString().trim(), cmd;
   if (txtMessage.charAt(0) === '/') {
-    // UNIMPLEMENTED
-    // Komento
-    log.notice('Player ' + player.name + ' sent a command: ' + txtMessage);
-    txtMessage = "";
+    cmd = txtMessage.split(' ')[0].slice(1);
+    // Komennot vaativat admin-oikeudet
+    if (player.admin) {
+      log.notice('Player %0 called ´%1´', player.name.green, txtMessage);
+      server.commands.call(cmd, txtMessage.split(' ').splice(1), player);
+    } else if (cmd === 'login') {
+      cmd = txtMessage.split(' ').splice(1);
+      log.notice('Player %0 is trying to login with password ´%1´.', player.name.green, cmd[0].red);
+      cmd.unshift(player.name); // Lisätään pelaajan nimi komennon ensimmäiseksi parametriksi.
+      server.commands.call('login', cmd, player);
+    } else {
+      log.warn('Player %0 tried to call ´%1´ without admin rights, access denied.', player.name.green, cmd);
+      server.serverMessage('You need to login as admin to use commands.', player.playerId);
+    }
   } else {
     // Ei ollut komento, logataanpas tämä.
     log.write('<' + player.name + '> ' + txtMessage);
-  }
 
-  var msgData = {
-    msgType: NET.TEXTMESSAGE,
-    playerId: player.playerId,
-    msgText: txtMessage
-  };
-  // Lähetetään kaikille muille paitsi boteille
-  if (txtMessage.charAt(0) === '*') {
-    // Lähetetään vain omalle joukkueelle tämä viesti
-    server.messages.addToTeam(player.team, msgData);
-  } else {
-    // Ei ollut tähteä ekana kirjaimena, joten tämä viesit on julkinen ja lähtee kaikille.
-    server.messages.addToAll(msgData);
+    var msgData = {
+      msgType: NET.TEXTMESSAGE,
+      playerId: player.playerId,
+      msgText: txtMessage
+    };
+    // Lähetetään kaikille muille paitsi boteille
+    if (txtMessage.charAt(0) === '*') {
+      // Lähetetään vain omalle joukkueelle tämä viesti
+      server.messages.addToTeam(player.team, msgData);
+    } else {
+      // Ei ollut tähteä ekana kirjaimena, joten tämä viesit on julkinen ja lähtee kaikille.
+      server.messages.addToAll(msgData);
+    }
   }
 });
 
