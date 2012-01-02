@@ -187,4 +187,42 @@ Player.prototype.applyExplosion = function (bullet, dist) {
   }
 }
 
+/**
+ * Tätä funktiota kutsutaan kun ammus osuu suoraan pelaajaan. Tämä hoitaa pelaajan vahingoittamisen.
+ *
+ * @param {Bullet} bullet  Ammus joka osui pelaajaan
+ * @param {Number} x       Osumakohta
+ * @param {Number} y       Osumakohta
+ */
+Player.prototype.bulletHit = function (bullet, x, y) {
+  if (this.health <= 0 || this.isDead) {
+    return;
+  }
+  // Talletetaan tieto ampujasta
+  this.shootedBy = bullet.playerId;
+
+  // Lisätään viestijonoon ilmoitus osumasta
+  this.server.messages.addToAll({
+    msgType: NET.BULLETHIT,     // Mikä viesti
+    bulletId: bullet.bulletId,  // Ammuksen tunnus
+    playerId: this.playerId,    // Keneen osui
+    x: x,                       // Missä osui
+    y: y,                       // Missä osui
+    weapon: bullet.weapon       // Millä aseella ammus ammuttiin
+  });
+
+  // Tutkitaan oliko räjähdys ja jos oli, niin meillä ei ole täällä enää muuta tehtävää.
+  if (bullet.checkExplosion(x, y)) {
+    return;
+  }
+
+  // Ei ollut räjähdys, tiputetaan pelaajan health-kentän arvoa
+  this.health -= Weapons[bullet.weapon].damage;
+
+  // Kuolema?
+  if (this.health <= 0) {
+    this.kill(bullet);
+  }
+}
+
 exports = module.exports = Player;

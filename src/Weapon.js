@@ -396,6 +396,9 @@ Bullet.prototype.checkExplosion = function (x, y) {
       }
     }
   }
+
+  // Ammus on räjähtänyt.
+  return true;
 }
 
 /**
@@ -427,7 +430,7 @@ Bullet.prototype.checkPlayerHit = function (player) {
         // Nyt tarkistetaan osuma. Osumaa itseensä ei tarkisteta
         if (player.playerId !== this.playerId && distance(player.x, player.y, bx, by) < 20) {
           // Osui
-          this.playerHit(player, bx, by);
+          player.bulletHit(this, bx, by);
           return true;
         }
       }
@@ -436,43 +439,6 @@ Bullet.prototype.checkPlayerHit = function (player) {
 
   // Jos tänne asti päästiin, ei ammus osunut.
   return false;
-}
-
-/**
- * Tätä funktiota kutsutaan kun ammus osuu suoraan pelaajaan
- * @param {Player} player  Pelaaja, kehen ammus osui.
- * @param {Number} x       Osumakohta
- * @param {Number} y       Osumakohta
- */
-Bullet.prototype.playerHit = function (player, x, y) {
-  if (player.health <= 0 || player.isDead) {
-    return;
-  }
-  // Talletetaan tieto ampujasta
-  player.shootedBy = this.playerId;
-
-  // Lisätään viestijonoon ilmoitus osumasta
-  this.server.messages.addToAll({
-    msgType: NET.BULLETHIT,     // Mikä viesti
-    bulletId: this.bulletId,    // Ammuksen tunnus
-    playerId: player.playerId,  // Keneen osui
-    x: x,                       // Missä osui
-    y: y,                       // Missä osui
-    weapon: this.weapon         // Millä aseella ammus ammuttiin
-  });
-
-  // Tutkitaan oliko räjähdys ja jos oli, niin meillä ei ole täällä enää muuta tehtävää.
-  if (this.checkExplosion(x, y)) {
-    return;
-  }
-
-  // Ei ollut räjähdys, tiputetaan pelaajan health-kentän arvoa
-  player.health -= Weapons[this.weapon].damage;
-
-  // Kuolema?
-  if (player.health <= 0) {
-    player.kill(this);
-  }
 }
 
 exports.Bullet = Bullet;
