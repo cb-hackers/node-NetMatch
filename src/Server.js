@@ -114,7 +114,7 @@ Server.prototype.initialize = function () {
   this.server.on('close', function onClose() {
     if (!self.gameState.closing) {
       // Hups! cbNetwork serveri kaatui alta.
-      log.fatal('cbNetwork kohtasi odottamattoman virheen.');
+      log.fatal('cbNetwork unexpectedly closed, server will terminate.');
       self.close(true);
     }
     // Muussa tapauksessa sulkeutuminen oli odotettavissa

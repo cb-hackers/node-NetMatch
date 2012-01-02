@@ -4,7 +4,8 @@
 
 /**#nocode+*/
 var log = require('./Utils').log
-  , NET = require('./Constants').NET;
+  , NET = require('./Constants').NET
+  , fs = require('fs');
 /**#nocode-*/
 
 /**
@@ -23,13 +24,15 @@ var log = require('./Utils').log
  */
 var Commands = {};
 
+// Sisäänrakennetut komennot
+
 /**
  * Help-komento tulostaa tietoja halutusta komennosta.
  * @param {String} [command]  Minkä komennot salat paljastetaan
  */
 Commands.help = {
   params: [
-    {name: 'command', type: 'string', optional: true, help: 'Which command\'s help to show'}
+    {name: 'command', type: 'command', optional: true, help: 'Which command\'s help to show'}
   ],
   help: 'Shows help about this server\'s commands. See ´commands´ for list of available commands.',
   remote: true,
@@ -81,9 +84,7 @@ Commands.say = {
   }
 };
 
-/**
- * Sulkee palvelimen.
- */
+/** Sulkee palvelimen. */
 Commands.close = {
   params: [],
   help: 'Closes the server.',
@@ -93,70 +94,7 @@ Commands.close = {
   }
 };
 
-/**
- * Kertoo kauanko palvelin on ollut päällä.
- */
-Commands.uptime = {
-  params: [],
-  help: 'Displays how long has the server been running.',
-  remote: true,
-  action: function commandsUptime() {
-    var t = secondsToTime(Math.floor(process.uptime()));
-    this.serverMessage('This server has been running for ' + t.d + 
-      ' days ' + t.h + ' hours ' + t.m + ' minutes and ' + t.s + ' seconds.');
-  }
-};
-
-/**
- * Uudelleennimeää pelaajan.
- * @param {Player} who   Pelaaja, joka uudelleennimetään. Nimi tai ID kelpaa
- * @param {String} name  Uusi nimi
- */
-Commands.rename = {
-  params: [
-    {name: 'who',  type: 'player', optional: false, help: 'Player who needs to be renamed'},
-    {name: 'name', type: 'string', optional: false, help: 'New name'}
-  ],
-  help: 'Renames a player.',
-  remote: true,
-  action: function commandsRename() {
-    var plr, playerIds, player
-      , plrName = arguments[0]
-      , newName = arguments[1];
-
-    // Jos annettiinkin ID, niin vaihdetaan se nimeksi
-    if (this.players[plrName]) {
-      plrName = this.players[plrName].name;
-    }
-
-    // Luupataan kaikki pelaajat ja etsitään haluamamme pelaaja.
-    playerIds = Object.keys(this.players)
-    for (var i = playerIds.length; i--;) {
-      plr = this.players[playerIds[i]];
-      plr.sendNames = true; // Kaikkien pitää päivittää nimitiedot
-      // Ei anneta vaihtaa nimeä, jos uusi nimi on jo käytössä
-      if (plr.name === newName) {
-        log.notice('Name "%0" is already in use!', newName.green);
-        return;
-      }
-      if (plr.name === plrName && !plr.zombie && plr.active) {
-        player = plr;
-      }
-    }
-
-    // Jos pelaaja löytyi, vaihdetaan nimi.
-    if (!player) {
-      log.notice('Sorry, player couldn\'t be found or you tried to rename a bot.');
-    } else {
-      player.name = newName;
-      log.info('Renamed "%0" -> "%1" >:)', plrName.green, newName.green);
-    }
-  }
-};
-
-/**
- * Listaa paikalla olevat pelaajat.
- */
+/** Listaa paikalla olevat pelaajat. */
 Commands.list = {
   params: [],
   help: 'Lists all connected players.',
@@ -192,7 +130,7 @@ Commands.kick = {
     if (this.players[plrName]) {
       plrName = this.players[plrName].name;
     }
-    
+
     player = this.getPlayer(plrName);
     if (!player) {
       log.notice('Sorry, player couldn\'t be found.');
@@ -200,7 +138,7 @@ Commands.kick = {
       // Vaihdetaan toinen parametri nollaksi, kun klientti on pätsätty, muuten MAV.
       this.kickPlayer(player.playerId, player.playerId, reason);
     }
-    
+
   }
 }
 
@@ -236,6 +174,17 @@ Commands.login = {
   }
 };
 
+// Ladataan lisää komentoja Commands-kansiosta, jos semmoisia löytyy.
+files = fs.readdirSync(__dirname + '/Commands');
+log.info('Found and loaded %0 command-modules: %1', String(files.length).magenta,
+  files.map(function loadCommands(fn) {
+    var cmd = fn.toLowerCase().split('.')[0];
+    Commands[cmd] = require(__dirname + '/Commands/' + fn);
+    return cmd;
+  }).join(', ').green
+);
+
+
 /**
  * Hoitaa komentojen sisäisen käsittelyn ja toteutuksen
  * @class Komentojen käsittely
@@ -261,7 +210,7 @@ Command.prototype.call = function (name, args, player) {
     log.warn('Player %0 tried to call ´%1´, denied.', player.name.green, name);
     return;
   }
-  
+
   // Validoidaan argumentit - parametrien tyyppejä ei tarkasteta tässä vaan se on tehtävä manuaalisesti
   for (var i = 0; i < c.params.length; i++) {
     var p = c.params[i];
@@ -302,40 +251,47 @@ Command.prototype.getHelpString = function (name) {
 
 Command.prototype.suggest = function (partial) {
   var suggestions = [], plr
+    , server = this.server
     , cmds = Object.keys(Commands)
     , cmdPart = partial.split(' ')[0]
     , args = partial.split(' ').slice(1)
     , playerIds = Object.keys(this.server.players)
-    , c = Commands[cmdPart];
+    , c = Commands[cmdPart]; // Se saattaa alkaa jo täydellisellä komennolla
 
-  // Jos rivi alkaa komennolla
+  // Jos rivi alkaa komennolla.
   if (c) {
-    // Luupataan sen argumentit
-    for (var i = 0; i < c.params.length; i++) {
-      var p = c.params[i];
+    // Luupataan sen argumentit ja lisätään ehdotuksiin
+    c.params.forEach(function paramLoop(p, i) {
+      // Valitaan, mitä pitää tarkistaa parametrin tyypin perusteella
       switch (p.type) {
-      case "player":
-        // Tarkistetaan onko parametrin alku joku pelaajista
+      case "player": // Pelaajien nikit on hyvä täydentää
         for (var j = playerIds.length; j--;) {
-          plr = this.server.players[playerIds[j]];
-          if (startsWith(plr.name, args[i]) && !plr.zombie) {
+          plr = server.players[playerIds[j]];
+          if (plr.name && startsWith(plr.name, args[i]) && plr.active) {
             // Pelaajan nimi alkaa argumentin alulla.
             suggestions.push(cmdPart + ' ' + plr.name);
           }
         }
         break;
+      case "command": // Samoin komentojen nimet
+        cmds.forEach(function commandLoop(s) {
+          if (startsWith(s, args[i])) {
+            // Komento alkaa argumentint alulla.
+            suggestions.push(cmdPart + ' ' + s);
+          }
+        });
+        break;
         // TODO: Muut + säätö
       }
-    }
-  }
-  // Se ei ole jo komento
-  if (!c) {
+    });
+  } else { // Muussa tapauksessa täydennetään komennoksi.
     Object.keys(Commands).map(function (i) {
       if (startsWith(i, partial)) {
         suggestions.push(i + ' ');
       }
     });
   }
+
   return suggestions;
 };
 
