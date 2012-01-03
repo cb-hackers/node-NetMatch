@@ -26,6 +26,16 @@ var Commands = {};
 
 // Sisäänrakennetut komennot
 
+Commands.asd = {
+  params: [
+    {name: 'command', type: 'command', optional: false, help: 'Which command\'s help to show'},
+    {name: 'cmd',     type: 'command', optional: false, help: 'Player who needs to be kicked'},
+  ],
+  help: 'Asadasdsafsf.',
+  remote: true,
+  action: function () {}
+};
+
 /**
  * Help-komento tulostaa tietoja halutusta komennosta.
  * @param {String} [command]  Minkä komennot salat paljastetaan
@@ -273,36 +283,38 @@ Command.prototype.suggest = function (partial) {
   var suggestions = []
     , cmdPart = partial.split(' ')[0]       // Rivin ensimmäinen sana on tietenkin komento-osa.
     , cmd = Commands[cmdPart]               // Yritetään lukea komento muuttujaan, jos se on täydellinen.
-    , argPart = partial.split(' ').slice(1) // Parametrit on hyvä ottaa myös talteen, koska niitäkin voi täydentää.
+    , argPart = partial.split(' ').slice(1) // Parametrit talteen
+    , lastArg = argPart[argPart.length - 1] || '' // Viimeinen parametri kiinnostaa, sillä sitä täydennetään.
     , server = this.server          // Otetaan talteen closurea varten
     , cmds = Object.keys(Commands)  // Otetaan talteen lista komentojen nimistä
-    , playerIds = Object.keys(this.server.players); // ja lista pelaajien tunnisteista
-
-  // Jos rivi alkaa komennolla.
-  if (cmd) {
-    // Luupataan sen argumentit ja lisätään ehdotuksiin, jos näyttää siltä, että sitä on aloitettu kirjoittaa
-    cmd.params.forEach(function paramLoop(param, i) {
-      var plr;
-      // i:stä nähdään monettako parametria täydennetään, jotta osataan täydentää oikeata kohtaa argPart:sta.
-      switch (param.type) { // Valitaan, mitä pitää tarkistaa parametrin tyypin perusteella
-      case "player": // Täydennetään pelaajien nimimerkit
-        for (var j = playerIds.length; j--;) {
-          plr = server.players[playerIds[j]];
-          if (plr.name && startsWith(plr.name, argPart[i]) && plr.active) {
-            suggestions.push(cmdPart + ' ' + plr.name);
-          }
+    , playerIds = Object.keys(this.server.players) // ja lista pelaajien tunnisteista
+    , param;
+  // Jos rivi alkaa komennolla ja sillä on parametrejä.
+  if (cmd && cmd.params) {
+    // Valitaan parametri, jota ollaan kirjoittamassa
+    param = cmd.params[argPart.length > 0 ? argPart.length - 1 : 0] // Otetaan viimeinen parametri.
+    if (!param) { return; } // Parametriä ei löydy, eli kaikki parametrit on jo täytetty!
+    var plr;
+    switch (param.type) { // Valitaan, mitä pitää tarkistaa parametrin tyypin perusteella
+    case "player": // Täydennetään pelaajien nimimerkit
+      for (var j = playerIds.length; j--;) {
+        plr = server.players[playerIds[j]];
+        if (plr.name && plr.active && startsWith(plr.name, lastArg)) {
+          // Yhdistetään komento-osa, välissä olevat parametrit sekä ehdotus.
+          suggestions.push([cmdPart].concat(argPart.slice(0, argPart.length - 1), plr.name).join(' ') + ' ');
         }
-        break;
-      case "command": // Täydennetään komentojen nimet
-        cmds.map(function commandLoop(cmdName) {
-          if (startsWith(cmdName, argPart[i])) {
-            suggestions.push(cmdPart + ' ' + cmdName);
-          }
-        });
-        break;
-      // Tähän voi lisätä uusia parametrien täydennyksiä
       }
-    });
+      break;
+    case "command": // Täydennetään komentojen nimet
+      cmds.map(function commandLoop(cmdName) {
+        if (startsWith(cmdName, lastArg)) {
+          // Yhdistetään komento-osa, välissä olevat parametrit sekä ehdotus.
+          suggestions.push([cmdPart].concat(argPart.slice(0, argPart.length - 1), cmdName).join(' ') + ' ');
+        }
+      });
+      break;
+    // Tähän voi lisätä uusia parametrien täydennyksiä
+    }
   } else { // Jos rivi ei ala komennolla täydennetään rivin alku komennoksi.
     cmds.map(function (cmdName) {
       if (startsWith(cmdName, partial)) {
