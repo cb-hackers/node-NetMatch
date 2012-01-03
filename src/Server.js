@@ -131,6 +131,7 @@ Server.prototype.initialize = function () {
   this.gameState.playerCount = 0;
   this.gameState.gameMode = this.config.gameMode;
   this.gameState.maxPlayers = this.config.maxPlayers;
+  this.gameState.radarArrows = this.config.radarArrows;
 
   // Ladataan kartta
   this.gameState.map = new Map(this, this.config.map);
@@ -335,9 +336,8 @@ Server.prototype.sendReply = function (client, player) {
           // Lähetetään tutkatiedot jos joukkueet ovat samat tai asetuksista on laitettu että
           // kaikkien joukkueiden pelaajien tutkatiedot lähetetään
           reply.putByte(NET.RADAR); // Tutkatietoa tulossa
-          // UNIMPLEMENTED
-          // Missä kulmassa tutkan pitäisi olla
-          reply.putByte(0);         // Kulma muutettuna välille 0-255
+          var angle = Math.atan2(y1 - y2, x1 - x2) + Math.PI; // Kulma radiaaneina välillä 0...2pi
+          reply.putByte((angle / (2 * Math.PI)) * 255); // Kulma muutettuna välille 0-255
           reply.putByte(plr.team);  // Pelaajan joukkue
         }
       }
