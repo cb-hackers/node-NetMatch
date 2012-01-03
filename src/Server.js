@@ -14,14 +14,15 @@ var cbNetwork = require('cbNetwork')
   , timer  = require('./Utils').timer
   , colors = require('colors')
   // Serverin moduulit
-  , NetMsgs = require('./NetMessage')
-  , Player  = require('./Player')
-  , Map     = require('./Map').Map
-  , Input   = require('./Input')
-  , Item    = require('./Item')
-  , Game    = require('./Game')
-  , Config  = require('./Config')
-  , Command = require('./Command');
+  , NetMsgs      = require('./NetMessage')
+  , Player       = require('./Player')
+  , Map          = require('./Map').Map
+  , Input        = require('./Input')
+  , Item         = require('./Item')
+  , Game         = require('./Game')
+  , Config       = require('./Config')
+  , Command      = require('./Command')
+  , Registration = require('./Registration');
 /**#nocode-*/
 
 Server.VERSION = "v2.4";
@@ -95,6 +96,12 @@ function Server(port, address, debug) {
    */
   this.input = new Input(this);
 
+  /**
+   * Tämän palvelimen palvelinlistaukseen liittyvä toiminallisuus
+   * @type Registration
+   */
+  this.registration = new Registration(this);
+
   // Alustetaan palvelin (esim. kartta, pelaajat, tavarat)
   this.initialize();
 
@@ -161,6 +168,17 @@ Server.prototype.initialize = function () {
   }
   for (var i = mapConfig.chainsawItems - 1; i--;) {
     new Item(this, ++itemId, ITM.FUEL);
+  }
+
+  // Lisätäänkö palvelin palvelinlistaukseen
+  if (this.config.register) {
+    this.registration.add(function initRegister(err) {
+      if (err) {
+        log.error('Server registration failed: %0', err);
+      } else {
+        log.info('Server registered successfully.');
+      }
+    });
   }
 };
 
