@@ -142,11 +142,12 @@ Commands.kick = {
     }
 
     player = this.getPlayer(plrName);
-    if (!player) {
-      log.notice('Sorry, player couldn\'t be found.');
+    if (!player || !player.active || player.zombie) {
+      log.notice('Sorry, player couldn\'t be found or you tried to kick a bot.');
     } else {
       // Vaihdetaan toinen parametri nollaksi, jos kutsut tulee palvelimelta, kun klientti on pätsätty, muuten MAV.
-      this.kickPlayer(player.playerId, argument[0] && arguments[0].playerId || player.playerId, reason);
+      this.kickPlayer(player.playerId, // Kicker id joko komennon kutsujan ID tai serveri.
+        arguments[0] && arguments[0].playerId || player.playerId, reason);
     }
 
   }
@@ -265,52 +266,50 @@ Command.prototype.getHelpString = function (name) {
 
 /**
  * Hoitaa komentojen ja pelaajien nimimerkkien täydentämisen annetun parametrin perusteella
- * @param {String}  partial
- * @returns {Array}  Löydetyt ehdotukset
+ * @param {String}  partial  Käyttäjän aloittama rivi, kun hän painaa tabia.
+ * @returns {Array}  Löydetyt ehdotukset, jos niitä on vain yksi, sillä korvataan koko rivi.
  */
 Command.prototype.suggest = function (partial) {
-  var suggestions = [], plr
-    , server = this.server
-    , cmds = Object.keys(Commands)
-    , cmdPart = partial.split(' ')[0]
-    , args = partial.split(' ').slice(1)
-    , playerIds = Object.keys(this.server.players)
-    , c = Commands[cmdPart]; // Se saattaa alkaa jo täydellisellä komennolla
+  var suggestions = []
+    , cmdPart = partial.split(' ')[0]       // Rivin ensimmäinen sana on tietenkin komento-osa.
+    , cmd = Commands[cmdPart]               // Yritetään lukea komento muuttujaan, jos se on täydellinen.
+    , argPart = partial.split(' ').slice(1) // Parametrit on hyvä ottaa myös talteen, koska niitäkin voi täydentää.
+    , server = this.server          // Otetaan talteen closurea varten
+    , cmds = Object.keys(Commands)  // Otetaan talteen lista komentojen nimistä
+    , playerIds = Object.keys(this.server.players); // ja lista pelaajien tunnisteista
 
   // Jos rivi alkaa komennolla.
-  if (c) {
-    // Luupataan sen argumentit ja lisätään ehdotuksiin
-    c.params.forEach(function paramLoop(p, i) {
-      // Valitaan, mitä pitää tarkistaa parametrin tyypin perusteella
-      switch (p.type) {
-      case "player": // Pelaajien nikit on hyvä täydentää
+  if (cmd) {
+    // Luupataan sen argumentit ja lisätään ehdotuksiin, jos näyttää siltä, että sitä on aloitettu kirjoittaa
+    cmd.params.forEach(function paramLoop(param, i) {
+      var plr;
+      // i:stä nähdään monettako parametria täydennetään, jotta osataan täydentää oikeata kohtaa argPart:sta.
+      switch (param.type) { // Valitaan, mitä pitää tarkistaa parametrin tyypin perusteella
+      case "player": // Täydennetään pelaajien nimimerkit
         for (var j = playerIds.length; j--;) {
           plr = server.players[playerIds[j]];
-          if (plr.name && startsWith(plr.name, args[i]) && plr.active) {
-            // Pelaajan nimi alkaa argumentin alulla.
+          if (plr.name && startsWith(plr.name, argPart[i]) && plr.active) {
             suggestions.push(cmdPart + ' ' + plr.name);
           }
         }
         break;
-      case "command": // Samoin komentojen nimet
-        cmds.forEach(function commandLoop(s) {
-          if (startsWith(s, args[i])) {
-            // Komento alkaa argumentint alulla.
-            suggestions.push(cmdPart + ' ' + s);
+      case "command": // Täydennetään komentojen nimet
+        cmds.map(function commandLoop(cmdName) {
+          if (startsWith(cmdName, argPart[i])) {
+            suggestions.push(cmdPart + ' ' + cmdName);
           }
         });
         break;
-        // TODO: Muut + säätö
+      // Tähän voi lisätä uusia parametrien täydennyksiä
       }
     });
-  } else { // Muussa tapauksessa täydennetään komennoksi.
-    Object.keys(Commands).map(function (i) {
-      if (startsWith(i, partial)) {
-        suggestions.push(i + ' ');
-      }
+  } else { // Jos rivi ei ala komennolla täydennetään rivin alku komennoksi.
+    cmds.map(function (cmdName) {
+      if (startsWith(cmdName, partial)) {
+        suggestions.push(cmdName + ' '); // Lisätään vielä väli. Se nopeuttaa kirjoittamista,
+      }                                  // jos komennolla on parametrejä.
     });
   }
-
   return suggestions;
 };
 
