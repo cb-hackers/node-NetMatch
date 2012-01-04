@@ -77,7 +77,20 @@ var Utils = {
   splitString: function (str) {
     var reg = /\ (?!\w+")/;
     return str.split(reg);
+  },
+
+  /** 
+   * Kuten Array.prototype.join, mutta tukee viimeisen erottimen vaihtoa.
+   * @param {Array}  arr     Lista, joka yhdistetään
+   * @param {String} delim   Ensimmäinen erotin, jota käytetään muihin kuin viimeiseen väliin
+   * @param {String} delim2  Erotin, joka laitetaan viimeiseen väliin
+   * @returns {String}  Yhdistetty jono
+   */
+  join: function (arr, delim, delim2) {
+    return arr.length > 1 ? arr.slice(0, arr.length - 1).join(delim) +
+      ' ' + delim2 + arr[arr.length - 1] : arr[0];
   }
+  
 };
 
 exports = module.exports = Utils;

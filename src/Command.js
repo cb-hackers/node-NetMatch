@@ -3,10 +3,10 @@
  */
 
 /**#nocode+*/
-var log = require('./Utils').log
-  , NET = require('./Constants').NET
-  , fs = require('fs')
-  , path = require('path');
+var log  = require('./Utils').log
+  , join = require('./Utils').join
+  , NET = require('./Constants').NET;
+
 /**#nocode-*/
 
 /**
@@ -60,7 +60,7 @@ Commands.help = {
         server.serverMessage(m, arguments[0].playerId);
       });
     } else {
-      console.log(this.commands.getHelpString(command));
+      console.log(this.commands.getHelpString(command, true));
     }
   }
 };
@@ -201,8 +201,10 @@ Commands.login = {
 /**#nocode+*/
 // Ladataan lisää komentoja Commands-kansiosta, jos semmoisia löytyy.
 (function () { // Ei vuodeta muuttujia
-  var files = fs.readdirSync(__dirname + '/Commands')
-    , cmds = files
+  var fs = require('fs')
+  , path = require('path')
+  , files = fs.readdirSync(__dirname + '/Commands')
+  , cmds = files
     // Filtteröi ei-js-filut.
     .filter(function (fn) { return path.extname(fn) === '.js'; })
     // Kartoita loput
@@ -235,23 +237,23 @@ function Command(server) {
  * @param {Player} [player]  Kuka kutsui komentoa (undefined mikäli konsolista)
  */
 Command.prototype.call = function (name, args, player) {
-  var c = Commands[name], server = this.server;
+  var c = Commands[name], p;
   if (!c) { log.error('Command "%0" not recognized. You need ´help´.', name.yellow); return; }
 
   // Tarkistetaan sallitaanko komento klienteillä
   if (player && !c.remote) {
     log.warn('Player %0 tried to call ´%1´, denied.', player.name.green, name);
-    server.serverMessage('Access denied.', player.playerId);
+    this.server.serverMessage('The command you tried to call is server-side only.', player.playerId);
     return;
   }
 
   // Validoidaan argumentit - parametrien tyyppejä ei tarkasteta vaan se on tehtävä manuaalisesti.
   for (var i = 0; i < c.params.length; i++) {
-    var p = c.params[i];
+    p = c.params[i];
     // Jos parametri ei ole valinnainen ja argumentteja on liian vähän
     if (!p.optional && args.length <= i) {
       if (player) {
-        server.serverMessage('You must give parameter {' + p.type + '} ' +
+        this.server.serverMessage('You must give parameter {' + p.type + '} ' +
           p.name + '. See ´help ' + name + '´', player.playerId);
       } else {
         log.error('You must give parameter %0 %1. For more information see ´help %2´',
@@ -268,29 +270,40 @@ Command.prototype.call = function (name, args, player) {
 
 /**
  * Palauttaa komennon tiedot merkkijonona.
- * @param {String} name  Komento, jonka tiedot haluat
+ * @param {String}  name    Komento, jonka tiedot haluat
+ * @param {Boolean} format  Formatoidaanko? (värit & wtf-8)
  * @return {String}  Hienosti muotoiltu merkkijono.
  */
-Command.prototype.getHelpString = function (name) {
-  var c = Commands[name], h, p
+Command.prototype.getHelpString = function (name, format) {
+  var c = Commands[name], h
     // Merkkijonojen täyttäminen ilmalla
     , pad = function (s, l, r) {
       if (r) { return Array(Math.max(l - s.length + 1, 0)).join(' ') + s; }
       else   { return s + Array(Math.max(l - s.length + 1, 0)).join(' '); }
     };
   if (!c) { return 'Could not find help about "' + name + '". You need ´help´.'; }
-  // Luodaan viesti h-muuttujaan
-  h = ' Description: ' + c.help + (c.params.length ? '\n  Parameters: ' : '');
-  // Listataan parametrit
-  for (var i = 0; i < c.params.length; i++) {
-    p = c.params[i];
-    h += '\n' +
-      // Type
-      pad('  {' + p.type + '} ', 15, true) +
-      // Name
-      pad((p.optional ? '[' + p.name + ']' : p.name), 10, false) +
-      // Description
-      ' -- ' + p.help;
+  if (format) {
+    h = ' Description: '.yellow + c.help +
+      // Jos on parametrejä
+      (c.params.length ? '\n Params\n   '.yellow +
+        // Jos niitä on useampi niin muotoillaan wtf-8:lla
+        (c.params.length > 1 ? '├→' : '└→').yellow +
+        // Listataan ne
+        join(c.params.map(function paramLoop(p) {
+          return pad((' {' + p.type + '} ').grey, 21, false)  // Tyyppi
+              +  pad((p.optional ? '[' + p.name + ']' : ' ' + p.name).green, 19, false) // Nimi
+              +  ' – ' + p.help; // Selitys
+        // Muotoillaan wtf-8:lla taulukosta merkkijono.
+        }), '\n   ├→'.yellow, '\n   └→'.yellow)
+      : ''); // Ei parametrejä
+  } else {
+    h = ' Description: ' + c.help +
+      (c.params.length ? '\n  Parameters:\n' : '') + // Sitten listataan parametrit mikäli niitä on.
+      (c.params.map(function paramLoop(p) {
+        return pad('  {' + p.type + '} ', 15, true) + // Tyyppi
+               pad((p.optional ? '[' + p.name + ']' : p.name), 18, false) + // Nimi
+               ' -- ' + p.help; // Selitys
+      }).join('\n'));
   }
   return h;
 };
