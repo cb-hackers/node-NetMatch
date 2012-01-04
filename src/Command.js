@@ -201,8 +201,8 @@ Commands.login = {
 /**#nocode+*/
 // Ladataan lisää komentoja Commands-kansiosta, jos semmoisia löytyy.
 (function () { // Ei vuodeta muuttujia
-  var files = fs.readdirSync(__dirname + '/Commands');
-  var cmds = files
+  var files = fs.readdirSync(__dirname + '/Commands')
+    , cmds = files
     // Filtteröi ei-js-filut.
     .filter(function (fn) { return path.extname(fn) === '.js'; })
     // Kartoita loput

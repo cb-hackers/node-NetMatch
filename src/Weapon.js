@@ -201,10 +201,8 @@ function Bullet(server, playerId, extraBullet) {
   weaponConfig = Weapons[player.weapon];
 
   // Debugataan
-  if (server.debug) {
-    log.info('Created a new bullet %0 (%1), shot by %2',
-      String(this.bulletId).magenta, weaponConfig.name.yellow, player.name.green);
-  }
+  log.debug('Created a new bullet %0 (%1), shot by %2',
+    String(this.bulletId).magenta, weaponConfig.name.yellow, player.name.green);
 
   // Mistä ammus lähtee pelaajaan nähden
   bPos = weaponConfig.bulletYaw;
