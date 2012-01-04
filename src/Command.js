@@ -200,17 +200,21 @@ Commands.login = {
 
 /**#nocode+*/
 // Ladataan lisää komentoja Commands-kansiosta, jos semmoisia löytyy.
-files = fs.readdirSync(__dirname + '/Commands');
-log.info('Found and loaded %0 command-modules: %1', String(files.length).magenta,
-  files.map(function loadCommands(fn) {
-    if (path.extname(fn) === '.js') {
+(function () { // Ei vuodeta muuttujia
+  var files = fs.readdirSync(__dirname + '/Commands');
+  var cmds = files
+    // Filtteröi ei-js-filut.
+    .filter(function (fn) { return path.extname(fn) === '.js'; })
+    // Kartoita loput
+    .map(function loadCommands(fn) {
       // Komennon nimi on filun ensimmäinen osa esim. asd.lol.js -> asd
       var cmd = fn.toLowerCase().split('.')[0];
       Commands[cmd] = require(__dirname + '/Commands/' + fn);
       return cmd;
-    }
-  }).join(', ').green
-);
+    });
+  log.info('Found and loaded %0 command-modules: %1',
+    String(cmds.length).magenta, cmds.join(', ').green);
+})();
 /**#nocode-*/
 
 
