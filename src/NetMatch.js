@@ -18,6 +18,7 @@ var argv = require('optimist')
   , log = require('./Utils').log
   , colors = require('colors')
   , timer = require('./Utils').timer
+  , splitString = require('./Utils').splitString
   , Bullet = require('./Weapon').Bullet;
 
 process.title = "NetMatch server";
@@ -97,7 +98,7 @@ server.on(NET.TEXTMESSAGE, function NetTextMessage(client, player) {
     // Komennot vaativat admin-oikeudet
     if (player.admin) {
       log.notice('Player %0 called ´%1´', player.name.green, txtMessage);
-      server.commands.call(cmd, txtMessage.split(' ').splice(1), player);
+      server.commands.call(cmd, splitString(txtMessage).splice(1), player);
     } else if (cmd === 'login') {
       cmd = txtMessage.split(' ').splice(1);
       log.notice('Player %0 is trying to login with password ´%1´.', player.name.green, String(cmd[0]).red);

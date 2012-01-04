@@ -67,6 +67,16 @@ var Utils = {
     var dx = x1 - x2; // Vaakasuuntainen etäisyys
     var dy = y1 - y2; // Pystysuuntainen etäisyys
     return Math.sqrt( dx*dx + dy*dy );
+  },
+  
+  /** 
+   * Palauttaa taulukon, jossa on merkkijono paloiteltuna sanoiksi, ottaa huomioon "merkki jonot"
+   * @param {String} str  Merkkijono, joka paloitellaan
+   * @returns {Array}  Paloiteltu jono
+   */
+  splitString: function (str) {
+    var reg = /\ (?!\w+")/;
+    return str.split(reg);
   }
 };
 
