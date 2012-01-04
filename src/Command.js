@@ -86,7 +86,7 @@ Commands.commands = {
     } else { // Verbose
       Object.keys(Commands).map(function (i) {
         console.log(i.toUpperCase().green);
-        console.log(server.commands.getHelpString(i));
+        console.log(server.commands.getHelpString(i, true));
       });
     }
   }
