@@ -1,3 +1,5 @@
+var log = require('../Utils').log;
+
 /**
  * Uudelleennimeää pelaajan.
  * @param {Player} who   Pelaaja, joka uudelleennimetään. Nimi tai ID kelpaa

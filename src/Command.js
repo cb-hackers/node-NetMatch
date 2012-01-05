@@ -30,18 +30,6 @@ var Commands = {};
 
 // Sisäänrakennetut komennot
 
-// Testaukseen
-Commands.asd = {
-  params: [
-    {name: 'sub command', type: 'sub', optional: false, help: 'Which command\'s help to show'},
-    {name: 'cmd',     type: 'command', optional: false, help: 'Player who needs to be kicked'},
-  ],
-  help: 'Asadasdsafsf.',
-  remote: true,
-  action: function () {},
-  sub: ['lol', 'lul']
-};
-
 /**
  * Help-komento tulostaa tietoja halutusta komennosta.
  * @param {String} [command]  Minkä komennot salat paljastetaan
@@ -211,11 +199,17 @@ Commands.login = {
     .map(function loadCommands(fn) {
       // Komennon nimi on filun ensimmäinen osa esim. asd.lol.js -> asd
       var cmd = fn.toLowerCase().split('.')[0];
-      Commands[cmd] = require(__dirname + '/Commands/' + fn);
-      return cmd;
+      try {
+        Commands[cmd] = require(__dirname + '/Commands/' + fn);
+        return cmd.green;
+      } catch (e) {
+        log.error('Failed to load module "%0". See --debug (-d) for stack trace.', cmd.red);
+        log.debug(e.stack);
+        return cmd.red;
+      }
     });
-  log.info('Found and loaded %0 command-modules: %1',
-    String(cmds.length).magenta, cmds.join(', ').green);
+  log.info('Found %0 command-module(s): %1',
+    String(cmds.length).magenta, cmds.join(', '));
 })();
 /**#nocode-*/
 
@@ -265,7 +259,13 @@ Command.prototype.call = function (name, args, player) {
 
   // Kutsutaan funktiota
   args.unshift(player); // Lisätään pelaaja ensimmäiseksi parametriksi
-  c.action.apply(this.server, args);
+  try {
+    c.action.apply(this.server, args);
+  } catch (e) {
+    log.error('Failed to call command %0 as %1 with [%2]. See --debug (-d) for stack trace.',
+      name.yellow, (player && player.name || 'server').green, args.join(', ').green);
+    log.debug(e.stack);
+  }
 };
 
 /**
