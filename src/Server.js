@@ -499,6 +499,9 @@ Server.prototype.login = function (client) {
       client.reply(replyData);
       log.info(' -> login successful, assigned ID (%0)', String(player.playerId).magenta);
 
+      // Päivitetään tiedot servulistaukseen
+      this.registration.update(function (e) { log.debug(e); });
+
       // Lisätään viestijonoon ilmoitus uudesta pelaajasta, kaikille muille paitsi boteille ja itselle.
       this.messages.addToAll({
         msgType: NET.LOGIN,
@@ -532,6 +535,9 @@ Server.prototype.logout = function (playerId) {
   player.loggedIn = false;
   player.admin = false;
   log.info('%0 logged out.', player.name.green);
+
+  // Päivitetään tiedot servulistaukseen
+  this.registration.update(function (e) { log.debug(e); });
 
   // Lähetetään viesti kaikille muille paitsi boteille ja itselle
   this.messages.addToAll({msgType: NET.LOGOUT, playerId: playerId}, playerId);

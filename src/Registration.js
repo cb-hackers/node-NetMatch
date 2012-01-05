@@ -37,7 +37,8 @@ Registration.prototype.apply = function (callback) {
 
   log.info('Registering server to %0...', this.server.config.regHost.green);
   // Luodaan pyyntö
-  var config = this.server.config
+  var reg = this
+    , config = this.server.config
     , url = config.regHost
     + config.regPath
     + '?profile=' + encodeURI('NetMatch')
@@ -49,8 +50,8 @@ Registration.prototype.apply = function (callback) {
     + (config.devBuild ? '&devbuild=1' : '');
 
   // Lähetetään pyyntö
-  http.get(url, function registerGet(err, data) {
-    if (err !== 200 || data !== 'ok') {
+  http.get(url, function registerGet(status, data) {
+    if (status !== 200 || data !== 'ok') {
       callback('[REG]'.red + ' Server returned: ' + data.red);
       return;
     }
@@ -65,10 +66,12 @@ Registration.prototype.apply = function (callback) {
       // Lähetetään palvelimen tiedot listausta varten
       this.registration.update(function (e) {
         if (!e) {
+          // Kaikki meni hyvin käynnistetään päivitys-luuppi.
+          reg.updateWait = setInterval(function updateReg() {
+            server.registration.update(function (e) { log.debug(e); });
+          }, 10000);
           callback();
-        } else {
-          callback('Could not update server info.');
-        }
+        } else { callback('Could not update server info.'); }
       });
     }
   });
@@ -102,13 +105,11 @@ Registration.prototype.remove = function (callback) {
     + '&mode=unreg';
 
   // Lähetetään pyyntö
-  http.get(url, function (err, data) {
+  http.get(url, function (status, data) {
     // Katsotaan, että kaikki meni putkeen
-    if (err !== 200 || data !== 'ok') {
+    if (status !== 200 || data !== 'ok') {
       callback('[UNREG]'.red + ' Server returned: ' + data.red);
-    } else {
-      callback();
-    }
+    } else { callback(); }
   });
 }
 
@@ -126,45 +127,33 @@ Registration.prototype.update = function (callback) {
     return;
   }
 
-  var server = this.server
-    , config = server.config
-    , state = server.gameState
+  // Temppimuuttujia
+  var reg = this, srv = reg.server, config = srv.config, state = srv.gameState
     // Listataan pelaajien nimet
-    , plrNames = Object.keys(server.players)
-      .filter(function (p) {
-        // Filter inactive players and bots
-        var plr = server.players[p];
-        return plr.active && plr.name && !plr.zombie})
-      .map(function (p) { return server.players[p].name; })
+    , plrNames = Object.keys(srv.players)
+      .filter(function (p) { // Filtteröidään inaktiiviset ja potit
+         p = srv.players[p]; return p.active && p.name && !p.zombie})
+      .map(function (p) { return srv.players[p].name; })
+    , plrs = plrNames.length
     // Luodaan merkkijono, jossa on palvelimen tiedot
     , data =
-      [ plrNames.length
-      , config.maxPlayers - plrNames.length
+      [ plrs
+      , state.maxPlayers - plrs
       , state.map.name
-      , config.maxPlayers
+      , state.maxPlayers
       , plrNames.join('&#124;')
       ].join(',')
     // Luodaan pyyntö
-    , url = config.regHost
-    + config.regPath
-    + '?profile=' + encodeURI('NetMatch')
-    + '&addr=' + config.address
-    + '&port=' + config.port
-    + '&mode=update'
+    , url = config.regHost + config.regPath
+    + '?profile=NetMatch&mode=update'
+    + '&addr=' + config.address + '&port=' + config.port
     + '&data=' + data;
 
   // Lähetetään pyyntö
-  http.get(url, function (err, data) {
+  http.get(url, function (status, data) {
     // Katsotaan, että kaikki meni putkeen
-    if (err !== 200 || data !== 'ok') {
+    if (status !== 200 || data !== 'ok') {
       callback('[UPD]'.red + ' Server returned: ' + data.red);
-    } else {
-      // Kaikki ok
-      setTimeout(function () {
-        server.registration.update(function (e) {
-          log.debug(e);
-        });
-      }, 4000);
     }
   });
 }
