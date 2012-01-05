@@ -86,7 +86,13 @@ Config.defaults = {
    * @type String
    * @default password
    */
-  password: "password"
+  password: "password",
+  /**
+   * Onko palvelin kehitysversio
+   * @type Boolean
+   * @default false
+   */
+  devBuild: false
 }
 
 /**

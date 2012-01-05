@@ -110,13 +110,16 @@ Server.prototype.initialize = function (port, address, config) {
 
   // Ladataan konffit
   this.config.load(config);
+  // Komentoriviparametrit voittaa.
+  if (port) { this.config.port = port; }
+  if (address) { this.config.address = address; }
 
   /**
    * cbNetwork-node UDP-palvelin
    * @type cbNetwork.Server
    * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html">cbNetwork.Server</a>
    */
-  this.server = new cbNetwork.Server(port || this.config.port, address || this.config.address);
+  this.server = new cbNetwork.Server(this.config.port, this.config.address);
 
   this.server.on('message', function recvMsg(client) {
     self.handlePacket(client);
@@ -133,6 +136,7 @@ Server.prototype.initialize = function (port, address, config) {
 
   // Alustetaan pelitilanne
   this.gameState.playerCount = 0;
+  this.gameState.botCount = 5;
   this.gameState.gameMode = this.config.gameMode;
   this.gameState.maxPlayers = this.config.maxPlayers;
   this.gameState.radarArrows = this.config.radarArrows;
@@ -177,12 +181,9 @@ Server.prototype.initialize = function (port, address, config) {
 
   // Lisätäänkö palvelin palvelinlistaukseen
   if (this.config.register) {
-    this.registration.add(function initRegister(err) {
-      if (err) {
-        log.error('Server registration failed: %0', err);
-      } else {
-        log.info('Server registered successfully.');
-      }
+    this.registration.apply(function initRegister(e) {
+      if (e) { log.error(e); }
+      else   { log.info('Server registered successfully.'); }
     });
   }
 };
@@ -197,6 +198,12 @@ Server.prototype.handlePacket = function (client) {
   var data = client.data
     , msgType = data.getByte()
     , currentPlayerId;
+
+  // Registeröinniltä paketti
+  if (client.data.clientId === 544437095) {
+    this.emit('register', client.data);
+    return;
+  }
 
   // Onko servu sammumassa?
   if (this.gameState.closing) {
@@ -584,6 +591,15 @@ Server.prototype.close = function (now) {
 
   // Pysäytetään Game-moduulin päivitys
   this.game.stop();
+
+  // Pyydetään, että palvelin poistetaan listauksesta
+  if (this.registration.registered) {
+    log.info('Unregistering server...');
+    this.registration.remove(function (e) {
+      if (e) { log.error(e); }
+      else   { log.info('Server unregistered.'); }
+    });
+  }
 
   var self = this;
   setTimeout(function closeServer() {
