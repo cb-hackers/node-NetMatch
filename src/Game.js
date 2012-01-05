@@ -40,7 +40,6 @@ Game.prototype.update = function (self) {
   self.updatePlayers();
   self.updateTimeouts();
   self.updateBotsAmount();
-  self.updateRegistration();
   self.updateBullets();
 
   self.lastUpdate = Date.now();
@@ -64,7 +63,15 @@ Game.prototype.updateFrameTimer = function () {
  * @private
  */
 Game.prototype.updateBotsAI = function () {
-
+  var playerIds = Object.keys(this.server.players);
+  for (var i = playerIds.length; i--;) {
+    var player = this.server.players[playerIds[i]];
+    if (!player.zombie) {
+      // Jos ei ollut botti niin jatketaan seuraavaan pelaajaan
+      continue;
+    }
+    player.botAI.update();
+  }
 }
 
 /**
@@ -130,14 +137,6 @@ Game.prototype.updateTimeouts = function () {
  * @private
  */
 Game.prototype.updateBotsAmount = function () {
-
-}
-
-/**
- * Pitää palvelimen rekisteröinnin kunnossa
- * @private
- */
-Game.prototype.updateRegistration = function () {
 
 }
 

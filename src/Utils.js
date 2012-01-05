@@ -27,15 +27,15 @@ var Utils = {
   log: new Logger('[NetMatch %t] '.grey, argv.d),
 
   /**
-   * Palauttaa satunnaisen luvun väliltä minVal...maxVal tarkkuudella floatVal
-   * @param {Number} minVal      Pienin mahdollinen luku
-   * @param {Number} maxVal      Suurin mahdollinen luku
-   * @param {Number} [floatVal]  Palautettavan satunnaisen luvun tarkkuus. Mikäli tätä ei anneta,
-   *                             palautetaan kokonaisluku.
+   * Palauttaa satunnaisen luvun väliltä minVal...maxVal, mahdollisesti liukulukuna
+   * @param {Number} minVal       Pienin mahdollinen luku
+   * @param {Number} maxVal       Suurin mahdollinen luku
+   * @param {Boolean} [floatVal]  Palautetaanko liukulukuna. Jos tätä ei anneta, palautetaan
+   *                              kokonaislukuna.
    */
   rand: function (minVal, maxVal, floatVal) {
     var randVal = minVal + (Math.random() * (maxVal - minVal));
-    return typeof floatVal === 'undefined' ? Math.round(randVal) : randVal.toFixed(floatVal);
+    return typeof floatVal === 'undefined' ? Math.round(randVal) : randVal;
   },
 
   /**
