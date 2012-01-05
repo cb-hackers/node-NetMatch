@@ -265,6 +265,10 @@ Command.prototype.call = function (name, args, player) {
     log.error('Failed to call command %0 as %1 with [%2]. See --debug (-d) for stack trace.',
       name.yellow, (player && player.name || 'server').green, args.join(', ').green);
     log.debug(e.stack);
+    // Also notify player if any
+    if (player) {
+      this.server.serverMessage('Oops, narrowly escaped a crash! Just whoa..', player.playerId);
+    }
   }
 };
 
