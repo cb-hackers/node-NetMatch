@@ -25,7 +25,6 @@ var cbNetwork = require('cbNetwork')
   , Registration = require('./Registration');
 /**#nocode-*/
 
-Server.VERSION = "v2.4";
 
 /**
  * Luo uuden palvelimen annettuun porttiin ja osoitteeseen. Kun palvelimeen tulee dataa, emittoi
@@ -38,8 +37,11 @@ Server.VERSION = "v2.4";
  *                                 yrittää kuunnella kaikkia osoitteita (0.0.0.0).
  * @param {Boolean} [debug=false]  Spämmitäänkö konsoliin paljon "turhaa" tietoa?
  */
-function Server(port, address, config, debug) {
-  if (this.debug = debug) { log.notice('Server running on debug mode, expect spam!'.red); }
+function Server(args, version) {
+  if (this.debug = args.d) { log.notice('Server running on debug mode, expect spam!'.red); }
+  
+  /** Palvelimen versio */
+  this.VERSION = version;
 
   /** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */
   this.gameState = {};
@@ -97,7 +99,7 @@ function Server(port, address, config, debug) {
   this.registration = new Registration(this);
 
   // Alustetaan palvelin (esim. kartta, pelaajat, tavarat)
-  this.initialize(port, address, config);
+  this.initialize(args.p, args.a, args.c);
 
   log.info('Server initialized successfully.');
 }
@@ -420,13 +422,13 @@ Server.prototype.login = function (client) {
     , randomPlace;
 
   // Täsmääkö clientin ja serverin versiot
-  if (version !== Server.VERSION) {
+  if (version !== this.VERSION) {
     log.notice('Player trying to connect with incorrect client version.');
     replyData = new Packet(3);
     replyData.putByte(NET.LOGIN);
     replyData.putByte(NET.LOGINFAILED);
     replyData.putByte(NET.WRONGVERSION);
-    replyData.putString(Server.VERSION);
+    replyData.putString(this.VERSION);
     client.reply(replyData);
     return;
   }

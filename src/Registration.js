@@ -42,7 +42,7 @@ Registration.prototype.apply = function (callback) {
     , url = config.regHost
     + config.regPath
     + '?profile=' + encodeURI('NetMatch')
-    + '&ver='     + encodeURI(config.version)
+    + '&ver='     + this.server.VERSION
     + '&mode=reg'
     + '&desc=' + encodeURI(config.description)
     + '&addr=' + encodeURI(config.address)
@@ -67,9 +67,13 @@ Registration.prototype.apply = function (callback) {
       this.registration.update(function (e) {
         if (!e) {
           // Kaikki meni hyvin käynnistetään päivitys-luuppi.
-          reg.updateWait = setInterval(function updateReg() {
-            server.registration.update(function (e) { log.debug(e); });
-          }, 10000);
+          reg.updateWait = setInterval(function updateRegInterval() {
+            reg.server.registration.update(function updateReg(e) {
+              if(e) {
+                log.debug(e);
+              }
+            });
+          }, 60000);
           callback();
         } else { callback('Could not update server info.'); }
       });
@@ -126,6 +130,7 @@ Registration.prototype.update = function (callback) {
     callback('Server is not registered, can not update!');
     return;
   }
+  log.debug('Called update');
 
   // Temppimuuttujia
   var reg = this, srv = reg.server, config = srv.config, state = srv.gameState
@@ -154,6 +159,8 @@ Registration.prototype.update = function (callback) {
     // Katsotaan, että kaikki meni putkeen
     if (status !== 200 || data !== 'ok') {
       callback('[UPD]'.red + ' Server returned: ' + data.red);
+    } else {
+      callback();
     }
   });
 }

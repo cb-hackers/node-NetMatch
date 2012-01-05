@@ -118,7 +118,7 @@ Config.prototype.load = function (config) {
     , loadedConfig;
 
   if (!path.existsSync(filePath)) {
-    log.error('Config %0 doesn\'t exist in %1', config.green, filePath.green);
+    log.error('Config %0 doesn\'t exist', filePath.green);
     return;
   }
 
