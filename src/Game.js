@@ -106,8 +106,10 @@ Game.prototype.updatePlayers = function () {
       player.hackTestX = player.x;
       player.hackTestY = player.y;
       player.spawnTime = Date.now();
-      // UNIMPLEMENTED
-      // Jos tämä on botti niin arvotaan ase
+      if (player.zombie) {
+        player.isDead = false;
+        player.weapon = this.server.getBotWeapon();
+      }
     }
 
     // UNIMPLEMENTED
