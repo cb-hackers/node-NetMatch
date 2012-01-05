@@ -38,14 +38,8 @@ Server.VERSION = "v2.4";
  *                                 yrittää kuunnella kaikkia osoitteita (0.0.0.0).
  * @param {Boolean} [debug=false]  Spämmitäänkö konsoliin paljon "turhaa" tietoa?
  */
-function Server(port, address, debug) {
+function Server(port, address, config, debug) {
   if (this.debug = debug) { log.notice('Server running on debug mode, expect spam!'.red); }
-  /**
-   * cbNetwork-node UDP-palvelin
-   * @type cbNetwork.Server
-   * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html">cbNetwork.Server</a>
-   */
-  this.server = new cbNetwork.Server(port, address);
 
   /** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */
   this.gameState = {};
@@ -103,7 +97,7 @@ function Server(port, address, debug) {
   this.registration = new Registration(this);
 
   // Alustetaan palvelin (esim. kartta, pelaajat, tavarat)
-  this.initialize();
+  this.initialize(port, address, config);
 
   log.info('Server initialized successfully.');
 }
@@ -111,9 +105,19 @@ function Server(port, address, debug) {
 Server.prototype.__proto__ = process.EventEmitter.prototype;
 
 /** Alustaa palvelimen */
-Server.prototype.initialize = function () {
-  // Kuunnellaan klinuja
+Server.prototype.initialize = function (port, address, config) {
   var self = this;
+
+  // Ladataan konffit
+  this.config.load(config);
+
+  /**
+   * cbNetwork-node UDP-palvelin
+   * @type cbNetwork.Server
+   * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html">cbNetwork.Server</a>
+   */
+  this.server = new cbNetwork.Server(port || this.config.port, address || this.config.address);
+
   this.server.on('message', function recvMsg(client) {
     self.handlePacket(client);
   });

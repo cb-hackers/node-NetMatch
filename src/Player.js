@@ -114,14 +114,12 @@ Player.prototype.constructor = Player;
 Player.prototype.kill = function (bullet) {
   var killer, weapon;
 
-  if (this.server.debug) {
-    if (!bullet) {
-      log.write('Player %0 committed suicide.', this.name);
-    } else {
-      log.write('Player %0 was killed by player %1 with bullet %2 (%3)', this.name.green,
-        this.server.players[bullet.playerId].name.green, String(bullet.bulletId).magenta,
-        Weapons[bullet.weapon].name.yellow);
-    }
+  // Logataan kuka tappoi kenet.
+  if (bullet && this.server.players[bullet.playerId].name !== this.name) {
+    log.info('%0 was killed by player %1', this.name.green,
+      this.server.players[bullet.playerId].name.green, String(bullet.bulletId).magenta);
+  } else {
+    log.info('%0 committed suicide.', this.name.green);
   }
 
   this.isDead = true;
@@ -169,10 +167,8 @@ Player.prototype.applyExplosion = function (bullet, dist) {
   }
   var damageRange = Weapons[bullet.weapon].damageRange;
 
-  if (this.server.debug) {
-    log.info('Applying explosion from bullet %0 (%1) to %2',
-      String(bullet.bulletId).magenta, Weapons[bullet.weapon].name.yellow, this.name.green);
-  }
+  log.debug('Applying explosion from bullet %0 (%1) to %2',
+    String(bullet.bulletId).magenta, Weapons[bullet.weapon].name.yellow, this.name.green);
 
   // Uhrille tieto ampujasta
   this.shootedBy = bullet.playerId;

@@ -201,7 +201,7 @@ function Bullet(server, playerId, extraBullet) {
   weaponConfig = Weapons[player.weapon];
 
   // Debugataan
-  log.debug('Created a new bullet %0 (%1), shot by %2',
+  log.debug('Created bullet %0 (%1), shot by %2',
     String(this.bulletId).magenta, weaponConfig.name.yellow, player.name.green);
 
   // Mistä ammus lähtee pelaajaan nähden
@@ -335,9 +335,7 @@ Bullet.prototype.update = function () {
 
   if (hit) {
     // Jos ollaan törmätty johonkin, poistetaan ammus.
-    if (this.server.debug) {
-      log.info('Deleted bullet %0 (%1).', String(this.bulletId).magenta, weaponConfig.name.yellow);
-    }
+    log.debug('Deleted bullet %0 (%1).', String(this.bulletId).magenta, weaponConfig.name.yellow);
     delete this.server.bullets[this.bulletId];
     delete this;
   } else {
@@ -368,11 +366,9 @@ Bullet.prototype.checkExplosion = function (x, y) {
     y = this.y;
   }
 
-  if (this.server.debug) {
-    log.info('Checking explosion from %0 (%1) at (%2, %3).',
-      String(this.bulletId).magenta, Weapons[this.weapon].name.yellow,
-      this.x.toFixed(2).blue, this.y.toFixed(2).blue);
-  }
+  log.debug('Checking explosion from %0 (%1) at (%2, %3).',
+    String(this.bulletId).magenta, Weapons[this.weapon].name.yellow,
+    this.x.toFixed(1).blue, this.y.toFixed(1).blue);
 
   var playerIds = Object.keys(this.server.players);
   for (var i = playerIds.length; i--;) {

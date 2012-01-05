@@ -116,7 +116,7 @@ Config.prototype.load = function (config) {
     return;
   }
 
-  log.info('Loading config %0" from %1', config.green, filePath.green);
+  log.info('Loading config from %0', filePath.green);
   loadedConfig = cjson.load(filePath);
   // Laajennetaan tämän Configin ominaisuuksia ladatulla json-tiedostolla
   cjson.extend(this, loadedConfig);
