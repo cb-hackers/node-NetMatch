@@ -12,6 +12,7 @@ var cbNetwork = require('cbNetwork')
   // Helpperit
   , log    = require('./Utils').log
   , timer  = require('./Utils').timer
+  , rand   = require('./Utils').rand
   , colors = require('colors')
   // Serverin moduulit
   , NetMsgs      = require('./NetMessage')
@@ -39,8 +40,11 @@ var cbNetwork = require('cbNetwork')
  */
 function Server(args, version) {
   if (this.debug = args.d) { log.notice('Server running on debug mode, expect spam!'.red); }
-  
-  /** Palvelimen versio */
+
+  /**
+   * Palvelimen versio
+   * @const
+  */
   this.VERSION = version;
 
   /** Sisältää pelin nykyisestä tilanteesta kertovat muuttujat. */
@@ -151,6 +155,11 @@ Server.prototype.initialize = function (port, address, config) {
     return;
   }
 
+  // Jos kartalla on botCount-asetus, overridaa se configin
+  if ('number' === typeof this.gameState.map.config.botCount) {
+    this.gameState.botCount = this.gameState.map.config.botCount;
+  }
+
   // UNIMPLEMENTED Mappien rotaatio
   this.maps[this.gameState.map.name] = this.gameState.map;
 
@@ -158,6 +167,9 @@ Server.prototype.initialize = function (port, address, config) {
   for (var i = 1; i <= this.config.maxPlayers; ++i) {
     new Player(this, i);
   }
+
+  // Alustetaan botit
+  this.initBots();
 
   // Alustetaan itemit
   var mapConfig = this.gameState.map.config;
@@ -320,7 +332,7 @@ Server.prototype.sendReply = function (client, player) {
 
         // Spawn-protect
         var isProtected = 0;
-        if (plr.spawnTime + this.gameState.spawnProtection > timer()) {
+        if (plr.spawnTime + this.config.spawnProtection > timer()) {
           isProtected = 1;
         }
 
@@ -502,7 +514,11 @@ Server.prototype.login = function (client) {
       log.info(' -> login successful, assigned ID (%0)', String(player.playerId).magenta);
 
       // Päivitetään tiedot servulistaukseen
-      this.registration.update(function (e) { log.debug(e); });
+      this.registration.update(function (e) {
+        if (e) {
+          log.debug(e);
+        }
+      });
 
       // Lisätään viestijonoon ilmoitus uudesta pelaajasta, kaikille muille paitsi boteille ja itselle.
       this.messages.addToAll({
@@ -539,7 +555,11 @@ Server.prototype.logout = function (playerId) {
   log.info('%0 logged out.', player.name.green);
 
   // Päivitetään tiedot servulistaukseen
-  this.registration.update(function (e) { log.debug(e); });
+  this.registration.update(function (e) {
+    if (e) {
+      log.debug(e);
+    }
+  });
 
   // Lähetetään viesti kaikille muille paitsi boteille ja itselle
   this.messages.addToAll({msgType: NET.LOGOUT, playerId: playerId}, playerId);
@@ -616,6 +636,51 @@ Server.prototype.close = function (now) {
     process.exit();
   }, now ? 0 : 1000);
 };
+
+/**
+ * Alustaa botit.
+ */
+Server.prototype.initBots = function () {
+  var count = this.gameState.botCount
+    , bot
+    , map = this.gameState.map
+    , randomPlace;
+
+  for (var i = 1; i <= count; i++) {
+    bot = this.players[i];
+    bot.clientId  = 'bot:' + i;
+    bot.name      = bot.botName;
+    bot.zombie    = true;
+    bot.active    = true;
+    bot.loggedIn  = true;
+    bot.isDead    = false;
+    bot.health    = 100;
+    bot.kills     = 0;
+    bot.deaths    = 0;
+    bot.weapon    = this.getBotWeapon();
+    randomPlace = map.findSpot();
+    bot.x = randomPlace.x;
+    bot.y = randomPlace.y;
+    bot.angle = rand(0, 360);
+    // UNIMPLEMENTED: boteille tiimit tasaisesti
+    bot.team = 1;
+  }
+}
+
+/**
+ * Arpoo aseen boteille sallittujen listalta.
+ */
+Server.prototype.getBotWeapon = function () {
+  var weapons;
+
+  if ('undefined' === this.gameState.map.config.botWeapons) {
+    weapons = [1, 2, 3, 4, 5, 6];
+  } else {
+    weapons = this.gameState.map.config.botWeapons;
+  }
+
+  return weapons[rand(0, weapons.length - 1)];
+}
 
 // Tapahtumien dokumentaatio
 /**

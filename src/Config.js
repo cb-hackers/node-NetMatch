@@ -48,9 +48,9 @@ Config.defaults = {
   /**
    * Maksimimäärä pelaajia
    * @type Number
-   * @default 5
+   * @default 10
    */
-  maxPlayers: 5,
+  maxPlayers: 10,
   /**
    * Pelimoodi, DM = 1 ja TDM = 2
    * @type Byte

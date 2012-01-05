@@ -68,8 +68,8 @@ var Utils = {
     var dy = y1 - y2; // Pystysuuntainen etäisyys
     return Math.sqrt( dx*dx + dy*dy );
   },
-  
-  /** 
+
+  /**
    * Palauttaa taulukon, jossa on merkkijono paloiteltuna sanoiksi, ottaa huomioon "merkki jonot"
    * @param {String} str  Merkkijono, joka paloitellaan
    * @returns {Array}  Paloiteltu jono
@@ -79,7 +79,7 @@ var Utils = {
     return str.split(reg);
   },
 
-  /** 
+  /**
    * Kuten Array.prototype.join, mutta tukee viimeisen erottimen vaihtoa.
    * @param {Array}  arr     Lista, joka yhdistetään
    * @param {String} delim   Ensimmäinen erotin, jota käytetään muihin kuin viimeiseen väliin
@@ -90,7 +90,7 @@ var Utils = {
     return arr.length > 1 ? arr.slice(0, arr.length - 1).join(delim) +
       ' ' + delim2 + arr[arr.length - 1] : arr[0];
   }
-  
+
 };
 
 exports = module.exports = Utils;

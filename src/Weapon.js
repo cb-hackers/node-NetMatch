@@ -188,6 +188,12 @@ function Bullet(server, playerId, extraBullet) {
 
   // Haetaan pelaaja joka ampui
   player = server.players[playerId];
+
+  // Jos pelaaja on nakkina niin ei anneta sen luoda uutta ammusta
+  if (player.spawnTime + server.config.spawnProtection > timer()) {
+    return;
+  }
+
   // Luodaan ammus
   this.bulletId = ++server.lastBulletId;  // Ammuksen tunnus
   this.weapon = player.weapon;            // Millä aseella ammuttu
