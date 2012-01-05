@@ -27,13 +27,6 @@ var Utils = {
   log: new Logger('[NetMatch %t] '.grey, argv.d),
 
   /**
-   * Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().
-   */
-  timer: function () {
-    return Date.now();
-  },
-
-  /**
    * Palauttaa satunnaisen luvun väliltä minVal...maxVal tarkkuudella floatVal
    * @param {Number} minVal      Pienin mahdollinen luku
    * @param {Number} maxVal      Suurin mahdollinen luku

@@ -11,7 +11,6 @@ var cbNetwork = require('cbNetwork')
   , ITM = require('./Constants').ITM
   // Helpperit
   , log    = require('./Utils').log
-  , timer  = require('./Utils').timer
   , rand   = require('./Utils').rand
   , colors = require('colors')
   // Serverin moduulit
@@ -270,9 +269,9 @@ Server.prototype.handlePacket = function (client) {
   }
 
   // Lasketaan pelaajan ja serverin välinen lagi
-  player.lag = timer() - player.lastActivity;
+  player.lag = Date.now() - player.lastActivity;
   // Päivitetään pelaajan olemassaolo
-  player.lastActivity = timer();
+  player.lastActivity = Date.now();
 
   // Luupataan kaikkien pakettien läpi
   while (msgType) {
@@ -332,7 +331,7 @@ Server.prototype.sendReply = function (client, player) {
 
         // Spawn-protect
         var isProtected = 0;
-        if (plr.spawnTime + this.config.spawnProtection > timer()) {
+        if (plr.spawnTime + this.config.spawnProtection > Date.now()) {
           isProtected = 1;
         }
 

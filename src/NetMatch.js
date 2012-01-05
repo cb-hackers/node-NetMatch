@@ -25,7 +25,6 @@ var argv = require('optimist')
   // Utilsseja
   , split  = require('./Utils').splitString
   , log    = require('./Utils').log
-  , timer  = require('./Utils').timer
   , colors = require('colors');
 
 process.title = "NetMatch server";

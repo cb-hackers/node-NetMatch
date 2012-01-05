@@ -4,7 +4,6 @@
 
 /**#nocode+*/
 var log = require('./Utils').log
-  , timer = require('./Utils').timer
   , rand = require('./Utils').rand
   , distance = require('./Utils').distance
   , NET = require('./Constants').NET
@@ -190,7 +189,7 @@ function Bullet(server, playerId, extraBullet) {
   player = server.players[playerId];
 
   // Jos pelaaja on nakkina niin ei anneta sen luoda uutta ammusta
-  if (player.spawnTime + server.config.spawnProtection > timer()) {
+  if (player.spawnTime + server.config.spawnProtection > Date.now()) {
     return;
   }
 
@@ -198,7 +197,7 @@ function Bullet(server, playerId, extraBullet) {
   this.bulletId = ++server.lastBulletId;  // Ammuksen tunnus
   this.weapon = player.weapon;            // Millä aseella ammuttu
   this.playerId = playerId;               // Kuka ampui
-  this.timeShooted = timer();             // Koska ammuttu
+  this.timeShooted = Date.now();             // Koska ammuttu
   this.moved = 0;
   this.x = player.x;
   this.y = player.y;
@@ -302,7 +301,7 @@ Bullet.prototype.update = function () {
   this.move(this.server.game.movePerSec(speed));
 
   // Jos on ammuttu kranaatinlaukaisimella niin tutkitaan aikaviive (1 sekunti)
-  if (this.weapon === WPN.LAUNCHER && this.timeShooted + 1000 < timer()) {
+  if (this.weapon === WPN.LAUNCHER && this.timeShooted + 1000 < Date.now()) {
     hit = true;
 
     // Lisätään viestijonoon ilmoitus osumasta.
@@ -407,7 +406,7 @@ Bullet.prototype.checkExplosion = function (x, y) {
  * @returns {Boolean} Osuiko vai eikö
  */
 Bullet.prototype.checkPlayerHit = function (player) {
-  var isProtected = (player.spawnTime + this.server.config.spawnProtection > timer())
+  var isProtected = (player.spawnTime + this.server.config.spawnProtection > Date.now())
     , move
     , xMove
     , yMove;

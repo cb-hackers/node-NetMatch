@@ -4,8 +4,7 @@
 
 /**#nocode+*/
 var log = require('./Utils').log
-  , colors = require('colors')
-  , timer = require('./Utils').timer;
+  , colors = require('colors');
 /**#nocode-*/
 
 /**
@@ -44,7 +43,7 @@ Game.prototype.update = function (self) {
   self.updateRegistration();
   self.updateBullets();
 
-  self.lastUpdate = timer();
+  self.lastUpdate = Date.now();
 }
 
 /**
@@ -52,7 +51,7 @@ Game.prototype.update = function (self) {
  * @private
  */
 Game.prototype.updateFrameTimer = function () {
-  var curTime = timer();
+  var curTime = Date.now();
   if (!this.lastUpdate) {
     this.lastUpdate = curTime;
   }
