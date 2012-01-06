@@ -22,7 +22,8 @@ var cbNetwork = require('cbNetwork')
   , Game         = require('./Game')
   , Config       = require('./Config')
   , Command      = require('./Command')
-  , Registration = require('./Registration');
+  , Registration = require('./Registration')
+  , BotAI        = require('./BotAI');
 /**#nocode-*/
 
 
@@ -663,6 +664,8 @@ Server.prototype.initBots = function () {
     bot.angle = rand(0, 360);
     // UNIMPLEMENTED: boteille tiimit tasaisesti
     bot.team = 1;
+
+    bot.botAI = new BotAI(bot);
   }
 }
 
