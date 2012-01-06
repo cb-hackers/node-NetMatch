@@ -59,26 +59,23 @@ Registration.prototype.apply = function (callback) {
   });
 
   // Odotellaan vastausta
-  this.server.on('register', function registerReply(data) {
-    // Tuliko oikea paketti
-    if (String(data.memBlock.slice(4)) === 'GSS+') {
-      // Rekisteröinti onnistui!
-      this.registration.registered = true;
-      // Lähetetään palvelimen tiedot listausta varten
-      this.registration.update(function (e) {
-        if (!e) {
-          // Kaikki meni hyvin käynnistetään päivitys-luuppi.
-          reg.updateWait = setInterval(function updateRegInterval() {
-            reg.server.registration.update(function updateReg(e) {
-              if(e) {
-                log.debug(e);
-              }
-            });
-          }, 60000);
-          callback();
-        } else { callback('Could not update server info.'); }
-      });
-    }
+  this.server.on('register', function registerReply() {
+    // Rekisteröinti onnistui!
+    this.registration.registered = true;
+    // Lähetetään palvelimen tiedot listausta varten
+    this.registration.update(function (e) {
+      if (!e) {
+        // Kaikki meni hyvin käynnistetään päivitys-luuppi.
+        reg.updateWait = setInterval(function updateRegInterval() {
+          reg.server.registration.update(function updateReg(e) {
+            if(e) {
+              log.debug(e);
+            }
+          });
+        }, 60000);
+        callback();
+      } else { callback(e); }
+    });
   });
 }
 

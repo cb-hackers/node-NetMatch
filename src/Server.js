@@ -215,7 +215,13 @@ Server.prototype.handlePacket = function (client) {
 
   // Registeröinniltä paketti
   if (client.data.clientId === 544437095) {
-    this.emit('register', client.data);
+    if (String(client.data.memBlock.slice(4)) === 'GSS+') {
+      this.emit('register', client.data);
+    } else if (String(client.data.memBlock.slice(4)) === 'PING') {
+      var reply = new Packet(4);
+      reply.putString('PONG');
+      client.reply(reply);
+    }
     return;
   }
 
@@ -319,7 +325,7 @@ Server.prototype.sendReply = function (client, player) {
         , y1 = player.y
         , x2 = plr.x
         , y2 = plr.y
-        , visible = !((Math.abs(x1 - x2) > 450) || (Math.abs(y1 - y2) > 350));
+        , visible = !((Math.abs(x1 - x2) > 450*2) || (Math.abs(y1 - y2) > 350*2));
 
       // Onko näkyvissä vai voidaanko muuten lähettää
       if (player.sendNames || visible || plr.health <= 0) {

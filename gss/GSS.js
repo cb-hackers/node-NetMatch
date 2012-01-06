@@ -1,4 +1,5 @@
 var static = require('node-static')
+  , dns  = require('dns')
   , hogan = require('hogan.js')
   , fs   = require('fs')
   , udp  = require('dgram')
@@ -25,7 +26,23 @@ function GSS(p, a) {
   self.listingTempl = hogan.compile(fs.readFileSync('listing.html', 'utf8'));
   self.servers = [];
   self.sock = udp.createSocket('udp4');
+  self.sock.bind(61902, 'lakka.kapsi.fi');
+
+  // Kuuntele pong-paketteja
+  self.sock.on('message', function (data, peer) {
+    var srv;
+    if (String(data.slice(data.length - 4)) === 'PONG') {
+      for (var i = self.servers.length; i--;) {
+        var srv = self.servers[i];
+        if (srv.ip === peer.address && srv.port === peer.port) {
+          srv.ping = Date.now() - srv.pingT;
+        }
+      }
+    }
+  });
+
   var file = new (static.Server)();
+
   self.htp = http.createServer().listen(p, a);
   self.htp.on('request', function (req, res) {
     var uri = url.parse(req.url, true)
@@ -47,6 +64,12 @@ function GSS(p, a) {
       // Tarjotaan staattisia varoja
       file.serve(req, res);
     } else {
+
+      self.servers.map(function (s) {
+        // Päivitetään pingit
+        self.getUpdatePing(s);
+      });
+
       self.listingTempl = hogan.compile(fs.readFileSync('listing.html', 'utf8'));
       res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
       res.end(self.listingTempl.render({
@@ -61,11 +84,26 @@ GSS.prototype.__proto__ = process.EventEmitter.prototype;
 GSS.prototype.getServer = function (sid) {
   for (var i = this.servers.length; i--;) {
     var s = this.servers[i];
-    if (s.ip + ':' + s.port === sid) {
+    if (s.addr + ':' + s.port === sid) {
       return s;
     }
   }
 };
+
+GSS.prototype.getUpdatePing = function (srv) {
+  if (srv && parseFloat(srv.ver.slice(1)) >= 2.5) {
+    srv.pingT = Date.now();
+    var msg = Buffer(8);
+    msg.writeUInt32LE(544437095, 0);
+    msg.write('PING', 4, 4);
+    // [ ,->  544437095  <-.  |  ,->    PING    <--.  ]
+    gss.sock.send(msg, 0, 8, srv.port, srv.addr);
+  }
+}
+
+process.on('uncaughtException', function (e) {
+  console.log(e.stack);
+});
 
 var gss = new GSS(argv.p, argv.a);
 
@@ -82,9 +120,9 @@ var gss = new GSS(argv.p, argv.a);
 gss.on('reg', function (req, res, uri) {
   var self = this
     , q = uri.query
-    , ip   = q.addr || req.headers['x-forwarded-for']
+    , addr   = q.addr || req.headers['x-forwarded-for']
     , port = parseInt(q.port, 10)
-    , sid  = ip + ':' + port
+    , sid  = addr + ':' + port
     , serv = gss.getServer(sid)
     , devb = !!q.devbuild;
 
@@ -110,22 +148,31 @@ gss.on('reg', function (req, res, uri) {
 
   // Tarkistetaan serverin toimivuus UDP-paketilla.
   //                       [ ,->  544437095  <-.  |  ,->    GSS+    <--.  ]
-  gss.sock.send(new Buffer([0x67, 0x73, 0x73, 0x20, 0x47, 0x53, 0x53, 0x2B]), 0, 8, port, ip,
+  gss.sock.send(new Buffer([0x67, 0x73, 0x73, 0x20, 0x47, 0x53, 0x53, 0x2B]), 0, 8, port, addr,
   function sockSend(err, bytes) {
     if (err) {
       res.end('system_error');
       return;
     }
-    // Tallennetaan serveri listaan, jos kaikki meni kuten piti
-    self.servers.push({
+
+    serv = {
       active: false,
-      ip: ip,
+      addr: addr,
       port: port,
       ver: q.ver,
       desc: q.desc,
       dev: devb,
+      ip: addr,
       last: undefined
-    });
+    };
+
+    // Tallennetaan serveri listaan, jos kaikki meni kuten piti
+    self.servers.push(serv);
+
+    // Muunnetaan osoite ip:ksi, jotta sitä voidaan verrata saapuviin UDP-paketteihin.
+    dns.resolve(addr, function (err, ip) {
+      if (!err) { serv.ip = ip[0]; }
+    })
   });
 
   res.end('ok')
@@ -142,9 +189,9 @@ gss.on('reg', function (req, res, uri) {
 gss.on('update', function (req, res, uri) {
   var self = this, info
   , q = uri.query
-  , ip   = q.addr || req.headers['x-forwarded-for']
+  , addr   = q.addr || req.headers['x-forwarded-for']
   , port = parseInt(q.port, 10)
-  , sid  = ip + ':' + port
+  , sid  = addr + ':' + port
   , serv = gss.getServer(sid)
   , devb = !!q.devbuild;
 
@@ -165,6 +212,9 @@ gss.on('update', function (req, res, uri) {
     return;
   }
 
+  // Päivitetään pingi, jos servu on tarpeeksi uusi
+  self.getUpdatePing(serv);
+  
   info = q.data.split(',');
   // Update data
   serv.info = {
@@ -189,9 +239,9 @@ gss.on('update', function (req, res, uri) {
 gss.on('unreg', function (req, res, uri) {
   var self = this, info
   , q = uri.query
-  , ip   = q.addr || req.headers['x-forwarded-for']
+  , addr   = q.addr || req.headers['x-forwarded-for']
   , port = parseInt(q.port, 10)
-  , sid  = ip + ':' + port
+  , sid  = addr + ':' + port
   , serv = gss.getServer(sid)
   , devb = !!q.devbuild;
 
