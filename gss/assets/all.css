@@ -1,0 +1,74 @@
+body {
+color: white;
+font-family: sans-serif;
+background-color: #072D2C;
+}
+abbr {
+cursor: help;
+}
+::selection {
+background-color: #7F8;
+color: #000;
+text-shadow: none; }
+header {
+background-color: #183433;
+}
+header h1 {
+text-shadow: 0 0 0.2em #7F8;
+text-align: center;
+color: #6E8;
+transition: text-shadow 0.05s linear;
+}
+article {
+background-color: #154442;
+padding: 0.2em 0.4em;
+margin: 0.5em 0;
+position: relative;
+overflow: hidden;
+opacity: 0.6;
+transition: box-shadow 0.5s ease;
+}
+article:hover, article:target {
+opacity: 1;
+box-shadow: 0 0 0.5em #7F8;
+}
+article h1 {
+margin: 0;
+color: #6E8;
+}
+.ip {
+font-style: italic;
+color: #64A19F;
+vertical-align: 0.3em;
+}
+.ver {
+float: right;
+font-style: italic;
+font-size: 0.8em;
+color: #072D2C;
+margin: 5px 0 0 0;
+}
+.ver strong {
+cursor: help;
+}
+.plrs {
+margin: 5px 0 0 0;
+}
+.plrs em {
+color: #4EA19E;
+}
+.anc, .anc:hover, .anc:active, .anc:visited {
+tap-highlight-color: rgba(0,0,0,0);
+text-decoration: none;
+color: inherit;
+}
+footer {
+margin-top: 2em;
+font-size: 0.7em;
+font-style: italic;
+text-align: center;
+opacity: 0.2;
+}
+footer a, footer a:active, footer a:visited {
+color: #7F8;
+}

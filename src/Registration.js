@@ -51,6 +51,7 @@ Registration.prototype.apply = function (callback) {
 
   // Lähetetään pyyntö
   http.get(url, function registerGet(status, data) {
+    log.debug(data);
     if (status !== 200 || data !== 'ok') {
       callback('[REG]'.red + ' Server returned: ' + data.red);
       return;
@@ -146,7 +147,7 @@ Registration.prototype.update = function (callback) {
       , state.maxPlayers - plrs
       , state.map.name
       , state.maxPlayers
-      , plrNames.join('&#124;')
+      , encodeURI(plrNames.join('|'))
       ].join(',')
     // Luodaan pyyntö
     , url = config.regHost + config.regPath

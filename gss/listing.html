@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>NetMatch &ndash; servers</title>
+  <meta name="author" content="Ville Lahdenvuo <tuhoojabotti@gmail.com>">
+  <meta name="description" content="A site that lists all NetMatch servers.">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <link rel="stylesheet" media="all"  href="assets/all.css" />
+  <link rel="stylesheet" media="screen and (min-width: 800px)" href="assets/big.css" />
+  <link rel="stylesheet" media="screen and (max-width: 799px)" href="assets/lil.css" />
+  <script src="assets/prefix-free.min.js"></script>
+</head>
+<body>
+  <header><a class="anc" href="."><h1>NetMatch servers</h1></a></header>
+  {{#servers}}
+  <a href="#{{ip}}:{{port}}" class="anc"><article id="{{ip}}:{{port}}">
+    <h1>{{desc}}</h1> <span class="ip">@{{ip}}:{{port}}</span><br />
+    <span class="plrs">{{#info.names}}{{{info.names}}} (<em>+{{info.bots}}</em> bots) playing map {{info.map}}.{{/info.names}}
+    {{^info.names}}No one's playing except {{info.bots}} bots! :({{/info.names}}</span>
+    <span class="ver">{{ver}}{{#dev}}-<strong title="You need a developer version to join dev-servers.">dev</strong>{{/dev}}</span>
+  </article></a>
+  {{/servers}}
+  {{^servers}}
+  <article style="text-align:center;">
+    <h1>No servers!</h1>
+  </article>
+  {{/servers}}
+  <footer><abbr title="Game Server Service">GSS</abbr>-node by Ville ´<a href="http://tuhoojabotti.com">tuhoojabotti</a>´ Lahdenvuo.</footer>
+</body>
+<script>
+// Broken neon-lamp effect :O)
+setTimeout(blink, 1000 + Math.random() * 5000);
+function blink() {
+  var h = document.getElementsByTagName('h1')[0]
+    , r = (Math.random() * 4).toFixed(0);
+  h.style['text-shadow'] = '0 0 0.' + r + 'em #384';
+  setTimeout(function () {
+    h.style['text-shadow'] = '0 0 0.2em #7F8';
+  }, Math.random() * 150);
+  setTimeout(blink, Math.random() * 3000);
+}
+</script>
+</html>
