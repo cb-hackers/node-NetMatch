@@ -15,7 +15,7 @@ var NET = require('./Constants').NET
  *
  * @param {Server} server  Tämän viestisäilön {@link Server}-instanssi
  */
-var NetMessages = function (server) {
+function NetMessages(server) {
   this.server = server;
   /**
    * Sisältää clienteille lähetettävät viestit
@@ -47,7 +47,7 @@ NetMessages.prototype.add = function (toPlayer, data) {
     this.data[toPlayer] = [];
   }
   this.data[toPlayer].push(data);
-}
+};
 
 /**
  * Lähettää kaikille clienteille viestin.
@@ -71,7 +71,7 @@ NetMessages.prototype.addToAll = function (data, butNotTo) {
       this.add(plr.playerId, data);
     }
   }
-}
+};
 
 /**
  * Lähettää kaikille annetun joukkueen jäsenille.
@@ -91,7 +91,7 @@ NetMessages.prototype.addToTeam = function (team, data) {
       this.add(plr.playerId, data);
     }
   }
-}
+};
 
 /**
  * Lisää data-pakettiin yksittäiselle pelaajalle kuuluvat viestit oikein jäsenneltynä.
@@ -107,7 +107,8 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
     return false;
   }
   // Tämän viestin data laitetaan d-muuttujaan, jotta tarvitsisi kirjoittaa vähemmän.
-  while (d = this.data[toPlayer][0]) {
+  d = this.data[toPlayer][0];
+  while (d) {
     if (!d.hasOwnProperty('msgType')) {
       log.error('Virheellistä dataa NetMessages-objektissa!');
       console.dir(d);
@@ -158,7 +159,7 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
             // Tungetaan samaan tavuun useampi muuttuja:
             b = ((d.weapon % 16) << 0)  // Millä aseella (mod 16 ettei vie yli 4 bittiä)
               + (d.sndPlay << 4)        // Soitetaanko ääni
-              + (d.handShooted << 5)    // Kummalla kädellä ammuttiin
+              + (d.handShooted << 5);   // Kummalla kädellä ammuttiin
             data.putByte(b);
 
             // Ammuksen sijainti
@@ -244,8 +245,11 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
 
     // Poistetaan viesti muistista
     this.data[toPlayer].splice(0, 1);
+
+    // Siirrytään seuraavaan viestiin
+    d = this.data[toPlayer][0];
   }
-}
+};
 
 
-exports = module.exports = NetMessages;
+module.exports = NetMessages;

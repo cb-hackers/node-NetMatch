@@ -81,7 +81,6 @@ function Player(server, playerId) {
   if (server.players.hasOwnProperty(playerId)) {
     delete server.players[playerId];
   }
-  server.players[playerId] = this;
 }
 Player.prototype = new Obj();
 Player.prototype.constructor = Player;
@@ -117,7 +116,7 @@ Player.prototype.kill = function (bullet) {
 
   // Onko tappaja vielä pelissä
   if (killer.active) {
-    if (killer.playerId == this.playerId || (killer.team === this.team && this.server.gameState.playMode > 1)) {
+    if (killer.playerId === this.playerId || (killer.team === this.team && this.server.gameState.playMode > 1)) {
       // Teamkilleri tai itsemurha, vähennetään tappo.
       killer.kills--;
     } else {
@@ -133,7 +132,7 @@ Player.prototype.kill = function (bullet) {
       playerId2: this.playerId    // Uhri
     });
   }
-}
+};
 
 /**
  * Vahingoittaa pelaajaa räjähdyksen etäisyyden arvoisesti
@@ -161,7 +160,7 @@ Player.prototype.applyExplosion = function (bullet, dist) {
   if (this.health <= 0) {
     this.kill(bullet);
   }
-}
+};
 
 /**
  * Tätä funktiota kutsutaan kun ammus osuu suoraan pelaajaan. Tämä hoitaa pelaajan vahingoittamisen.
@@ -199,6 +198,6 @@ Player.prototype.bulletHit = function (bullet, x, y) {
   if (this.health <= 0) {
     this.kill(bullet);
   }
-}
+};
 
-exports = module.exports = Player;
+module.exports = Player;

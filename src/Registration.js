@@ -67,17 +67,13 @@ Registration.prototype.apply = function (callback) {
       if (!e) {
         // Kaikki meni hyvin käynnistetään päivitys-luuppi.
         reg.updateWait = setInterval(function updateRegInterval() {
-          reg.server.registration.update(function updateReg(e) {
-            if(e) {
-              log.debug(e);
-            }
-          });
+          reg.server.registration.update();
         }, 60000);
         callback();
       } else { callback(e); }
     });
   });
-}
+};
 
 
 /**
@@ -113,7 +109,7 @@ Registration.prototype.remove = function (callback) {
       callback('[UNREG]'.red + ' Server returned: ' + data.red);
     } else { callback(); }
   });
-}
+};
 
 
 /**
@@ -124,6 +120,13 @@ Registration.prototype.remove = function (callback) {
  *                               virheilmoitus merkkijonona.
  */
 Registration.prototype.update = function (callback) {
+  if ('function' !== typeof callback) {
+    callback = function (e) {
+      if (e) {
+        log.debug(e);
+      }
+    };
+  }
   if (!this.registered) {
     callback('Server is not registered, can not update!');
     return;
@@ -135,7 +138,7 @@ Registration.prototype.update = function (callback) {
     // Listataan pelaajien nimet
     , plrNames = Object.keys(srv.players)
       .filter(function (p) { // Filtteröidään inaktiiviset ja potit
-         p = srv.players[p]; return p.active && p.name && !p.zombie})
+         p = srv.players[p]; return p.active && p.name && !p.zombie; })
       .map(function (p) { return srv.players[p].name; })
     , plrs = plrNames.length
     // Luodaan merkkijono, jossa on palvelimen tiedot
@@ -161,6 +164,6 @@ Registration.prototype.update = function (callback) {
       callback();
     }
   });
-}
+};
 
-exports = module.exports = Registration;
+module.exports = Registration;

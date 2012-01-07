@@ -153,7 +153,7 @@ Commands.kick = {
     }
 
   }
-}
+};
 
 /**
  * Kirjaa pelaajan sisään adminiksi.
@@ -179,7 +179,7 @@ Commands.login = {
     }
     if (pass === this.config.password) {
       player.admin = true;
-      this.serverMessage('You are now an admin!', player.playerId)
+      this.serverMessage('You are now an admin!', player.playerId);
     } else {
       log.warn('Incorrect password!');
     }
@@ -210,7 +210,7 @@ Commands.login = {
     });
   log.info('Found %0 command-module(s): %1',
     String(cmds.length).magenta, cmds.join(', '));
-})();
+}());
 /**#nocode-*/
 
 
@@ -255,7 +255,7 @@ Command.prototype.call = function (name, args, player) {
       }
       return;
     }
-  };
+  }
 
   // Kutsutaan funktiota
   args.unshift(player); // Lisätään pelaaja ensimmäiseksi parametriksi
@@ -282,8 +282,8 @@ Command.prototype.getHelpString = function (name, format) {
   var c = Commands[name], h
     // Merkkijonojen täyttäminen ilmalla
     , pad = function (s, l, r) {
-      if (r) { return Array(Math.max(l - s.length + 1, 0)).join(' ') + s; }
-      else   { return s + Array(Math.max(l - s.length + 1, 0)).join(' '); }
+      if (r) { return new Array(Math.max(l - s.length + 1, 0)).join(' ') + s; }
+      else   { return s + new Array(Math.max(l - s.length + 1, 0)).join(' '); }
     };
   if (!c) { return 'Could not find help about "' + name + '". You need ´help´.'; }
   if (format) {

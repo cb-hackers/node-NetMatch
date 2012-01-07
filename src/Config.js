@@ -11,6 +11,19 @@ var log = require('./Utils').log
 /**#nocode-*/
 
 /**
+ * Alustaa luokan käyttöä varten, lataa {@link Config.defaults} kentät tämän instanssin kentiksi
+ * @class Asetukset
+ *
+ * @param {Server} server  NetMatch-palvelin, joka kutsuu tätä konstruktoria
+ */
+function Config(server) {
+  this.server = server;
+
+  // Laajennetaan tämän Configin ominaisuuksia oletusconfigeilla
+  cjson.extend(this, Config.defaults);
+}
+
+/**
  * @namespace Sisältää NetMatch-palvelimen oletusasetukset. Näitä voi muuttaa antamalla
  * {@link Server}-konstruktorille parametrina objektin, jonka avaimet sopivat tämän muotoon.
  */
@@ -93,20 +106,7 @@ Config.defaults = {
    * @default false
    */
   devBuild: false
-}
-
-/**
- * Alustaa luokan käyttöä varten, lataa {@link Config.defaults} kentät tämän instanssin kentiksi
- * @class Asetukset
- *
- * @param {Server} server  NetMatch-palvelin, joka kutsuu tätä konstruktoria
- */
-function Config(server) {
-  this.server = server;
-
-  // Laajennetaan tämän Configin ominaisuuksia oletusconfigeilla
-  cjson.extend(this, Config.defaults);
-}
+};
 
 /**
  * Lataa asetukset annetusta tiedostosta. Tämä metodi hakee tiedostoa node-NetMatchin juuresta.
@@ -126,6 +126,6 @@ Config.prototype.load = function (config) {
   loadedConfig = cjson.load(filePath);
   // Laajennetaan tämän Configin ominaisuuksia ladatulla json-tiedostolla
   cjson.extend(this, loadedConfig);
-}
+};
 
-exports = module.exports = Config;
+module.exports = Config;

@@ -16,7 +16,7 @@ var cbNetwork = require('cbNetwork')
   // Serverin moduulit
   , NetMsgs      = require('./NetMessage')
   , Player       = require('./Player')
-  , Map          = require('./Map').Map
+  , Map          = require('./Map')
   , Input        = require('./Input')
   , Item         = require('./Item')
   , Game         = require('./Game')
@@ -39,7 +39,10 @@ var cbNetwork = require('cbNetwork')
  * @param {Boolean} [debug=false]  Spämmitäänkö konsoliin paljon "turhaa" tietoa?
  */
 function Server(args, version) {
-  if (this.debug = args.d) { log.notice('Server running on debug mode, expect spam!'.red); }
+  /** Palvelimen debug-tila */
+  this.debug = args.d;
+
+  if (this.debug) { log.notice('Server running on debug mode, expect spam!'.red); }
 
   /**
    * Palvelimen versio
@@ -108,7 +111,8 @@ function Server(args, version) {
   log.info('Server initialized successfully.');
 }
 
-Server.prototype.__proto__ = process.EventEmitter.prototype;
+Server.prototype = process.EventEmitter.prototype;
+Server.prototype.constructor = Server;
 
 /** Alustaa palvelimen */
 Server.prototype.initialize = function (port, address, config) {
@@ -165,33 +169,11 @@ Server.prototype.initialize = function (port, address, config) {
 
   // Alustetaan pelaajat
   for (var i = 1; i <= this.config.maxPlayers; ++i) {
-    new Player(this, i);
+    this.players[i] = new Player(this, i);
   }
 
   // Alustetaan botit
   this.initBots();
-
-  // Alustetaan itemit
-  var mapConfig = this.gameState.map.config;
-  var itemId = 0;
-  for (var i = mapConfig.healthItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.HEALTH);
-  }
-  for (var i = mapConfig.mgunItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.AMMO);
-  }
-  for (var i = mapConfig.bazookaItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.ROCKET);
-  }
-  for (var i = mapConfig.shotgunItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.SHOTGUN);
-  }
-  for (var i = mapConfig.launcherItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.LAUNCHER);
-  }
-  for (var i = mapConfig.chainsawItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.FUEL);
-  }
 
   // Lisätäänkö palvelin palvelinlistaukseen
   if (this.config.register) {
@@ -211,14 +193,16 @@ Server.prototype.initialize = function (port, address, config) {
 Server.prototype.handlePacket = function (client) {
   var data = client.data
     , msgType = data.getByte()
-    , currentPlayerId;
+    , currentPlayerId
+    , reply
+    , player;
 
   // Registeröinniltä paketti
   if (client.data.clientId === 544437095) {
     if (String(client.data.memBlock.slice(4)) === 'GSS+') {
       this.emit('register', client.data);
     } else if (String(client.data.memBlock.slice(4)) === 'PING') {
-      var reply = new Packet(4);
+      reply = new Packet(4);
       reply.putString('PONG');
       client.reply(reply);
     }
@@ -386,7 +370,7 @@ Server.prototype.sendReply = function (client, player) {
   if (player.sendNames) {
     player.sendNames = false;
     var itemIds = Object.keys(this.items);
-    for (var i = itemIds.length; i--;) {
+    for (i = itemIds.length; i--;) {
       var item = this.items[itemIds[i]];
       this.messages.add(player.playerId, {
         msgType: NET.ITEM,
@@ -423,7 +407,7 @@ Server.prototype.serverMessage = function (msg, to) {
       msgText: msg
     });
   }
-}
+};
 
 /**
  * Kirjaa pelaajan sisään peliin.
@@ -437,7 +421,8 @@ Server.prototype.login = function (client) {
     , replyData
     , nickname
     , playerIds
-    , randomPlace;
+    , randomPlace
+    , player;
 
   // Täsmääkö clientin ja serverin versiot
   if (version !== this.VERSION) {
@@ -458,7 +443,7 @@ Server.prototype.login = function (client) {
   // Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa
   playerIds = Object.keys(this.players);
   for (var i = playerIds.length; i--;) {
-    var player = this.players[playerIds[i]];
+    player = this.players[playerIds[i]];
     if (player.name.toLowerCase() === nickname.toLowerCase()) {
       if (player.kicked || !player.active) {
         player.name = "";
@@ -476,8 +461,8 @@ Server.prototype.login = function (client) {
   }
 
   // Etsitään inaktiivinen pelaaja
-  for (var i = playerIds.length; i--;) {
-    var player = this.players[playerIds[i]];
+  for (i = playerIds.length; i--;) {
+    player = this.players[playerIds[i]];
     if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
       // Tyhjä paikka löytyi
       player.clientId = client.id;
@@ -520,11 +505,7 @@ Server.prototype.login = function (client) {
       log.info(' -> login successful, assigned ID (%0)', String(player.playerId).magenta);
 
       // Päivitetään tiedot servulistaukseen
-      this.registration.update(function (e) {
-        if (e) {
-          log.debug(e);
-        }
-      });
+      this.registration.update();
 
       // Lisätään viestijonoon ilmoitus uudesta pelaajasta, kaikille muille paitsi boteille ja itselle.
       this.messages.addToAll({
@@ -561,15 +542,11 @@ Server.prototype.logout = function (playerId) {
   log.info('%0 logged out.', player.name.green);
 
   // Päivitetään tiedot servulistaukseen
-  this.registration.update(function (e) {
-    if (e) {
-      log.debug(e);
-    }
-  });
+  this.registration.update();
 
   // Lähetetään viesti kaikille muille paitsi boteille ja itselle
   this.messages.addToAll({msgType: NET.LOGOUT, playerId: playerId}, playerId);
-}
+};
 
 /**
  * Palvelimelta potkaiseminen
@@ -580,7 +557,7 @@ Server.prototype.logout = function (playerId) {
  */
 Server.prototype.kickPlayer = function (playerId, kickerId, reason) {
   var player = this.players[playerId];
-  player.kicked = true,
+  player.kicked = true;
   player.kickReason = reason || '';
   player.kickerId = kickerId;
   player.loggedIn = false;
@@ -593,7 +570,7 @@ Server.prototype.kickPlayer = function (playerId, kickerId, reason) {
     playerId2: kickerId,
     msgText: reason
   });
-}
+};
 
 /**
  * Etsii pelaajan nimen perusteella
@@ -673,7 +650,7 @@ Server.prototype.initBots = function () {
 
     bot.botAI = new BotAI(bot);
   }
-}
+};
 
 /**
  * Arpoo aseen boteille sallittujen listalta.
@@ -688,7 +665,7 @@ Server.prototype.getBotWeapon = function () {
   }
 
   return weapons[rand(0, weapons.length - 1)];
-}
+};
 
 // Tapahtumien dokumentaatio
 /**

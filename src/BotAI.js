@@ -47,17 +47,17 @@ BotAI.prototype.update = function () {
     this.nextAction = rand(500,1000) + Date.now();
     // Arvotaan botille uusi kääntyminen
     this.rotation = rand(-90, 90, true);
-    
+
     if (this.sideStep !== 0) {
       this.sideStep = rand(-1, 1, true);
     }
-    
+
     // Spam much?
     /*
-    log.debug('Updated botAI for %0 (playerId %1)', this.player.name.green, 
+    log.debug('Updated botAI for %0 (playerId %1)', this.player.name.green,
       String(this.player.playerId).magenta);
     */
   }
-}
+};
 
-exports = module.exports = BotAI;
+module.exports = BotAI;

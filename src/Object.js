@@ -36,7 +36,7 @@ Obj.prototype.move = function (px, sidePx) {
     this.x += Math.cos((this.angle - 90) / 180 * Math.PI) * sidePx;
     this.y += Math.sin((this.angle - 90) / 180 * Math.PI) * sidePx;
   }
-}
+};
 
 /**
  * Kääntää objektia, pitäen kulman kuitenkin välillä 0-360
@@ -44,6 +44,6 @@ Obj.prototype.move = function (px, sidePx) {
  */
 Obj.prototype.turn = function (angle) {
   this.angle = wrapAngle(this.angle + angle);
-}
+};
 
-exports = module.exports = Obj;
+module.exports = Obj;
