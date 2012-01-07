@@ -7,7 +7,7 @@ var log = require('./Utils').log
   , Obj = require('./Object')
   , WPN = require('./Constants').WPN
   , NET = require('./Constants').NET
-  , Weapons = require('./Weapon').Weapons;
+  , Weapons = require('./Weapon');
 /**#nocode-*/
 
 /**
@@ -146,7 +146,7 @@ Player.prototype.applyExplosion = function (bullet, dist) {
   }
   var damageRange = Weapons[bullet.weapon].damageRange;
 
-  log.debug('Applying explosion from bullet %0 (%1) to %2',
+  log.debug('Applying explosion from %0 (%1) to %2',
     String(bullet.bulletId).magenta, Weapons[bullet.weapon].name.yellow, this.name.green);
 
   // Uhrille tieto ampujasta

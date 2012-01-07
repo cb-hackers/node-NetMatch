@@ -18,7 +18,7 @@ var argv = require('optimist')
   // Nettimättö-juttuja
   , Packet = require('cbNetwork').Packet
   , Server = require('./Server')
-  , Bullet = require('./Weapon').Bullet
+  , Bullet = require('./Bullet')
   // Vakioita
   , NET = require('./Constants').NET
   , ITM = require('./Constants').ITM
