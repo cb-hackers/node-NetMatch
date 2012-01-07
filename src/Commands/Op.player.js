@@ -12,12 +12,12 @@ module.exports = {
   remote: true,
   action: function commandsOp() {
     var server = this
-      , clr = arguments[0]
+      , caller = arguments[0]
       , player = this.getPlayer(arguments[1])
       // Vastaa konsoliin tai pelaajalle, jos ilmenee ongelmia.
       , reply = function (s) {
-        if (clr) { server.serverMessage(s, clr.playerId); }
-        else     { log.warn(s); }
+        if (caller) { server.serverMessage(s, caller); }
+        else        { log.warn(s); }
       };
 
     if (!player) {
@@ -31,8 +31,8 @@ module.exports = {
     }
 
     player.admin = true;
-    this.serverMessage('You are now an admin!', player.playerId);
+    this.serverMessage('You are now an admin!', player);
     // Kerrotaan kutsujalle myös
-    if (clr) { this.serverMessage('Done! :)', clr.playerId); }
+    if (caller) { this.serverMessage('Done! :)', caller); }
   }
 };

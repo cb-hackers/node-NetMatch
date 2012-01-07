@@ -55,7 +55,7 @@ BotAI.prototype.update = function () {
     // Spam much?
     /*
     log.debug('Updated botAI for %0 (playerId %1)', this.player.name.green,
-      String(this.player.playerId).magenta);
+      String(this.player.id).magenta);
     */
   }
 };

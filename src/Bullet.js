@@ -17,12 +17,13 @@ var log = require('./Utils').log
  *
  * @class Ammus
  *
- * @param {Server} server     Palvelimen sisältävä muuttuja, instanssi luokasta {@link Server}.
- * @param {Integer} playerId  Pelaajan, joka ampui ammuksen, ID
- * @param {Integer} [extraBullet=0]
+ * @param {Server} server  Palvelimen sisältävä muuttuja, instanssi luokasta {@link Server}.
+ * @param {Player} player  Pelaaja joka ampui ammuksen
+ * @param {Integer} newId  Uuden ammuksen ID
+ * @param {Boolean} [mirrored=false]  Peilataanko ammuksen lähtösuunta (kranaatinlaukaisimen 2. ammus)
  *
- * @property {Short}   bulletId     Ammuksen tunnus
- * @property {Integer} playerId     Kuka ampui
+ * @property {Short}   id           Ammuksen tunnus
+ * @property {Player}  player       Kuka ampui
  * @property {Byte}    weapon       Millä aseella tämä on ammuttu
  * @property {Integer} x            Paikkatietoa
  * @property {Integer} y            Paikkatietoa
@@ -32,25 +33,10 @@ var log = require('./Utils').log
  * @property {Byte}    moved        Onko ammusta vielä liikutettu yhtään
  * @property {Integer} timeShooted  Milloin ammus on ammuttu
  */
-function Bullet(server, playerId, extraBullet) {
+function Bullet(server, player, newId, mirrored) {
   Obj.call(this, 0, 0, 0);
-  var player
-    , weaponConfig
-    , bPos
-    , spread
-    , randomSpread;
 
   this.server = server;
-
-  if ('undefined' === typeof extraBullet) {
-    extraBullet = 0;
-  }
-
-  // UNIMPLEMENTED
-  // Ei tehdä ammusta jos erä on päättynyt
-
-  // Haetaan pelaaja joka ampui
-  player = server.players[playerId];
 
   // Jos pelaaja on nakkina niin ei anneta sen luoda uutta ammusta
   if (player.spawnTime + server.config.spawnProtection > Date.now()) {
@@ -58,29 +44,48 @@ function Bullet(server, playerId, extraBullet) {
   }
 
   // Luodaan ammus
-  this.bulletId = ++server.lastBulletId;  // Ammuksen tunnus
-  this.weapon = player.weapon;            // Millä aseella ammuttu
-  this.playerId = playerId;               // Kuka ampui
-  this.timeShooted = Date.now();          // Koska ammuttu
+  this.id = newId;
+  this.player = player;
+  this.weapon = player.weapon;
+  this.timeShooted = Date.now();
   this.moved = 0;
   this.x = player.x;
   this.y = player.y;
   this.angle = player.angle;
+  this.mirrored = !!mirrored;
+}
+Bullet.prototype = new Obj();
+Bullet.prototype.constructor = Bullet;
 
-  weaponConfig = Weapons[player.weapon];
+/**
+ * Alustaa ammuksen.
+ *
+ * @returns {Boolean}  Onnistuiko ammuksen alustus. Jos palautusarvo on false, ei ammusta tulisi
+ *                     lisätä palvelimelle muistiin.
+ */
+Bullet.prototype.initialize = function () {
+  var weaponConfig
+    , bPos
+    , spread
+    , randomSpread;
+
+  // UNIMPLEMENTED
+  // Ei tehdä ammusta jos erä on päättynyt
+
+  weaponConfig = Weapons[this.weapon];
 
   // Debugataan
   log.debug('Created bullet %0 (%1), shot by %2',
-    String(this.bulletId).magenta, weaponConfig.name.yellow, player.name.green);
+    String(this.id).magenta, weaponConfig.name.yellow, this.player.name.green);
 
   // Mistä ammus lähtee pelaajaan nähden
   bPos = weaponConfig.bulletYaw;
-  if (player.weapon === WPN.PISTOL) {
-    if (!player.handShooted) {
+  if (this.weapon === WPN.PISTOL) {
+    if (!this.player.handShooted) {
       bPos = -bPos;
-      player.handShooted = 1;
+      this.player.handShooted = 1;
     } else {
-      player.handShooted = 0;
+      this.player.handShooted = 0;
     }
   }
   this.x += Math.cos((this.angle) / 180 * Math.PI) * weaponConfig.bulletForth;
@@ -92,8 +97,8 @@ function Bullet(server, playerId, extraBullet) {
 
   // Hajonta
   spread = weaponConfig.spread;
-  if (player.weapon === WPN.LAUNCHER) {
-    if (extraBullet) {
+  if (this.weapon === WPN.LAUNCHER) {
+    if (this.mirrored) {
       spread = -spread;
     }
   } else {
@@ -101,7 +106,7 @@ function Bullet(server, playerId, extraBullet) {
   }
 
   this.angle += spread;
-  if (player.weapon === WPN.SHOTGUN) {
+  if (this.weapon === WPN.SHOTGUN) {
     randomSpread = rand(0, 20);
     this.x += Math.cos((this.angle / 180) * Math.PI) * randomSpread;
     this.y += Math.sin((this.angle / 180) * Math.PI) * randomSpread;
@@ -109,7 +114,7 @@ function Bullet(server, playerId, extraBullet) {
 
   // Tarkista että onko ammus kartan sisällä ja liikuttele taaksepäin kunnes ei ole
   for (var i = 50; i--; true) {
-    if (!server.gameState.map.isColliding(this.x, this.y)) {
+    if (!this.server.gameState.map.isColliding(this.x, this.y)) {
       break;
     }
     this.x -= Math.cos((this.angle / 180) * Math.PI);
@@ -117,38 +122,13 @@ function Bullet(server, playerId, extraBullet) {
   }
   // Jos mentiin edellinen for-looppi loppuun asti, niin failataan ammuksen luonti.
   if (i < 0) {
-    log.warn("Player %0 tried to shoot a bullet while inside of a wall!", player.name);
-    server.lastBulletId--;
-    return;
+    log.warn("Player %0 tried to shoot a bullet while inside of a wall!", this.player.name.green);
+    return false;
   }
 
-  // Lisätään palvelimen bullets-kokoelmaan tämä ammus
-  server.bullets[this.bulletId] = this;
-
-  // Lisätään ammusviesti lähetettäväksi jokaiselle pelaajalle
-  server.messages.addToAll({
-    msgType: NET.NEWBULLET,
-    bulletId: this.bulletId,
-    sndPlay: !extraBullet,
-    weapon: player.weapon,
-    playerId: playerId,
-    x: this.x,
-    y: this.y,
-    handShooted: player.handShooted
-  });
-
-  if (player.weapon === WPN.LAUNCHER && !extraBullet) {
-    // Jos tämä on ammuttu kranaatinheittimellä niin tehdään vielä toinen ammus koska 2 kranaattia
-    new Bullet(server, playerId, 1);
-  }
-
-  // Haulikosta lähtee monta kutia
-  if (player.weapon === WPN.SHOTGUN && extraBullet < 6) {
-    new Bullet(server, playerId, extraBullet + 1);
-  }
-}
-Bullet.prototype = new Obj();
-Bullet.prototype.constructor = Bullet;
+  // Jos tänne asti päästiin, on ammus alustettu onnistuneesti
+  return true;
+};
 
 /**
  * Päivittää yksittäisen ammuksen.
@@ -172,8 +152,7 @@ Bullet.prototype.update = function () {
     // Lisätään viestijonoon ilmoitus osumasta.
     this.server.messages.addToAll({
       msgType: NET.BULLETHIT,  // Mikä viesti
-      bulletId: this.bulletId, // Ammuksen tunnus
-      playerId: 0,             // Keneen osui
+      bullet: this,            // Ammuksen tunnus
       x: this.x,               // Missä osui
       y: this.y,               // Missä osui
       weapon: this.weapon      // Millä aseella ammus ammuttiin
@@ -205,8 +184,8 @@ Bullet.prototype.update = function () {
 
   if (hit) {
     // Jos ollaan törmätty johonkin, poistetaan ammus.
-    log.debug('Deleted bullet %0 (%1).', String(this.bulletId).magenta, weaponConfig.name.yellow);
-    delete this.server.bullets[this.bulletId];
+    log.debug('Deleted bullet %0 (%1).', String(this.id).magenta, weaponConfig.name.yellow);
+    delete this.server.bullets[this.id];
   } else {
     this.prevPosX = this.x;
     this.prevPosY = this.y;
@@ -241,7 +220,7 @@ Bullet.prototype.checkExplosion = function (x, y) {
   }
 
   log.debug('Checking explosion from %0 (%1) at (%2, %3).',
-    String(this.bulletId).magenta, Weapons[this.weapon].name.yellow,
+    String(this.id).magenta, Weapons[this.weapon].name.yellow,
     this.x.toFixed(1).blue, this.y.toFixed(1).blue);
 
   playerIds = Object.keys(this.server.players);
@@ -253,7 +232,7 @@ Bullet.prototype.checkExplosion = function (x, y) {
       dist = distance(x, y, player.x, player.y);
       checkRange = true;
 
-      if (this.weapon === WPN.CHAINSAW && this.playerId === player.playerId) {
+      if (this.weapon === WPN.CHAINSAW && this.player === player) {
         // Moottorisahalla ei voi osua itseensä
         checkRange = false;
       }
@@ -301,7 +280,7 @@ Bullet.prototype.checkPlayerHit = function (player) {
         by = this.prevPosY + (yMove * bPos);
 
         // Nyt tarkistetaan osuma. Osumaa itseensä ei tarkisteta
-        if (player.playerId !== this.playerId && distance(player.x, player.y, bx, by) < 20) {
+        if (player !== this.player && distance(player.x, player.y, bx, by) < 20) {
           // Osui
           player.bulletHit(this, bx, by);
           return true;

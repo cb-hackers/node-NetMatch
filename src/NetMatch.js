@@ -41,9 +41,9 @@ server.on(NET.LOGIN, function NetLogin(client) {
   server.login(client);
 });
 
-server.on(NET.LOGOUT, function NetLogout(client, playerId) {
+server.on(NET.LOGOUT, function NetLogout(client, player) {
   // Heitä pelaaja pellolle
-  server.logout(playerId);
+  server.logout(player);
 });
 
 server.on(NET.PLAYER, function NetPlayer(client, player) {
@@ -75,7 +75,7 @@ server.on(NET.PLAYER, function NetPlayer(client, player) {
     // speedhack
 
     if (shooting === 1) {
-      new Bullet(server, player.playerId);
+      server.createBullet(player);
     }
 
     // Poimittiinko jotain
@@ -116,7 +116,7 @@ server.on(NET.TEXTMESSAGE, function NetTextMessage(client, player) {
       server.commands.call('login', cmd, player);
     } else {
       log.warn('Player %0 tried to call ´%1´ without admin rights, access denied.', player.name.green, cmd);
-      server.serverMessage('You need to login as admin to use commands.', player.playerId);
+      server.serverMessage('You need to login as admin to use commands.', player);
     }
   } else {
     // Ei ollut komento, logataanpas tämä.
@@ -124,7 +124,7 @@ server.on(NET.TEXTMESSAGE, function NetTextMessage(client, player) {
 
     var msgData = {
       msgType: NET.TEXTMESSAGE,
-      playerId: player.playerId,
+      player: player,
       msgText: txtMessage
     };
     // Lähetetään kaikille muille paitsi boteille
