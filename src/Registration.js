@@ -137,14 +137,14 @@ Registration.prototype.update = function (callback) {
   var reg = this, srv = reg.server, config = srv.config, state = srv.gameState
     // Listataan pelaajien nimet
     , plrNames = Object.keys(srv.players)
-      .filter(function (p) { // Filtteröidään inaktiiviset ja potit
-         p = srv.players[p]; return p.active && p.name && !p.zombie; })
+      .filter(function (p) { // Filtteröidään inaktiiviset
+         p = srv.players[p]; return p.active; })
       .map(function (p) { return srv.players[p].name; })
     , plrs = plrNames.length
     // Luodaan merkkijono, jossa on palvelimen tiedot
     , data =
       [ plrs
-      , state.maxPlayers - plrs
+      , state.botCount
       , state.map.name
       , state.maxPlayers
       , encodeURI(plrNames.join('|'))
