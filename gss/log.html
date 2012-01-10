@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>GSS log</title>
+  <base href="http://tuhoojabotti.com/nm/log" />
+  <meta name="author" content="Ville Lahdenvuo <tuhoojabotti@gmail.com>">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <link rel="stylesheet" media="all"  href="assets/all.css" />
+  <link rel="stylesheet" media="screen and (min-width: 800px)" href="assets/big.css" />
+  <link rel="stylesheet" media="screen and (max-width: 799px)" href="assets/lil.css" />
+  <script src="assets/prefix-free.min.js"></script>
+  <script src="assets/jquery-1.7.1.min.js"></script>
+  <script src="assets/libs.js"></script>
+</head>
+<body>
+  <header><a class="anc" href="./log"><h1>GSS log</h1></a></header>
+  <nav>{{#files}}{{{.}}} {{/files}}</nav>
+  {{#logs}}
+  <article id="{{time}}">
+    <a href="log/{{currentFile}}#{{time}}" class="anc"><h1>{{name}}</h1></a>
+    <span class="ip"> from {{from}}</span> → {{{end}}}
+    <!-- Request -->
+    {{#request}}<details><summary>Request</summary><pre>{{request}}</pre></details>{{/request}}
+    <!-- Parameters -->
+    {{#params}}<details><summary>Parameters</summary><pre>{{params}}</pre></details>{{/params}}
+    <!-- Any messages? -->
+    {{#details}}
+    <details><summary>{{name}}</summary><pre>{{{msg}}}</pre></details>
+    {{/details}}
+
+    <!-- Pong -->
+    <!--{{#ping}}({{ping}}ms){{/ping}}</span><br />-->
+    <!-- Players & map -->
+    <!--<span class="plrs">{{#info.names}}{{{info.names}}} (<em>+{{info.bots}}</em> bots) playing map {{info.map}}.{{/info.names}}
+    {{^info.names}}No one's playing except {{info.bots}} bots! :({{/info.names}}</span>-->
+    <!-- Version info -->
+    <span class="ver">{{date}}</span>
+  </article>
+  {{/logs}}
+  {{^logs}}
+  <article style="text-align:center;">
+    <h1>No messages found!</h1>
+  </article>
+  {{/logs}}
+  <footer><abbr title="Game Server Service">GSS</abbr>-node by Ville
+  ´<a href="http://tuhoojabotti.com">tuhoojabotti</a>´ Lahdenvuo.</footer>
+</body>
+<script>
+$(function() {
+  var nativeDetailsSupport = $.fn.details.support;
+  if (!nativeDetailsSupport) {
+    $('html').addClass('no-details');
+  }
+  $('details').details();
+
+  // Broken neon-lamp effect :O)
+  setTimeout(blink, 1000 + Math.random() * 5000);
+  function blink() {
+    var h = document.getElementsByTagName('h1')[0]
+      , r = (Math.random() * 4).toFixed(0);
+    h.style['text-shadow'] = '0 0 0.' + r + 'em #384';
+    setTimeout(function () {
+      h.style['text-shadow'] = '0 0 0.2em #7F8';
+    }, Math.random() * 150);
+    setTimeout(blink, Math.random() * 3000);
+  }
+});
+</script>
+</html>

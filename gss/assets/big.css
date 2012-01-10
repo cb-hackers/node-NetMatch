@@ -2,17 +2,17 @@ body {
 width: 700px;
 margin: 10px auto;
 }
-header {
-border-radius: 1em;
-}
 header h1 {
-font-size: 3em;
+font-size: 4em;
+margin: 0.3em;
 }
 article {
 border-radius: 0.5em;
 }
 article h1 {
-margin: 0;
 font-size: 1.7em;
 display: inline;
+}
+article h2 {
+font-size: 1.3em;
 }

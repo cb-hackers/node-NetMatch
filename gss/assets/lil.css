@@ -2,6 +2,7 @@ body {
 width: 100%;
 margin: 0 0;
 }
+.no-details details summary::before { font-size: 130%; float: left; width: 15px; content: '▶'; }
 header h1 {
 margin: 0 0;
 }
