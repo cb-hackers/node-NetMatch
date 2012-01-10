@@ -42,7 +42,7 @@ function Input(server) {
   });
 
   rli.on('line', function rliLine(input){
-    msg = input.trim();
+    var msg = input.trim();
     if (!msg) { return; }
     // Käsitellään serverikomennot
     server.commands.call(msg.split(' ')[0], splitString(msg).splice(1));
@@ -52,4 +52,4 @@ function Input(server) {
   /**#nocode-*/
 }
 
-exports = module.exports = Input;
+module.exports = Input;

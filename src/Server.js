@@ -16,14 +16,15 @@ var cbNetwork = require('cbNetwork')
   // Serverin moduulit
   , NetMsgs      = require('./NetMessage')
   , Player       = require('./Player')
-  , Map          = require('./Map').Map
+  , Map          = require('./Map')
   , Input        = require('./Input')
   , Item         = require('./Item')
   , Game         = require('./Game')
   , Config       = require('./Config')
   , Command      = require('./Command')
   , Registration = require('./Registration')
-  , BotAI        = require('./BotAI');
+  , BotAI        = require('./BotAI')
+  , Bullet       = require('./Bullet');
 /**#nocode-*/
 
 
@@ -39,7 +40,10 @@ var cbNetwork = require('cbNetwork')
  * @param {Boolean} [debug=false]  Spämmitäänkö konsoliin paljon "turhaa" tietoa?
  */
 function Server(args, version) {
-  if (this.debug = args.d) { log.notice('Server running on debug mode, expect spam!'.red); }
+  /** Palvelimen debug-tila */
+  this.debug = args.d;
+
+  if (this.debug) { log.notice('Server running on debug mode, expect spam!'.red); }
 
   /**
    * Palvelimen versio
@@ -108,7 +112,8 @@ function Server(args, version) {
   log.info('Server initialized successfully.');
 }
 
-Server.prototype.__proto__ = process.EventEmitter.prototype;
+Server.prototype = process.EventEmitter.prototype;
+Server.prototype.constructor = Server;
 
 /** Alustaa palvelimen */
 Server.prototype.initialize = function (port, address, config) {
@@ -165,33 +170,11 @@ Server.prototype.initialize = function (port, address, config) {
 
   // Alustetaan pelaajat
   for (var i = 1; i <= this.config.maxPlayers; ++i) {
-    new Player(this, i);
+    this.players[i] = new Player(this, i);
   }
 
   // Alustetaan botit
   this.initBots();
-
-  // Alustetaan itemit
-  var mapConfig = this.gameState.map.config;
-  var itemId = 0;
-  for (var i = mapConfig.healthItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.HEALTH);
-  }
-  for (var i = mapConfig.mgunItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.AMMO);
-  }
-  for (var i = mapConfig.bazookaItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.ROCKET);
-  }
-  for (var i = mapConfig.shotgunItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.SHOTGUN);
-  }
-  for (var i = mapConfig.launcherItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.LAUNCHER);
-  }
-  for (var i = mapConfig.chainsawItems - 1; i--;) {
-    new Item(this, ++itemId, ITM.FUEL);
-  }
 
   // Lisätäänkö palvelin palvelinlistaukseen
   if (this.config.register) {
@@ -211,14 +194,16 @@ Server.prototype.initialize = function (port, address, config) {
 Server.prototype.handlePacket = function (client) {
   var data = client.data
     , msgType = data.getByte()
-    , currentPlayerId;
+    , currentPlayerId
+    , reply
+    , player;
 
   // Registeröinniltä paketti
   if (client.data.clientId === 544437095) {
     if (String(client.data.memBlock.slice(4)) === 'GSS+') {
       this.emit('register', client.data);
     } else if (String(client.data.memBlock.slice(4)) === 'PING') {
-      var reply = new Packet(4);
+      reply = new Packet(4);
       reply.putString('PONG');
       client.reply(reply);
     }
@@ -255,7 +240,12 @@ Server.prototype.handlePacket = function (client) {
   if (player.kicked && player.clientId === client.id) {
     reply = new Packet(7);
     reply.putByte(NET.KICKED);
-    reply.putByte(player.kickerId);
+    if (player.kicker) {
+      reply.putByte(player.kicker.id);
+    } else {
+      // Palvelin potkaisi
+      reply.putByte(0);
+    }
     reply.putByte(currentPlayerId);
     reply.putString(player.kickReason);
     client.reply(reply);
@@ -271,7 +261,7 @@ Server.prototype.handlePacket = function (client) {
 
   // Logout on erikseen, koska sen jälkeen ei varmasti tule mitään muuta
   if (msgType === NET.LOGOUT) {
-    this.emit(NET.LOGOUT, client, currentPlayerId);
+    this.emit(NET.LOGOUT, client, player);
     return;
   }
 
@@ -303,16 +293,16 @@ Server.prototype.handlePacket = function (client) {
 Server.prototype.sendReply = function (client, player) {
   var reply = new Packet()
     , playerIds = Object.keys(this.players)
-    , plr;
+    , plr
+    , server = this;
 
   // Lähetetään kaikkien pelaajien tiedot
-  for (var i = playerIds.length; i--;) {
-    plr = this.players[playerIds[i]];
+  this.loopPlayers(function (plr) {
     // Onko pyydetty nimet
     if (player.sendNames) {
       if (plr.active) {
         reply.putByte(NET.PLAYERNAME);  // Nimet
-        reply.putByte(plr.playerId);    // Pelaajan tunnus
+        reply.putByte(plr.id);          // Pelaajan tunnus
         reply.putString(plr.name);      // Nimi
         reply.putByte(plr.zombie);      // Onko botti
         reply.putByte(plr.team);        // Joukkue
@@ -330,15 +320,15 @@ Server.prototype.sendReply = function (client, player) {
       // Onko näkyvissä vai voidaanko muuten lähettää
       if (player.sendNames || visible || plr.health <= 0) {
         // Näkyy
-        reply.putByte(NET.PLAYER);    // Pelaajan tietoja
-        reply.putByte(plr.playerId);  // Pelaajan tunnus
-        reply.putShort(plr.x);        // Sijainti
-        reply.putShort(plr.y);        // Sijainti
-        reply.putShort(plr.angle);    // Kulma
+        reply.putByte(NET.PLAYER); // Pelaajan tietoja
+        reply.putByte(plr.id);     // Pelaajan tunnus
+        reply.putShort(plr.x);     // Sijainti
+        reply.putShort(plr.y);     // Sijainti
+        reply.putShort(plr.angle); // Kulma
 
         // Spawn-protect
         var isProtected = 0;
-        if (plr.spawnTime + this.config.spawnProtection > Date.now()) {
+        if (plr.spawnTime + server.config.spawnProtection > Date.now()) {
           isProtected = 1;
         }
 
@@ -361,9 +351,9 @@ Server.prototype.sendReply = function (client, player) {
         }
         reply.putShort(plr.kills);      // Tapot
         reply.putShort(plr.deaths);     // Kuolemat
-      } else if (this.gameState.radarArrows || this.gameState.playMode === 2) {
+      } else if (server.gameState.radarArrows || server.gameState.playMode === 2) {
         // Ei näy. Lähetetään tutkatieto. playMode === 2 tarkoittaa TDM-pelimuotoa
-        if (player.team === plr.team || this.gameState.radarArrows) {
+        if (player.team === plr.team || server.gameState.radarArrows) {
           // Lähetetään tutkatiedot jos joukkueet ovat samat tai asetuksista on laitettu että
           // kaikkien joukkueiden pelaajien tutkatiedot lähetetään
           reply.putByte(NET.RADAR); // Tutkatietoa tulossa
@@ -373,22 +363,22 @@ Server.prototype.sendReply = function (client, player) {
         }
       }
     }
-  }
+  });
 
   // UNIMPLEMENTED
   // Kartan vaihtaminen
 
   // Lähetetään kaikki pelaajalle osoitetut viestit
-  this.messages.fetch(player.playerId, reply);
+  this.messages.fetch(player, reply);
 
 
   // Jos on pyydetty nimilista niin palautetaan myös kaikkien tavaroiden tiedot
   if (player.sendNames) {
     player.sendNames = false;
     var itemIds = Object.keys(this.items);
-    for (var i = itemIds.length; i--;) {
+    for (i = itemIds.length; i--;) {
       var item = this.items[itemIds[i]];
-      this.messages.add(player.playerId, {
+      this.messages.add(player.id, {
         msgType: NET.ITEM,
         itemId: item.id,
         itemType: item.type,
@@ -408,22 +398,22 @@ Server.prototype.sendReply = function (client, player) {
   return;
 };
 
-Server.prototype.serverMessage = function (msg, to) {
+Server.prototype.serverMessage = function (msg, player) {
 
-  if (!to) {
+  if (!player) {
     log.write('<Server>'.blue + ' %0', msg);
     this.messages.addToAll({
       msgType: NET.SERVERMSG,
       msgText: msg
     });
   } else {
-    log.write('<Server @%0>'.blue + ' %1', this.players[to].name, msg);
-    this.messages.add(to, {
+    log.write('<Server @%0>'.blue + ' %1', player.name, msg);
+    this.messages.add(player.id, {
       msgType: NET.SERVERMSG,
       msgText: msg
     });
   }
-}
+};
 
 /**
  * Kirjaa pelaajan sisään peliin.
@@ -437,7 +427,8 @@ Server.prototype.login = function (client) {
     , replyData
     , nickname
     , playerIds
-    , randomPlace;
+    , randomPlace
+    , player;
 
   // Täsmääkö clientin ja serverin versiot
   if (version !== this.VERSION) {
@@ -458,7 +449,7 @@ Server.prototype.login = function (client) {
   // Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa
   playerIds = Object.keys(this.players);
   for (var i = playerIds.length; i--;) {
-    var player = this.players[playerIds[i]];
+    player = this.players[playerIds[i]];
     if (player.name.toLowerCase() === nickname.toLowerCase()) {
       if (player.kicked || !player.active) {
         player.name = "";
@@ -476,8 +467,8 @@ Server.prototype.login = function (client) {
   }
 
   // Etsitään inaktiivinen pelaaja
-  for (var i = playerIds.length; i--;) {
-    var player = this.players[playerIds[i]];
+  for (i = playerIds.length; i--;) {
+    player = this.players[playerIds[i]];
     if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
       // Tyhjä paikka löytyi
       player.clientId = client.id;
@@ -510,29 +501,24 @@ Server.prototype.login = function (client) {
       replyData = new Packet(16);
       replyData.putByte(NET.LOGIN);
       replyData.putByte(NET.LOGINOK);
-      replyData.putByte(player.playerId);
+      replyData.putByte(player.id);
       replyData.putByte(this.gameState.gameMode);
       replyData.putString(this.gameState.map.name);
       replyData.putInt(this.gameState.map.crc32);
       // UNIMPLEMENTED
       replyData.putString(" "); // Kartan URL josta sen voi ladata, mikäli se puuttuu
       client.reply(replyData);
-      log.info(' -> login successful, assigned ID (%0)', String(player.playerId).magenta);
+      log.info(' -> login successful, assigned ID (%0)', String(player.id).magenta);
 
       // Päivitetään tiedot servulistaukseen
-      this.registration.update(function (e) {
-        if (e) {
-          log.debug(e);
-        }
-      });
+      this.registration.update();
 
       // Lisätään viestijonoon ilmoitus uudesta pelaajasta, kaikille muille paitsi boteille ja itselle.
       this.messages.addToAll({
         msgType: NET.LOGIN,
         msgText: nickname,
-        playerId: player.playerId,
-        playerId2: player.zombie
-      }, player.playerId);
+        player: player
+      }, player.id);
       return;
     }
   }
@@ -549,51 +535,43 @@ Server.prototype.login = function (client) {
 
 /**
  * Kirjaa pelaajan ulos pelistä.
- * @param {Integer} playerId  Pelaajan ID
+ * @param {Player} player  Pelaaja joka kirjataan ulos
  */
-Server.prototype.logout = function (playerId) {
-  var player = this.players[playerId]
-    , playerIds = Object.keys(this.players);
-
+Server.prototype.logout = function (player) {
   player.active = false;
   player.loggedIn = false;
   player.admin = false;
   log.info('%0 logged out.', player.name.green);
 
   // Päivitetään tiedot servulistaukseen
-  this.registration.update(function (e) {
-    if (e) {
-      log.debug(e);
-    }
-  });
+  this.registration.update();
 
   // Lähetetään viesti kaikille muille paitsi boteille ja itselle
-  this.messages.addToAll({msgType: NET.LOGOUT, playerId: playerId}, playerId);
-}
+  this.messages.addToAll({msgType: NET.LOGOUT, playerId: player.id}, player.id);
+};
 
 /**
  * Palvelimelta potkaiseminen
  *
- * @param {Integer} playerId    Pelaajan ID
- * @param {Integer} kickerId    Potkijan ID
+ * @param {Player} player       Pelaaja, joka potkitaan
+ * @param {Player} kicker       Potkaisija
  * @param {String} [reason=""]  Potkujen syy
  */
-Server.prototype.kickPlayer = function (playerId, kickerId, reason) {
-  var player = this.players[playerId];
-  player.kicked = true,
+Server.prototype.kickPlayer = function (player, kicker, reason) {
+  player.kicked = true;
   player.kickReason = reason || '';
-  player.kickerId = kickerId;
+  player.kicker = kicker;
   player.loggedIn = false;
   player.active = false;
   player.admin = false;
   // Lähetään viesti kaikille
   this.messages.addToAll({
     msgType: NET.KICKED,
-    playerId: playerId,
-    playerId2: kickerId,
+    player: player,
+    player2: kicker,
     msgText: reason
   });
-}
+};
 
 /**
  * Etsii pelaajan nimen perusteella
@@ -608,6 +586,19 @@ Server.prototype.getPlayer = function (name) {
     if (plr.name === name && !plr.zombie) {
       return plr;
     }
+  }
+};
+
+/**
+ * Käy kaikki pelaajat läpi ja kutsuu callbackia jokaisen pelaajan kohdalla. Callback saa
+ * parametrikseen {@link Player}-luokan instanssin.
+ *
+ * @param {Function} callback  Funktio jota kutsutaan jokaisen pelaajan kohdalla
+ */
+Server.prototype.loopPlayers = function (callback) {
+  var playerIds = Object.keys(this.players), plr;
+  for (var i = playerIds.length; i--;) {
+    callback(this.players[playerIds[i]]);
   }
 };
 
@@ -673,7 +664,7 @@ Server.prototype.initBots = function () {
 
     bot.botAI = new BotAI(bot);
   }
-}
+};
 
 /**
  * Arpoo aseen boteille sallittujen listalta.
@@ -688,6 +679,57 @@ Server.prototype.getBotWeapon = function () {
   }
 
   return weapons[rand(0, weapons.length - 1)];
+};
+
+/**
+ * Luo uuden ammuksen.
+ *
+ * @param {Player} player  Pelaaja joka ampui ammuksen
+ */
+Server.prototype.createBullet = function (player) {
+  var bullet, bulletAmount;
+
+  switch (player.weapon) {
+    case WPN.LAUNCHER:
+      // Kranaatinheittimestä lähtee kaksi ammusta
+      bulletAmount = 2;
+      break;
+    case WPN.SHOTGUN:
+      // Haulikosta lähtee kuusi ammusta
+      bulletAmount = 6;
+      break;
+    default:
+      // Oletuksena ammutaan vain yksi kuti
+      bulletAmount = 1;
+  }
+
+  for (var i = 1; i <= bulletAmount; i++) {
+    if (player.weapon === WPN.LAUNCHER && i === 2) {
+      // Toinen ammus kranaatinlaukaisimesta lähtee peilattuna
+      bullet = new Bullet(this, player, ++this.lastBulletId, true);
+    } else {
+      bullet = new Bullet(this, player, ++this.lastBulletId, true);
+    }
+    if (bullet.initialize()) {
+      // Jos ammuksen alustus onnistui (esim. ei ammuttu seinän sisällä), lisätään se listaan.
+      this.bullets[bullet.id] = bullet;
+      // Lisätään ammusviesti lähetettäväksi jokaiselle pelaajalle
+      this.messages.addToAll({
+        msgType: NET.NEWBULLET,          // Viestin tyyppi
+        bullet: bullet,                  // Ammus
+        sndPlay: (i === 1),              // Ääni toistetaan vain ensimmäisen luodin kohdalla
+        weapon: player.weapon,           // Millä aseella ammuttiin
+        player: player,                  // Kuka ampui
+        x: bullet.x,                     // Mistä ammus lähti
+        y: bullet.y,                     // Mistä ammus lähti
+        handShooted: player.handShooted  // Kummalla kädellä ammuttiin (pistooli)
+      });
+    } else {
+      // Ammuksen luonti epäonnistui
+      this.lastBulletId--;
+      log.debug('Failed to initialize a new bullet shot by %0', player.name.green);
+    }
+  }
 }
 
 // Tapahtumien dokumentaatio

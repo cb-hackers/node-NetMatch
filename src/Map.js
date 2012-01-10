@@ -7,7 +7,9 @@ var log = require('./Utils').log
   , rand = require('./Utils').rand
   , path = require('path')
   , cjson = require('cjson')
-  , colors = require('colors');
+  , colors = require('colors')
+  , Item = require('./Item')
+  , ITM = require('./Constants').ITM;
 /**#nocode-*/
 
 /**
@@ -57,6 +59,9 @@ function Map(server, name) {
   // Laajennetaan tämän kartan ominaisuuksia ladatulla json-tiedostolla
   cjson.extend(this, data);
 
+  // Alustetaan kartan tavarat
+  this.initItems();
+
   this.loaded = true;
 }
 
@@ -90,7 +95,7 @@ Map.prototype.isColliding = function (x, y) {
 
   // Jos päästiin tänne asti niin ei olla törmätty
   return false;
-}
+};
 
 /**
  * Etsii satunnaisen paikan kartalta, joka ei ole seinän sisällä, ja palauttaa kyseisen paikan
@@ -116,6 +121,32 @@ Map.prototype.findSpot = function () {
     }
   }
   return returnObj;
-}
+};
 
-exports.Map = Map;
+/**
+ * Alustaa kartalla olevat tavarat.
+ */
+Map.prototype.initItems = function () {
+  var itemId = 0;
+
+  for (var i = this.config.healthItems - 1; i--;) {
+    new Item(this.server, this, ++itemId, ITM.HEALTH);
+  }
+  for (i = this.config.mgunItems - 1; i--;) {
+    new Item(this.server, this, ++itemId, ITM.AMMO);
+  }
+  for (i = this.config.bazookaItems - 1; i--;) {
+    new Item(this.server, this, ++itemId, ITM.ROCKET);
+  }
+  for (i = this.config.shotgunItems - 1; i--;) {
+    new Item(this.server, this, ++itemId, ITM.SHOTGUN);
+  }
+  for (i = this.config.launcherItems - 1; i--;) {
+    new Item(this.server, this, ++itemId, ITM.LAUNCHER);
+  }
+  for (i = this.config.chainsawItems - 1; i--;) {
+    new Item(this.server, this, ++itemId, ITM.FUEL);
+  }
+};
+
+module.exports = Map;

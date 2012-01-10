@@ -23,7 +23,7 @@ module.exports = {
     }
 
     // Luupataan kaikki pelaajat ja etsitään haluamamme pelaaja.
-    playerIds = Object.keys(this.players)
+    playerIds = Object.keys(this.players);
     for (var i = playerIds.length; i--;) {
       plr = this.players[playerIds[i]];
       plr.sendNames = true; // Kaikkien pitää päivittää nimitiedot

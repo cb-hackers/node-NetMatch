@@ -95,7 +95,7 @@ var NET = {
 
   /** Viestin loppu */
   END: 255
-}
+};
 
 /**
  * @namespace Aseet
@@ -121,7 +121,7 @@ var WPN = {
 
   /** Aseiden lukumäärä */
   COUNT: 6
-}
+};
 
 /**
  * @namespace Itemit omana kokoelmanaan eroteltuna OBJ kokoelmasta.
@@ -144,7 +144,7 @@ var ITM = {
 
   /** Kranaatteja */
   LAUNCHER: 34
-}
+};
 
 exports.NET = NET;
 exports.WPN = WPN;

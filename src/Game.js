@@ -25,7 +25,7 @@ function Game(server) {
  */
 Game.prototype.stop = function () {
   clearInterval(this.interval);
-}
+};
 
 /**
  * Päivittää pelimekaniikan, mikäli viime päivityksestä on kulunut tarpeeksi aikaa ja
@@ -43,7 +43,7 @@ Game.prototype.update = function (self) {
   self.updateBullets();
 
   self.lastUpdate = Date.now();
-}
+};
 
 /**
  * Päivittää vakionopeusajastimen
@@ -56,7 +56,7 @@ Game.prototype.updateFrameTimer = function () {
   }
   this.frameTime = (curTime - this.lastUpdate) / 1000;
   this.lastUpdate = curTime;
-}
+};
 
 /**
  * Hoitaa bottien tekoälyn.
@@ -72,7 +72,7 @@ Game.prototype.updateBotsAI = function () {
     }
     player.botAI.update();
   }
-}
+};
 
 /**
  * Tarkistaa onko erä päättynyt ja hoitaa vastaavat päivitykset, jos on
@@ -80,7 +80,7 @@ Game.prototype.updateBotsAI = function () {
  */
 Game.prototype.updateRoundTime = function () {
 
-}
+};
 
 /**
  * Päivittää pelaajien ja joukkueiden statsit, pelaajien määrän yms.
@@ -88,7 +88,7 @@ Game.prototype.updateRoundTime = function () {
  */
 Game.prototype.updateStats = function () {
 
-}
+};
 
 /**
  * Päivittää pelaajat. Hoitaa kuolleista herätykset ja sen etteivät pelaajat ole kartan sisällä.
@@ -122,7 +122,7 @@ Game.prototype.updatePlayers = function () {
     // UNIMPLEMENTED
     // Onko pelajaa kartalla
   }
-}
+};
 
 /**
  * Poistaa pelaajat, joista ei ole hetkeen kuulunut mitään.
@@ -130,7 +130,7 @@ Game.prototype.updatePlayers = function () {
  */
 Game.prototype.updateTimeouts = function () {
 
-}
+};
 
 /**
  * Pitää bottien lukumäärän oikeana
@@ -138,7 +138,7 @@ Game.prototype.updateTimeouts = function () {
  */
 Game.prototype.updateBotsAmount = function () {
 
-}
+};
 
 /**
  * Hoitaa ammusten siirtelyn, osumisen ja poistamisen.
@@ -153,7 +153,7 @@ Game.prototype.updateBullets = function () {
     bullet = this.server.bullets[bulletIds[i]];
     bullet.update();
   }
-}
+};
 
 /**
  * Palauttaa siirtymän tai kääntymän (pikseliä tai astetta sekunnissa)
@@ -162,6 +162,6 @@ Game.prototype.updateBullets = function () {
  */
 Game.prototype.movePerSec = function (amount) {
   return amount * this.frameTime;
-}
+};
 
-exports = module.exports = Game;
+module.exports = Game;

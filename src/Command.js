@@ -6,7 +6,6 @@
 var log  = require('./Utils').log
   , join = require('./Utils').join
   , NET = require('./Constants').NET;
-
 /**#nocode-*/
 
 /**
@@ -45,7 +44,7 @@ Commands.help = {
       command = arguments[1] || 'help';
     if (arguments[0]) {
       this.commands.getHelpString(command).split('\n').forEach(function (m) {
-        server.serverMessage(m, arguments[0].playerId);
+        server.serverMessage(m, arguments[0]);
       });
     } else {
       console.log(this.commands.getHelpString(command, true));
@@ -67,7 +66,7 @@ Commands.commands = {
     var server = this;
     if (!arguments[1]) {
       if (arguments[0]) {
-        this.serverMessage('Commands: ' + Object.keys(Commands).join(', '), arguments[0].playerId);
+        this.serverMessage('Commands: ' + Object.keys(Commands).join(', '), arguments[0]);
       } else {
         console.log('Commands: '.green + Object.keys(Commands).join(', '));
       }
@@ -148,12 +147,12 @@ Commands.kick = {
       log.notice('Sorry, player couldn\'t be found or you tried to kick a bot.');
     } else {
       // Vaihdetaan toinen parametri nollaksi, jos kutsut tulee palvelimelta, kun klientti on pätsätty, muuten MAV.
-      this.kickPlayer(player.playerId, // Kicker id joko komennon kutsujan ID tai serveri.
-        arguments[0] && arguments[0].playerId || 0, reason);
+      this.kickPlayer(player, // Kicker id joko komennon kutsujan ID tai serveri.
+        arguments[0], reason);
     }
 
   }
-}
+};
 
 /**
  * Kirjaa pelaajan sisään adminiksi.
@@ -174,12 +173,12 @@ Commands.login = {
       return;
     }
     if (player.admin) {
-      this.serverMessage('You are already an admin!', player.playerId);
+      this.serverMessage('You are already an admin!', player);
       return;
     }
     if (pass === this.config.password) {
       player.admin = true;
-      this.serverMessage('You are now an admin!', player.playerId)
+      this.serverMessage('You are now an admin!', player);
     } else {
       log.warn('Incorrect password!');
     }
@@ -210,7 +209,7 @@ Commands.login = {
     });
   log.info('Found %0 command-module(s): %1',
     String(cmds.length).magenta, cmds.join(', '));
-})();
+}());
 /**#nocode-*/
 
 
@@ -231,43 +230,43 @@ function Command(server) {
  * @param {Player} [player]  Kuka kutsui komentoa (undefined mikäli konsolista)
  */
 Command.prototype.call = function (name, args, player) {
-  var c = Commands[name], p;
-  if (!c) { log.error('Command "%0" not recognized. You need ´help´.', name.yellow); return; }
+  var cmd = Commands[name], param;
+  if (!cmd) { log.error('Command "%0" not recognized. You need ´help´.', name.yellow); return; }
 
   // Tarkistetaan sallitaanko komento klienteillä
-  if (player && !c.remote) {
+  if (player && !cmd.remote) {
     log.warn('Player %0 tried to call ´%1´, denied.', player.name.green, name);
-    this.server.serverMessage('The command you tried to call is server-side only.', player.playerId);
+    this.server.serverMessage('The command you tried to call is server-side only.', player);
     return;
   }
 
   // Validoidaan argumentit - parametrien tyyppejä ei tarkasteta vaan se on tehtävä manuaalisesti.
-  for (var i = 0; i < c.params.length; i++) {
-    p = c.params[i];
+  for (var i = 0; i < cmd.params.length; i++) {
+    param = cmd.params[i];
     // Jos parametri ei ole valinnainen ja argumentteja on liian vähän
-    if (!p.optional && args.length <= i) {
+    if (!param.optional && args.length <= i) {
       if (player) {
-        this.server.serverMessage('You must give parameter {' + p.type + '} ' +
-          p.name + '. See ´help ' + name + '´', player.playerId);
+        this.server.serverMessage('You must give parameter {' + param.type + '} ' +
+          param.name + '. See ´help ' + name + '´', player);
       } else {
         log.error('You must give parameter %0 %1. For more information see ´help %2´',
-          ('{' + p.type + '}').grey, p.name.red, name);
+          ('{' + param.type + '}').grey, param.name.red, name);
       }
       return;
     }
-  };
+  }
 
   // Kutsutaan funktiota
   args.unshift(player); // Lisätään pelaaja ensimmäiseksi parametriksi
   try {
-    c.action.apply(this.server, args);
+    cmd.action.apply(this.server, args);
   } catch (e) {
     log.error('Failed to call command %0 as %1 with [%2]. See --debug (-d) for stack trace.',
       name.yellow, (player && player.name || 'server').green, args.join(', ').green);
     log.debug(e.stack);
     // Also notify player if any
     if (player) {
-      this.server.serverMessage('Oops, narrowly escaped a crash! Just whoa..', player.playerId);
+      this.server.serverMessage('Oops, narrowly escaped a crash! Just whoa..', player);
     }
   }
 };
@@ -279,37 +278,37 @@ Command.prototype.call = function (name, args, player) {
  * @return {String}  Hienosti muotoiltu merkkijono.
  */
 Command.prototype.getHelpString = function (name, format) {
-  var c = Commands[name], h
+  var cmd = Commands[name], help
     // Merkkijonojen täyttäminen ilmalla
     , pad = function (s, l, r) {
-      if (r) { return Array(Math.max(l - s.length + 1, 0)).join(' ') + s; }
-      else   { return s + Array(Math.max(l - s.length + 1, 0)).join(' '); }
+      if (r) { return new Array(Math.max(l - s.length + 1, 0)).join(' ') + s; }
+      else   { return s + new Array(Math.max(l - s.length + 1, 0)).join(' '); }
     };
-  if (!c) { return 'Could not find help about "' + name + '". You need ´help´.'; }
+  if (!cmd) { return 'Could not find help about "' + name + '". You need ´help´.'; }
   if (format) {
-    h = ' Description: '.yellow + c.help +
+    help = ' Description: '.yellow + cmd.help +
       // Jos on parametrejä
-      (c.params.length ? '\n Params\n   '.yellow +
+      (cmd.params.length ? '\n Params\n   '.yellow +
         // Jos niitä on useampi niin muotoillaan wtf-8:lla
-        (c.params.length > 1 ? '├→' : '└→').yellow +
+        (cmd.params.length > 1 ? '├→' : '└→').yellow +
         // Listataan ne
-        join(c.params.map(function paramLoop(p) {
-          return pad((' {' + p.type + '} ').grey, 21, false)  // Tyyppi
-              +  pad((p.optional ? '[' + p.name + ']' : ' ' + p.name).green, 19, false) // Nimi
-              +  ' – ' + p.help; // Selitys
+        join(cmd.params.map(function paramLoop(param) {
+          return pad((' {' + param.type + '} ').grey, 21, false)  // Tyyppi
+              +  pad((param.optional ? '[' + param.name + ']' : ' ' + param.name).green, 19, false) // Nimi
+              +  ' – ' + param.help; // Selitys
         // Muotoillaan wtf-8:lla taulukosta merkkijono.
         }), '\n   ├→'.yellow, '\n   └→'.yellow)
       : ''); // Ei parametrejä
   } else {
-    h = ' Description: ' + c.help +
-      (c.params.length ? '\n  Parameters:\n' : '') + // Sitten listataan parametrit mikäli niitä on.
-      (c.params.map(function paramLoop(p) {
-        return pad('  {' + p.type + '} ', 15, true) + // Tyyppi
-               pad((p.optional ? '[' + p.name + ']' : p.name), 18, false) + // Nimi
-               ' -- ' + p.help; // Selitys
+    help = ' Description: ' + cmd.help +
+      (cmd.params.length ? '\n  Parameters:\n' : '') + // Sitten listataan parametrit mikäli niitä on.
+      (cmd.params.map(function paramLoop(param) {
+        return pad('  {' + param.type + '} ', 15, true) + // Tyyppi
+               pad((param.optional ? '[' + param.name + ']' : param.name), 18, false) + // Nimi
+               ' -- ' + param.help; // Selitys
       }).join('\n'));
   }
-  return h;
+  return help;
 };
 
 /**
