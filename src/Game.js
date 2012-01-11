@@ -59,19 +59,20 @@ Game.prototype.updateFrameTimer = function () {
 };
 
 /**
- * Hoitaa bottien tekoälyn.
+ * Käy botit läpi ja kutsuu jokaisen päivitysrutiinia.
  * @private
  */
 Game.prototype.updateBotsAI = function () {
-  var playerIds = Object.keys(this.server.players);
-  for (var i = playerIds.length; i--;) {
-    var player = this.server.players[playerIds[i]];
-    if (!player.zombie) {
-      // Jos ei ollut botti niin jatketaan seuraavaan pelaajaan
-      continue;
-    }
-    player.botAI.update();
+  // Tarkistetaan onko pelaajia pelissä. Jos ei, niin ei päivitetä botteja.
+  if (this.server.gameState.playerCount <= 0) {
+    return;
   }
+
+  this.server.loopPlayers (function (player) {
+    if (player.zombie) {
+      player.botAI.update();
+    }
+  });
 };
 
 /**

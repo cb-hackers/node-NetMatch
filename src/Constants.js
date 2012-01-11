@@ -93,6 +93,9 @@ var NET = {
   /** Nopeuden huijaus havaittu */
   SPEEDHACK: 24,
 
+  /** Piirtelyjä debug-tarkoituksia varten */
+  DEBUGDRAWING: 25,
+
   /** Viestin loppu */
   END: 255
 };
@@ -146,6 +149,21 @@ var ITM = {
   LAUNCHER: 34
 };
 
+/**
+ * @namespace Piirrettävien tavaroiden tyypit, debuggailua varten.
+ */
+var DRAW = {
+  /** Viiva */
+  LINE: 1,
+
+  /** Origokeskinen ympyrä */
+  CIRCLE: 2,
+
+  /** Laatikko */
+  BOX: 3
+};
+
 exports.NET = NET;
 exports.WPN = WPN;
 exports.ITM = ITM;
+exports.DRAW = DRAW;

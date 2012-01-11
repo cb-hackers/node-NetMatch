@@ -63,6 +63,19 @@ var Utils = {
   },
 
   /**
+   * Palauttaa kahden pisteen välisen kulman asteina
+   * @param {Number} x1  Ensimmäisen pisteen x-koordinaatti
+   * @param {Number} y1  Ensimmäisen pisteen y-koordinaatti
+   * @param {Number} x2  Toisen pisteen x-koordinaatti
+   * @param {Number} y2  Toisen pisteen y-koordinaatti
+   * @returns {Number}   Pisteiden välinen kulma asteina välillä 0...360º
+  */
+  getAngle: function (x1, y1, x2, y2) {
+    var radAngle = Math.atan2(y1 - y2, x1 - x2) + Math.PI; // Kulma radiaaneina välillä 0...2pi
+    return (radAngle / Math.PI) * 180;
+  },
+
+  /**
    * Palauttaa taulukon, jossa on merkkijono paloiteltuna sanoiksi, ottaa huomioon "merkki jonot"
    * @param {String} str  Merkkijono, joka paloitellaan
    * @returns {Array}  Paloiteltu jono

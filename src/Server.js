@@ -496,6 +496,7 @@ Server.prototype.login = function (client) {
         // Tasainen jako joukkueihin TDM-pelimoodissa
         player.team = Math.floor(Math.random() * 2 + 1) + 1; // Rand(1,2)
       }
+      this.gameState.playerCount++;
 
       // Lähetetään vastaus clientille
       replyData = new Packet(16);
@@ -542,6 +543,7 @@ Server.prototype.logout = function (player) {
   player.loggedIn = false;
   player.admin = false;
   log.info('%0 logged out.', player.name.green);
+  this.gameState.playerCount--;
 
   // Päivitetään tiedot servulistaukseen
   this.registration.update();
@@ -564,6 +566,7 @@ Server.prototype.kickPlayer = function (player, kicker, reason) {
   player.loggedIn = false;
   player.active = false;
   player.admin = false;
+  this.gameState.playerCount--;
   // Lähetään viesti kaikille
   this.messages.addToAll({
     msgType: NET.KICKED,
@@ -662,7 +665,7 @@ Server.prototype.initBots = function () {
     // UNIMPLEMENTED: boteille tiimit tasaisesti
     bot.team = 1;
 
-    bot.botAI = new BotAI(bot);
+    bot.botAI = new BotAI(this, bot);
   }
 };
 

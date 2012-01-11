@@ -149,4 +149,20 @@ Map.prototype.initItems = function () {
   }
 };
 
+/**
+ * Etsii annettujen koordinaattien ja kulman muodostavalta suoralta lähimmän seinän koordinaatit
+ * ja palauttaa ne objektin kenttinä x ja y.
+ *
+ * @param {Number} x      Aloituspisteen x-koordinaatti
+ * @param {Number} y      Aloituspisteen y-koordinaatti
+ * @param {Number} angle  Mihin suuntaan suora muodostuu (asteina)
+ *
+ * @returns {Object}  Palauttaa objektin jolla on kentät x ja y jotka sisältävät lähimmän seinän
+ *                    koordinaatit.
+ */
+Map.prototype.findWall = function (x, y, angle) {
+
+
+}
+
 module.exports = Map;

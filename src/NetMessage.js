@@ -5,6 +5,7 @@
 /**#nocode+*/
 var NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
+  , DRAW = require('./Constants').DRAW
   , log = require('./Utils').log
   , colors = require('colors');
 /**#nocode-*/
@@ -27,20 +28,22 @@ function NetMessages(server) {
 /**
  * Luo uuden clientille lähetettävän viestin.
  *
- * @param {Byte}    toPlayer          Pelaajan ID kelle viesti lähetetään.
- * @param {Object}  data              Pelaajalle lähetettävä data
- * @param {Byte}    data.msgType      Viestityyppi, kts. {@link NET}
- * @param {String}  data.msgText      Viestin teksti
- * @param {Player}  data.player       Kuka viestin lähetti
- * @param {Short}   data.bullet       Ammus
- * @param {Byte}    data.itemId       Tavaran tunnus
- * @param {Byte}    data.itemType     Tavaran tyyppi
- * @param {Byte}    data.weapon       Ase
- * @param {Short}   data.x            Sijaintitietoa
- * @param {Short}   data.y            Sijaintitietoa
- * @param {Player}  data.player2      Kehen tapahtuma kohdistui
- * @param {Boolean} data.sndPlay      Soitetaanko ääni
- * @param {Boolean} data.handShooted  Kumpi käsi ampui (pistooli) 0 = vasen, 1 = oikea
+ * @param {Byte}      toPlayer          Pelaajan ID kelle viesti lähetetään.
+ * @param {Object}    data              Pelaajalle lähetettävä data
+ * @param {Byte}      data.msgType      Viestityyppi, kts. {@link NET}
+ * @param {String}    data.msgText      Viestin teksti
+ * @param {Player}    data.player       Kuka viestin lähetti
+ * @param {Short}     data.bullet       Ammus
+ * @param {Byte}      data.itemId       Tavaran tunnus
+ * @param {Byte}      data.itemType     Tavaran tyyppi
+ * @param {Byte}      data.weapon       Ase
+ * @param {Short}     data.x            Sijaintitietoa
+ * @param {Short}     data.y            Sijaintitietoa
+ * @param {Player}    data.player2      Kehen tapahtuma kohdistui
+ * @param {Boolean}   data.sndPlay      Soitetaanko ääni
+ * @param {Boolean}   data.handShooted  Kumpi käsi ampui (pistooli) 0 = vasen, 1 = oikea
+ * @param {Byte}      data.drawType     Minkä kuvion piirto on kyseessä
+ * @param {Integer[]} data.drawVars     Suoraan listassa piirtoa varten tarvittavat arvot
  */
 NetMessages.prototype.add = function (toPlayer, data) {
   if ('undefined' === typeof this.data[toPlayer]) {
@@ -231,6 +234,15 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
         data.putByte(d.msgType);
         // UNIMPLEMENTED
         // Login( False, gCurrentPlayerId )
+        break;
+
+      case NET.DEBUGDRAWING:
+        // Debug-piirtelytavaraa tulossa
+        data.putByte(d.msgType);
+        data.putByte(d.drawType);
+        for (var i=0; i < d.drawVars.length; i++) {
+          data.putInt(d.drawVars[i]);
+        }
         break;
 
       default:
