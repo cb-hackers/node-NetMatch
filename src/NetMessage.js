@@ -182,11 +182,15 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
       case NET.BULLETHIT:
         // Osumaviesti
         data.putByte(d.msgType);
-        data.putShort(d.bullet.id); // Ammuksen tunnus
-        data.putByte(d.player.id);  // Keneen osui
-        data.putShort(d.x);         // Missä osui
-        data.putShort(d.y);         // Missä osui
-        data.putByte(d.weapon);     // Mistä aseesta ammus on
+        data.putShort(d.bullet.id);   // Ammuksen tunnus
+        if (d.player) {
+          data.putByte(d.player.id);  // Keneen osui
+        } else {
+          data.putByte(0);
+        }
+        data.putShort(d.x);           // Missä osui
+        data.putShort(d.y);           // Missä osui
+        data.putByte(d.weapon);       // Mistä aseesta ammus on
         break;
 
       case NET.ITEM:
