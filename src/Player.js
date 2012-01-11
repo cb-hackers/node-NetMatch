@@ -68,7 +68,7 @@ function Player(server, playerId) {
   // Alustetaan pelaaja
   this.id = playerId;
   this.team = 1;
-  this.botName = server.gameState.map.config.botNames[playerId];
+  this.botName = server.gameState.map.config.botNames[playerId-1];
   this.clientId = "";
   this.name = "";
   var skill = 21 - playerId; // Botteja hieman eritasoisiksi vissiinkin?
