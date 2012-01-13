@@ -13,6 +13,8 @@ var cbNetwork = require('cbNetwork')
   , log    = require('./Utils').log
   , rand   = require('./Utils').rand
   , colors = require('colors')
+  , util   = require('util')
+  , events = require('events')
   // Serverin moduulit
   , NetMsgs      = require('./NetMessage')
   , Player       = require('./Player')
@@ -112,8 +114,7 @@ function Server(args, version) {
   log.info('Server initialized successfully.');
 }
 
-Server.prototype = process.EventEmitter.prototype;
-Server.prototype.constructor = Server;
+util.inherits(Server, events.EventEmitter);
 
 /** Alustaa palvelimen */
 Server.prototype.initialize = function (port, address, config) {
