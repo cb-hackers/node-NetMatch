@@ -6,7 +6,7 @@
 	.REGX {color: #339;}
 	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
 	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
-<span class='line'>  2</span>  * @fileOverview Toteutus komennolle AsPlayer: {@link Commands.AsPlayer}
+<span class='line'>  2</span>  * @fileOverview Toteutus komennolle asplayer: {@link Commands.asplayer}
 <span class='line'>  3</span>  */</span><span class="WHIT">
 <span class='line'>  4</span> 
 <span class='line'>  5</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">log</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'../Utils'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">log</span><span class="PUNC">;</span><span class="WHIT">
@@ -19,7 +19,7 @@
 <span class='line'> 12</span>  * @param {command} cmd  Mitä komentoa kutsutaan
 <span class='line'> 13</span>  * @param {string} args  komennon parametrit
 <span class='line'> 14</span>  */</span><span class="WHIT">
-<span class='line'> 15</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">AsPlayer</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 15</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">asplayer</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 16</span> </span><span class="WHIT">  </span><span class="COMM">/**#nocode+*/</span><span class="WHIT">
 <span class='line'> 17</span> </span><span class="WHIT">  </span><span class="NAME">params</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
 <span class='line'> 18</span> </span><span class="WHIT">    </span><span class="PUNC">{</span><span class="NAME">name</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'as'</span><span class="PUNC">,</span><span class="WHIT">   </span><span class="NAME">type</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'player'</span><span class="PUNC">,</span><span class="WHIT">  </span><span class="NAME">optional</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">help</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'Player who to call as'</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
@@ -39,5 +39,5 @@
 <span class='line'> 32</span> </span><span class="WHIT">  </span><span class="COMM">/**#nocode-*/</span><span class="WHIT">
 <span class='line'> 33</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 34</span> 
-<span class='line'> 35</span> </span><span class="NAME">module.exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">AsPlayer</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 35</span> </span><span class="NAME">module.exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">asplayer</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 36</span> </span></pre></body></html>
