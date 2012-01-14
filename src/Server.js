@@ -501,10 +501,6 @@ Server.prototype.login = function (client) {
         // Tasainen jako joukkueihin TDM-pelimoodissa
         player.team = Math.floor(Math.random() * 2 + 1) + 1; // Rand(1,2)
       }
-      if (this.debug) {
-        // Jos ollaan debug-tilassa niin luodaan myös pelaajalle botin tekoäly
-        player.botAI = new BotAI(this, player);
-      }
       this.gameState.playerCount++;
 
       // Lähetetään vastaus clientille

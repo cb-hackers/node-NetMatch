@@ -93,7 +93,7 @@ Game.prototype.updateBotsAI = function () {
   }
 
   this.server.loopPlayers (function (player) {
-    if (player.active && !player.isDead && (player.zombie || self.server.debug)) {
+    if (player.zombie && player.active && !player.isDead) {
       player.botAI.update();
     }
   });
