@@ -246,7 +246,7 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
         data.putByte(d.drawType);
         if (d.drawVars) {
           for (var i=0; i < d.drawVars.length; i++) {
-            data.putInt(d.drawVars[i]);
+            data.putShort(d.drawVars[i]);
           }
         }
         break;
