@@ -7,6 +7,7 @@ var WPN = require('./Constants').WPN;
 /**#nocode-*/
 
 /**
+ * @name Weapons.WPN
  * @namespace Sisältää aseet ja niiden ominaisuudet. Jokaisella aseella on alla olevat kentät:
  * <table>
  * <tr><td> reloadTime   </td><td>  Latausaika  </td></tr>
@@ -26,7 +27,10 @@ var WPN = require('./Constants').WPN;
  */
 var Weapons = {};
 
-/** Pistooli, <code>Weapons[WPN.PISTOL]</code> */
+/**
+ * Pistooli, <code>Weapons[WPN.PISTOL]</code>
+ * @name Weapons.WPN.PISTOL
+ */
 Weapons[WPN.PISTOL] = {
   reloadTime: 250,
   bulletSpeed: 1200,
@@ -43,7 +47,10 @@ Weapons[WPN.PISTOL] = {
   name: "pistol"
 };
 
-/** Konekivääri, <code>Weapons[WPN.MGUN]</code> */
+/**
+ * Konekivääri, <code>Weapons[WPN.MGUN]</code>
+ * @name Weapons.WPN.MGUN
+ */
 Weapons[WPN.MGUN] = {
   reloadTime: 100,
   bulletSpeed: 1000,
@@ -60,7 +67,10 @@ Weapons[WPN.MGUN] = {
   name: "machinegun"
 };
 
-/** Sinko, <code>Weapons[WPN.BAZOOKA]</code> */
+/**
+ * Sinko, <code>Weapons[WPN.BAZOOKA]</code>
+ * @name Weapons.WPN.BAZOOKA
+ */
 Weapons[WPN.BAZOOKA] = {
   reloadTime: 1500,
   bulletSpeed: 900,
@@ -77,7 +87,10 @@ Weapons[WPN.BAZOOKA] = {
   name: "bazooka"
 };
 
-/** Haulikko, <code>Weapons[WPN.SHOTGUN]</code> */
+/**
+ * Haulikko, <code>Weapons[WPN.SHOTGUN]</code>
+ * @name Weapons.WPN.SHOTGUN
+ */
 Weapons[WPN.SHOTGUN] = {
   reloadTime: 1000,
   bulletSpeed: 900,
@@ -94,7 +107,10 @@ Weapons[WPN.SHOTGUN] = {
   name: "shotgun"
 };
 
-/** Kranaatinlaukaisin, <code>Weapons[WPN.LAUNCHER]</code> */
+/**
+ * Kranaatinlaukaisin, <code>Weapons[WPN.LAUNCHER]</code>
+ * @name Weapons.WPN.LAUNCHER
+ */
 Weapons[WPN.LAUNCHER] = {
   reloadTime: 1000,
   bulletSpeed: 400,
@@ -111,7 +127,10 @@ Weapons[WPN.LAUNCHER] = {
   name: "launcher"
 };
 
-/** Moottorisaha, <code>Weapons[WPN.CHAINSAW]</code> */
+/**
+ * Moottorisaha, <code>Weapons[WPN.CHAINSAW]</code>
+ * @name Weapons.WPN.CHAINSAW
+ */
 Weapons[WPN.CHAINSAW] = {
   reloadTime: 100,
   bulletSpeed: 0,

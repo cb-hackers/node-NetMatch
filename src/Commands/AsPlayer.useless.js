@@ -1,12 +1,19 @@
+/**
+ * @fileOverview Toteutus komennolle AsPlayer: {@link Commands.AsPlayer}
+ */
+
 var log = require('../Utils').log;
 
 /**
  * Suorittaa komennon toisena pelaajana. >:)
+ * @methodOf Commands
+ *
  * @param {player}  as   Kenenä komentoa kutsutaan
  * @param {command} cmd  Mitä komentoa kutsutaan
  * @param {string} args  komennon parametrit
  */
-module.exports = {
+var AsPlayer = {
+  /**#nocode+*/
   params: [
     {name: 'as',   type: 'player',  optional: false, help: 'Player who to call as'},
     {name: 'cmd',  type: 'command', optional: false, help: 'Command to call'},
@@ -22,4 +29,7 @@ module.exports = {
     log.info('Calling `%0` as "%1" with arguments `%2`', cmd, plr.name, args.join(' ') || 'none');
     this.commands.call(cmd, args, plr);
   }
+  /**#nocode-*/
 };
+
+module.exports = AsPlayer;

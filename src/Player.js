@@ -18,6 +18,8 @@ var log = require('./Utils').log
  * @param {Server} server  NetMatch-palvelin, joka pyörittää pelaajaa
  * @param {Byte} playerId  Luotavan pelaajan ID
  *
+ * @extends Obj
+ *
  * @property {Integer} id            Pelaajan tunnus välillä 1-MAX_PLAYERS
  * @property {String}  clientId      ClientId eli ip-osoite ja tunnus
  * @property {Integer} active        Onko tämä pelaaja pelissä

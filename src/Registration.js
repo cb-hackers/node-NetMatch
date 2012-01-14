@@ -121,6 +121,7 @@ Registration.prototype.remove = function (callback) {
  */
 Registration.prototype.update = function (callback) {
   if ('function' !== typeof callback) {
+    /** @ignore */
     callback = function (e) {
       if (e) {
         log.debug(e);

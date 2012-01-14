@@ -1,10 +1,17 @@
+/**
+ * @fileOverview Toteutus komennolle Op: {@link Commands.Op}
+ */
+
 var log = require('../Utils').log;
 
 /**
  * Tekee pelaajasta adminin.
+ * @methodOf Commands
+ *
  * @param {player} who  Kenet opataan
  */
-module.exports = {
+var Op = {
+  /**#nocode+*/
   params: [
     {name: 'who',  type: 'player', optional: false, help: 'Player who to op'}
   ],
@@ -35,4 +42,7 @@ module.exports = {
     // Kerrotaan kutsujalle myös
     if (caller) { this.serverMessage('Done! :)', caller); }
   }
+  /**#nocode-*/
 };
+
+module.exports = Op;

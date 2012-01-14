@@ -18,11 +18,11 @@ var Utils = {
    * var log = Utils.log;
    *
    * log.write('Perusviesti, tämä on ilman värejä.');
-   * log.info('Jotain tiedotettavaa tapahtui. Tulostuu vihreänä.');
-   * log.warn('Varoitus! Tulostuu keltaisena.');
-   * log.notice('Ilmoitus! Tulostuu keltaisena.');
-   * log.error('VIRHE! Tulostuu punaisena ja lihavoituna.');
-   * log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');
+   * log.info('Jotain tiedotettavaa tapahtui. Tulostuu vihreän INFO-tagin kanssa.');
+   * log.warn('Varoitus! Tulostuu keltaisen WARN-tagin kanssa.');
+   * log.notice('Ilmoitus! Tulostuu keltaisen NOTICE-tagin kanssa.');
+   * log.error('VIRHE! Tulostuu punaisen ja lihavoidun ERROR-tagin kanssa.');
+   * log.fatal('KRIITTINEN VIRHE! Tulostuu punaisen ja lihavoidun FATAL-tagin kanssa.');
    */
   log: new Logger('[NetMatch %t] '.grey, argv.d),
 

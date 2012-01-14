@@ -62,7 +62,7 @@ function Server(args, version) {
   /** Sisältää palvelimen pelaajat, eli luokan {@link Player} jäsenet. */
   this.players = {};
 
-  /** Sisältää palvelimen ammukset, eli luokan {@link Weapon} jäsenet. */
+  /** Sisältää palvelimen ammukset, eli luokan {@link Bullet} jäsenet. */
   this.bullets = {};
   /** @private */
   this.lastBulletId = 0;
@@ -403,6 +403,13 @@ Server.prototype.sendReply = function (client, player) {
   return;
 };
 
+/**
+ * Lähettää NET.SERVERMESSAGE viestin pelaajille. Jos player-parametri on annettu,
+ * lähetetään viesti vain kyseiselle pelaajalle.
+ *
+ * @param {String} msg       Viesti, joka lähetetään
+ * @param {Player} [player]  Yksityisviestin saava pelaaja
+ */
 Server.prototype.serverMessage = function (msg, player) {
 
   if (!player) {

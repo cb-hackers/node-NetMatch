@@ -23,7 +23,7 @@ var log       = require('./Utils').log
  * @param {Server} server  NetMatch-palvelin
  * @param {Player} player  {@link Player}-luokan instanssi johon tämä tekoäly kuuluu.
  *
- * @property {Player}   player        {@link Player}-luokan instanssi johon tämä tekoäly kuuluu.
+ * @property {Player}   player        Player-luokan instanssi johon tämä tekoäly kuuluu.
  * @property {Number}   nextAngle     Kulma johon botin pitäisi liikkua
  * @property {Number}   lastAngle     Kuinka paljon botin ja kohdekulman ero oli edellisellä kierroksella
  * @property {Number}   rotation      Tällä käännetään objektia (TurnObject)
@@ -32,7 +32,7 @@ var log       = require('./Utils').log
  * @property {Boolean}  tooClose      Botti on liian lähellä seinää tai toista pelaajaa
  * @property {Number}   fightRotate   Kääntymisnopeus kun ollaan havaittu vastustaja
  * @property {Number}   shootingAngle Ammutaan kun uhri on tämän kulman sisällä botin edessä
- * @property {Object}   config        Botin tekoälyä ohjaavat asetukset: {@link #initConfig}
+ * @property {Object}   config        Botin tekoälyä ohjaavat asetukset: {@link BotAI#initConfig}
 */
 function BotAI(server, player) {
   this.server = server;
@@ -45,6 +45,7 @@ function BotAI(server, player) {
   this.tooClose = false;
   this.fightRotate = 0;
   this.shootingAngle = 0;
+  this.config = {};
 
   // Alustetaan botin tekoälyä ohjaavat asetukset
   this.initConfig();
@@ -54,40 +55,35 @@ function BotAI(server, player) {
  * Alustaa botin tekoälyä ohjaavat asetukset.
  */
 BotAI.prototype.initConfig = function () {
-  // Tähän alustetaan asetukset ja tämä asetetaan lopulta this.config -kenttään
-  var c = {};
-
   /** Koska aikaisintaan arvotaan botille uusi suunta */
-  c.minNextAction = 500;
+  this.config.minNextAction = 500;
 
   /** Koska viimeistään arvotaan botille uusi suunta */
-  c.maxNextAction = 1000;
+  this.config.maxNextAction = 1000;
 
   /** Kun botille arvotaan uusi kääntyminen niin tämä on maksimi. */
-  c.randRotation = 90;
+  this.config.randRotation = 90;
 
   /** Botin nopeus kun se on havainnut esteen */
-  c.minSpeed = 80;
+  this.config.minSpeed = 80;
 
   /** Botin nopeus kun tie on vapaa */
-  c.maxSpeed = 200;
+  this.config.maxSpeed = 200;
 
   /** Jos matkaa esteeseen on vähemmän kuin tämä niin aletaan etsiä uutta suuntaa */
-  c.wakeupDist = 100;
+  this.config.wakeupDist = 100;
 
   /**
    * Kun pitää päätellä uusi suunta niin se tehdään katselemalla näin monta astetta molempiin
    * suuntiin.
    */
-  c.exploreAngle = 50;
+  this.config.exploreAngle = 50;
 
   /**
    * Kun botti on lähellä estettä niin tällä määrätään kuinka jyrkällä käännöksellä yritetään
    * väistää. Pienempi arvo on jyrkempi käännös.
    */
-  c.dodgeRotation = 0.2;
-
-  this.config = c;
+  this.config.dodgeRotation = 0.2;
 }
 
 /**

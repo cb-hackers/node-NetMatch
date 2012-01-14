@@ -1,4 +1,9 @@
+/**
+ * @fileOverview Toteutus komennolle Uptime: {@link Commands.Uptime}
+ */
+
 // http://codeaid.net/javascript/convert-seconds-to-hours-minutes-and-seconds-(javascript) Vähän editoituna
+/** @ignore */
 function secondsToTime(secs) {
   var days = Math.floor(secs / (60 * 60 * 24))
     , divisor_for_hours = secs % (60 * 60 * 24)
@@ -12,8 +17,10 @@ function secondsToTime(secs) {
 
 /**
  * Kertoo kauanko palvelin on ollut päällä.
+ * @methodOf Commands
  */
-module.exports = {
+Uptime = {
+  /**#nocode+*/
   params: [],
   help: 'Displays how long has the server been running.',
   remote: true,
@@ -22,4 +29,7 @@ module.exports = {
     this.serverMessage('This server has been running for ' + t.d +
       ' days ' + t.h + ' hours ' + t.m + ' minutes and ' + t.s + ' seconds.');
   }
+  /**#nocode-*/
 };
+
+module.exports = Uptime;

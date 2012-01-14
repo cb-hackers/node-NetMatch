@@ -31,6 +31,7 @@ var Commands = {};
 
 /**
  * Help-komento tulostaa tietoja halutusta komennosta.
+ * @methodOf Commands
  * @param {String} [command]  Minkä komennot salat paljastetaan
  */
 Commands.help = {
@@ -54,6 +55,7 @@ Commands.help = {
 
 /**
  * Listaa kaikki komennot.
+ * @methodOf Commands
  * @param {Boolean} [verbose]  Tulostetaanko samalla helpit.
  */
 Commands.commands = {
@@ -81,6 +83,7 @@ Commands.commands = {
 
 /**
  * Lähettää NET.SERVERMSG paketin klienteille.
+ * @methodOf Commands
  * @param {String} [message]  Viesti, joka lähetetään
  */
 Commands.say = {
@@ -95,7 +98,10 @@ Commands.say = {
   }
 };
 
-/** Sulkee palvelimen. */
+/**
+ * Sulkee palvelimen.
+ * @methodOf Commands
+ */
 Commands.close = {
   params: [],
   help: 'Closes the server.',
@@ -105,7 +111,10 @@ Commands.close = {
   }
 };
 
-/** Listaa paikalla olevat pelaajat. */
+/**
+ * Listaa paikalla olevat pelaajat.
+ * @methodOf Commands
+ */
 Commands.list = {
   params: [],
   help: 'Lists all connected players.',
@@ -122,6 +131,7 @@ Commands.list = {
 
 /**
  * Heittää pelaajan pellolle
+ * @methodOf Commands
  * @param {Player} who     Pelaaja, joka potkaistaan. Nimi tai ID kelpaa
  * @param {String} reason  Selitys tälle hirmuteolle
  */
@@ -156,6 +166,7 @@ Commands.kick = {
 
 /**
  * Kirjaa pelaajan sisään adminiksi.
+ * @methodOf Commands
  * @param {Player} who    Pelaaja, joka kirjautuu
  * @param {String} pass   Salasana
  */
@@ -278,6 +289,7 @@ Command.prototype.call = function (name, args, player) {
  * @return {String}  Hienosti muotoiltu merkkijono.
  */
 Command.prototype.getHelpString = function (name, format) {
+  /**#nocode+*/
   var cmd = Commands[name], help
     // Merkkijonojen täyttäminen ilmalla
     , pad = function (s, l, r) {
@@ -309,6 +321,7 @@ Command.prototype.getHelpString = function (name, format) {
       }).join('\n'));
   }
   return help;
+  /**#nocode-*/
 };
 
 /**
@@ -317,6 +330,7 @@ Command.prototype.getHelpString = function (name, format) {
  * @returns {Array}  Löydetyt  ehdotukset, jos niitä on vain yksi, sillä korvataan koko rivi.
  */
 Command.prototype.suggest = function (partial) {
+  /**#nocode+*/
   var startsWith = function (str1, str2) { return str1.slice(0, str2.length) === str2; }
     // Yhdistetään komento-osa, välissä olevat parametrit sekä ehdotus.
     , merge = function (cmd, args, suggestion) {
@@ -373,6 +387,7 @@ Command.prototype.suggest = function (partial) {
   }
 
   return suggestions;
+  /**#nocode-*/
 };
 
 

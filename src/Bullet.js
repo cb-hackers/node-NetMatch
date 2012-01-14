@@ -22,6 +22,8 @@ var log = require('./Utils').log
  * @param {Integer} newId  Uuden ammuksen ID
  * @param {Boolean} [mirrored=false]  Peilataanko ammuksen lähtösuunta (kranaatinlaukaisimen 2. ammus)
  *
+ * @extends Obj
+ *
  * @property {Short}   id           Ammuksen tunnus
  * @property {Player}  player       Kuka ampui
  * @property {Byte}    weapon       Millä aseella tämä on ammuttu
