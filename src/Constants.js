@@ -1,5 +1,6 @@
 /**
- * @fileOverview Pitää sisällään eri vakioita: {@link NET}
+ * @fileOverview Pitää sisällään eri vakioita: {@link NET}, {@link WPN}, {@link ITM}, {@link DRAW},
+ * {@link PLR}
  */
 
 /*
@@ -166,7 +167,22 @@ var DRAW = {
   CLEAR: 127
 };
 
+/**
+ * @namespace Pelaajiin liittyvät rajoitukset
+ */
+var PLR = {
+  /** Nopeus eteen (pikseliä sekunnissa) */
+  FORWARD_SPEED: 250,
+
+  /** Nopeus taakse (pikseliä sekunnissa) */
+  BACKWARD_SPEED: 150,
+
+  /** Nopeus sivulle (pikseliä sekunnissa) */
+  SIDESTEP_SPEED: 160,
+};
+
 exports.NET = NET;
 exports.WPN = WPN;
 exports.ITM = ITM;
 exports.DRAW = DRAW;
+exports.PLR = PLR;

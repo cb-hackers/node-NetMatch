@@ -4,14 +4,16 @@
  */
 
 /**#nocode+*/
-var log      = require('./Utils').log
-  , rand     = require('./Utils').rand
-  , distance = require('./Utils').distance
-  , getAngle = require('./Utils').getAngle
-  , colors   = require('colors')
-  , Obj      = require('./Object')
-  , NET      = require('./Constants').NET
-  , DRAW     = require('./Constants').DRAW;
+var log       = require('./Utils').log
+  , rand      = require('./Utils').rand
+  , distance  = require('./Utils').distance
+  , wrapAngle = require('./Utils').wrapAngle
+  , colors    = require('colors')
+  , Obj       = require('./Object')
+  , Weapons   = require('./Weapon')
+  , NET       = require('./Constants').NET
+  , PLR       = require('./Constants').PLR
+  , DRAW      = require('./Constants').DRAW;
 /**#nocode-*/
 
 /**
@@ -92,10 +94,18 @@ BotAI.prototype.initConfig = function () {
  * Yksittäisen botin tekoälyn päivitys.
  */
 BotAI.prototype.update = function () {
-  var minDist, dist, self = this
+  var self = this
     , map = this.server.gameState.map
-    , pickerObject
-    , colFront, colLeft, colRight;
+    , wakeupDist = this.config.wakeupDist
+    , superLargeDist = (map.width + map.height) * map.tileSize
+    , minDist
+    , picker
+    , pickWall
+    , dist1, dist2, dodge
+    , objectiveAngle
+    , moveDirection = 1
+    , speed, forwardSpeed, sidestepSpeed
+    , weaponWeight = Weapons[this.player.weapon].weight;
   // Mikäli botti ei ole liian lähellä seinää ja on aika arpoa sille uusi suunta
   // niin tehdään se nyt.
   if (!this.tooClose && this.nextAction < Date.now()) {
@@ -107,12 +117,6 @@ BotAI.prototype.update = function () {
     if (this.sideStep !== 0) {
       this.sideStep = rand(-1, 1, true);
     }
-
-    // Spam much?
-    /*
-    log.debug('Updated botAI for %0 (playerId %1)', this.player.name.green,
-      String(this.player.id).magenta);
-    */
   }
 
   // Käännetään bottia
@@ -120,7 +124,7 @@ BotAI.prototype.update = function () {
     this.player.turn(this.server.game.movePerSec(this.rotation));
   }
 
-  // Seuraavaksi alkaa varsinainen tekäly jossa tutkitaan ympäristöä.
+  // Seuraavaksi alkaa varsinainen tekoäly jossa tutkitaan ympäristöä.
   // Tämä tehdään kuitenkin vain mikäli botti ei ole liian lähellä jotakin estettä.
   if (!this.tooClose) {
     // Lasketaan etäisyys edessä olevaan esteeseen.
@@ -129,20 +133,91 @@ BotAI.prototype.update = function () {
     // Luodaan väliaikainen poimintaobjekti
     picker = new Obj(this.player.x, this.player.y, this.player.angle);
 
-    // Poimitaan lähin este suoraan nenän edestä
-    colFront = map.findWall(picker.x, picker.y, picker.angle, this.config.wakeupDist);
-    this.debugRayCast(colFront, picker);
+    // Poimitaan botin nenän edestä mahdollinen seinä
+    pickWall = map.findWall(picker.x, picker.y, picker.angle, wakeupDist);
+    this.debugRayCast(pickWall, picker);
+    if (pickWall) {
+      minDist = distance(picker.x, picker.y, pickWall.x, pickWall.y);
+    }
 
-    // Poimitaan botin vasemman reunan puolelta lähin seinä
+    // Poimitaan botin vasemman reunan puolelta seinä
     picker.move(0, -15);
-    colLeft = map.findWall(picker.x, picker.y, picker.angle, this.config.wakeupDist);
-    this.debugRayCast(colLeft, picker);
+    pickWall = map.findWall(picker.x, picker.y, picker.angle, wakeupDist);
+    this.debugRayCast(pickWall, picker);
+    if (pickWall) {
+      minDist = Math.min(minDist, distance(picker.x, picker.y, pickWall.x, pickWall.y));
+    }
 
-    // Poimitaan botin oikean reunan puolelta lähin seinä
+    // Poimitaan botin oikean reunan puolelta seinä
     picker.move(0, 30);
-    colRight = map.findWall(picker.x, picker.y, picker.angle, this.config.wakeupDist);
-    this.debugRayCast(colRight, picker);
+    pickWall = map.findWall(picker.x, picker.y, picker.angle, wakeupDist);
+    this.debugRayCast(pickWall, picker);
+    if (pickWall) {
+      minDist = Math.min(minDist, distance(picker.x, picker.y, pickWall.x, pickWall.y));
+    }
+
+    // Jos tarpeeksi lähellä on seinä niin reagoidaan siihen nyt
+    if (minDist) {
+      // Käännetään poimintaobjekti samaan kulmaan kuin botti
+      picker.angle = this.player.angle;
+
+      // Käännetään katsetta toiselle sivulle ja lasketaan etäisyys lähimpään esteeseen
+      picker.turn(-this.config.exploreAngle);
+      pickWall = map.findWall(picker.x, picker.y, picker.angle, superLargeDist);
+      this.debugRayCast(pickWall, picker);
+      dist1 = distance(picker.x, picker.y, pickWall.x, pickWall.y);
+
+      // Ja sitten vielä toiseen suuntaan.
+      picker.turn(this.config.exploreAngle * 2);
+      pickWall = map.findWall(picker.x, picker.y, picker.angle, superLargeDist);
+      this.debugRayCast(pickWall, picker);
+      dist2 = distance(picker.x, picker.y, pickWall.x, pickWall.y);
+
+      // Tutkitaan kumpaan suuntaan on pidempi matka seuraavaan esteeseen ja suunnataan sinne.
+      // Kääntymisen jyrkkyyteen vaikuttaa vielä etäisyys esteeseen eli mitä lähempänä ollaan niin
+      // sitä jyrkemmin käännytään
+      if (dist1 > dist2) {
+        dodge = -(wakeupDist - minDist);
+      } else {
+        dodge = wakeupDist - minDist;
+      }
+
+      // Asetetaan kääntymisnopeus
+      this.rotation = dodge / this.config.dodgeRotation;
+      // Asetetaan tavoitekulma
+      this.nextAngle = wrapAngle(this.player.angle + dodge);
+      // Asetetaan vielä tooClose-muuttuja päälle eli tekoälyä ei päivitetä ennen kuin objekti on
+      // kääntynyt tavoitekulmaan. Samalla myös objektin nopeutta vähennetään.
+      this.tooClose = true;
+
+      this.lastAngle = this.player.angle - this.nextAngle;
+      if (this.lastAngle > 180) { this.lastAngle -= 360; }
+      if (this.lastAngle < -180) { this.lastAngle += 360; }
+    }
+  } else {
+    // Botti on liian lähellä jotain estettä.
+    // tooClose-muuttuja nollataan vain jos tekoälyn asettama tavoitekulma on saavutettu.
+    objectiveAngle = this.player.angle - this.nextAngle;
+    if (objectiveAngle > 180) { objectiveAngle -= 360; }
+    if (objectiveAngle < -180) { objectiveAngle += 360; }
+    if ((objectiveAngle < 0 && this.lastAngle >= 0) || (objectiveAngle > 0 && this.lastAngle <= 0)) {
+      // Objektin kulma on nyt riittävän lähellä tavoitekulmaa joten kääntäminen voidaan lopettaa.
+      this.rotation = 0;
+      this.tooClose = false;
+    }
+    this.lastAngle = objectiveAngle;
   }
+
+  // Siirretään bottia
+  speed = this.config.maxSpeed;
+  // Jos ollaan liian lähellä jotain estettä niin pienemmällä vauhdilla
+  if (this.tooClose) { speed = this.config.minSpeed; }
+
+  forwardSpeed = moveDirection * 100 / weaponWeight;
+  forwardSpeed *= this.server.game.movePerSec(speed);
+  sidestepSpeed = this.sideStep * 100.0 / weaponWeight;
+  sidestepSpeed *= this.server.game.movePerSec(PLR.SIDESTEP_SPEED * 0.8);
+  this.player.move(forwardSpeed, sidestepSpeed);
 };
 
 /**
