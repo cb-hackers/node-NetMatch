@@ -30,9 +30,11 @@ function Obj(x, y, angle) {
  * @param {Number} [sidePx]  Kuinka monta pikseliä objektia siirretään leveyssuunnassa
  */
 Obj.prototype.move = function (px, sidePx) {
-  this.x += Math.cos((this.angle / 180) * Math.PI) * px;
-  this.y += Math.sin((this.angle / 180) * Math.PI) * px;
-  if ('number' === typeof sidePx) {
+  if (px !== 0) {
+    this.x += Math.cos((this.angle / 180) * Math.PI) * px;
+    this.y += Math.sin((this.angle / 180) * Math.PI) * px;
+  }
+  if ('number' === typeof sidePx && sidePx !== 0) {
     this.x += Math.cos((this.angle - 90) / 180 * Math.PI) * sidePx;
     this.y += Math.sin((this.angle - 90) / 180 * Math.PI) * sidePx;
   }

@@ -15,8 +15,7 @@
     "launcherItems": 5,
     "chainsawItems": 5
   },
-  "tileWidth": 48,
-  "tileHeight": 48,
+  "tileSize": 48,
   "width": 78,
   "height": 51,
   "data": [

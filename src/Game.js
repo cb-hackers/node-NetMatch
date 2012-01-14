@@ -4,7 +4,9 @@
 
 /**#nocode+*/
 var log = require('./Utils').log
-  , colors = require('colors');
+  , colors = require('colors')
+  , NET = require('./Constants').NET
+  , DRAW = require('./Constants').DRAW;
 /**#nocode-*/
 
 /**
@@ -17,8 +19,16 @@ function Game(server) {
   this.server = server;
   this.lastUpdate = 0;
   this.frameTime = 0;
-  this.interval = setInterval(this.update, 1000 / server.gameState.updatesPerSecond, this);
 }
+
+/**
+ * Käynnistää palvelimen
+ *
+ * @param {Number} updatesPerSecond  Kuinka monta kertaa sekunnissa palvelinta päivitetään
+ */
+Game.prototype.start = function (updatesPerSecond) {
+  this.interval = setInterval(this.update, 1000 / updatesPerSecond, this);
+};
 
 /**
  * Pysäyttää pelimekaniikan päivityksen.
@@ -63,13 +73,27 @@ Game.prototype.updateFrameTimer = function () {
  * @private
  */
 Game.prototype.updateBotsAI = function () {
+  var self = this;
   // Tarkistetaan onko pelaajia pelissä. Jos ei, niin ei päivitetä botteja.
   if (this.server.gameState.playerCount <= 0) {
     return;
   }
 
+  // Pyyhitään jokaiselta pelaajalta debuggaukset, jos debugataan.
+  if (this.server.debug) {
+    this.server.loopPlayers (function (player) {
+      if (!player.zombie && player.active && player.loggedIn && !player.debugState) {
+        self.server.messages.add(player.id, {
+          msgType: NET.DEBUGDRAWING,
+          drawType: DRAW.CLEAR
+        });
+        player.debugState = 1;
+      }
+    });
+  }
+
   this.server.loopPlayers (function (player) {
-    if (player.zombie) {
+    if (player.active && !player.isDead && (player.zombie || self.server.debug)) {
       player.botAI.update();
     }
   });

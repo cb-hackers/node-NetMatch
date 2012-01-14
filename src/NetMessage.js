@@ -244,8 +244,10 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
         // Debug-piirtelytavaraa tulossa
         data.putByte(d.msgType);
         data.putByte(d.drawType);
-        for (var i=0; i < d.drawVars.length; i++) {
-          data.putInt(d.drawVars[i]);
+        if (d.drawVars) {
+          for (var i=0; i < d.drawVars.length; i++) {
+            data.putInt(d.drawVars[i]);
+          }
         }
         break;
 

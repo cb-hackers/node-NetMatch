@@ -69,10 +69,19 @@ var Utils = {
    * @param {Number} x2  Toisen pisteen x-koordinaatti
    * @param {Number} y2  Toisen pisteen y-koordinaatti
    * @returns {Number}   Pisteiden välinen kulma asteina välillä 0...360º
-  */
+   */
   getAngle: function (x1, y1, x2, y2) {
     var radAngle = Math.atan2(y1 - y2, x1 - x2) + Math.PI; // Kulma radiaaneina välillä 0...2pi
     return (radAngle / Math.PI) * 180;
+  },
+
+  /**
+   * Poistaa numeron perästä desimaalit riippumatta numeron etumerkistä.
+   * @param {Number} num  Numero, jonka perästä desimaalit poistetaan
+   */
+  truncateNumber: function (num) {
+    if (num<0) return Math.ceil(num);
+    else return Math.floor(num);
   },
 
   /**

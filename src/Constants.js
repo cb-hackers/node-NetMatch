@@ -160,7 +160,10 @@ var DRAW = {
   CIRCLE: 2,
 
   /** Laatikko */
-  BOX: 3
+  BOX: 3,
+
+  /** Clientille käsky tyhjentää piirrokset muistista */
+  CLEAR: 127
 };
 
 exports.NET = NET;

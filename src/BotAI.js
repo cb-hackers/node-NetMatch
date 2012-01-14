@@ -9,6 +9,7 @@ var log      = require('./Utils').log
   , distance = require('./Utils').distance
   , getAngle = require('./Utils').getAngle
   , colors   = require('colors')
+  , Obj      = require('./Object')
   , NET      = require('./Constants').NET
   , DRAW     = require('./Constants').DRAW;
 /**#nocode-*/
@@ -91,7 +92,10 @@ BotAI.prototype.initConfig = function () {
  * Yksittäisen botin tekoälyn päivitys.
  */
 BotAI.prototype.update = function () {
-  var minDist, dist, self = this;
+  var minDist, dist, self = this
+    , map = this.server.gameState.map
+    , pickerObject
+    , colFront, colLeft, colRight;
   // Mikäli botti ei ole liian lähellä seinää ja on aika arpoa sille uusi suunta
   // niin tehdään se nyt.
   if (!this.tooClose && this.nextAction < Date.now()) {
@@ -111,40 +115,10 @@ BotAI.prototype.update = function () {
     */
   }
 
-  // Piirrellään debugtavaraa klienteille
-  var debugDraw = [];
-  debugDraw.push({
-    msgType: NET.DEBUGDRAWING,
-    drawType: DRAW.CIRCLE,
-    drawVars: [
-      Math.round(this.player.x),
-      Math.round(this.player.y),
-      this.config.wakeupDist,
-      0
-    ]
-  });
-  debugDraw.push({
-    msgType: NET.DEBUGDRAWING,
-    drawType: DRAW.LINE,
-    drawVars: [
-      Math.round(this.player.x),
-      Math.round(this.player.y),
-      Math.round(this.player.x  + Math.cos(this.player.angle / 180 * Math.PI) * this.config.wakeupDist),
-      Math.round(this.player.y  + Math.sin(this.player.angle / 180 * Math.PI) * this.config.wakeupDist)
-    ]
-  });
-
-  this.server.loopPlayers( function(player) {
-    if (self.lastDebugged <= player.lastActivity) {
-      self.server.messages.add(player.id, debugDraw[0]);
-      self.server.messages.add(player.id, debugDraw[1]);
-    }
-  });
-
-  this.lastDebugged = Date.now();
-
   // Käännetään bottia
-  this.player.turn(this.server.game.movePerSec(this.rotation));
+  if (this.player.zombie) {
+    this.player.turn(this.server.game.movePerSec(this.rotation));
+  }
 
   // Seuraavaksi alkaa varsinainen tekäly jossa tutkitaan ympäristöä.
   // Tämä tehdään kuitenkin vain mikäli botti ei ole liian lähellä jotakin estettä.
@@ -152,9 +126,70 @@ BotAI.prototype.update = function () {
     // Lasketaan etäisyys edessä olevaan esteeseen.
     // Etäisyys lasketaan objektin keskeltä sekä reunoista eli objektin koko leveydeltä.
 
+    // Luodaan väliaikainen poimintaobjekti
+    picker = new Obj(this.player.x, this.player.y, this.player.angle);
 
+    // Poimitaan lähin este suoraan nenän edestä
+    colFront = map.findWall(picker.x, picker.y, picker.angle, this.config.wakeupDist);
+    this.debugRayCast(colFront, picker);
+
+    // Poimitaan botin vasemman reunan puolelta lähin seinä
+    picker.move(0, -15);
+    colLeft = map.findWall(picker.x, picker.y, picker.angle, this.config.wakeupDist);
+    this.debugRayCast(colLeft, picker);
+
+    // Poimitaan botin oikean reunan puolelta lähin seinä
+    picker.move(0, 30);
+    colRight = map.findWall(picker.x, picker.y, picker.angle, this.config.wakeupDist);
+    this.debugRayCast(colRight, picker);
   }
 };
 
+/**
+ * Debuggaa raycastia
+ */
+BotAI.prototype.debugRayCast = function (collision, picker) {
+  if (!this.server.debug) {
+    return;
+  }
+  var self = this
+    , startX, startY, endX, endY, colX, colY;
+
+  startX = Math.round(picker.x);
+  startY = Math.round(picker.y);
+  endX = Math.round(picker.x + Math.cos(picker.angle / 180 * Math.PI) * this.config.wakeupDist);
+  endY = Math.round(picker.y + Math.sin(picker.angle / 180 * Math.PI) * this.config.wakeupDist);
+  if (collision) {
+    colX = Math.round(collision.x);
+    colY = Math.round(collision.y);
+  }
+
+  this.server.loopPlayers(function (player) {
+    if (player.debugState) {
+      player.debugState += 1;
+      self.server.messages.add(player.id, {
+        msgType: NET.DEBUGDRAWING,
+        drawType: DRAW.LINE,
+        drawVars: [
+          startX,
+          startY,
+          endX,
+          endY
+        ]
+      });
+      if (!collision) { return; }
+      self.server.messages.add(player.id, {
+        msgType: NET.DEBUGDRAWING,
+        drawType: DRAW.CIRCLE,
+        drawVars: [
+          colX,
+          colY,
+          5,
+          0
+        ]
+      });
+    }
+  });
+}
 
 module.exports = BotAI;

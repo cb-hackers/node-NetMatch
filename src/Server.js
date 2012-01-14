@@ -170,7 +170,7 @@ Server.prototype.initialize = function (port, address, config) {
   this.maps[this.gameState.map.name] = this.gameState.map;
 
   // Alustetaan pelaajat
-  for (var i = 1; i <= this.config.maxPlayers; ++i) {
+  for (var i = 1; i <= this.gameState.maxPlayers; ++i) {
     this.players[i] = new Player(this, i);
   }
 
@@ -184,6 +184,9 @@ Server.prototype.initialize = function (port, address, config) {
       else   { log.info('Server registered successfully.'); }
     });
   }
+
+  // Käynnistetään pelimekaniikka, joka päivittyy 60 kertaa sekunnissa
+  this.game.start(60);
 };
 
 /**
@@ -391,6 +394,7 @@ Server.prototype.sendReply = function (client, player) {
 
   // UNIMPLEMENTED
   // Pelisession aikatiedot
+  player.debugState = 0;
 
   reply.putByte(NET.END);
   client.reply(reply);
@@ -496,6 +500,10 @@ Server.prototype.login = function (client) {
         // UNIMPLEMENTED
         // Tasainen jako joukkueihin TDM-pelimoodissa
         player.team = Math.floor(Math.random() * 2 + 1) + 1; // Rand(1,2)
+      }
+      if (this.debug) {
+        // Jos ollaan debug-tilassa niin luodaan myös pelaajalle botin tekoäly
+        player.botAI = new BotAI(this, player);
       }
       this.gameState.playerCount++;
 

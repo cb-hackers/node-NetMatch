@@ -69,6 +69,10 @@ function Player(server, playerId) {
   this.id = playerId;
   this.team = 1;
   this.botName = server.gameState.map.config.botNames[playerId-1];
+  if ('undefined' === typeof this.botName) {
+    // Bottien nimiä ei ollut kaikkia määritelty kartan tiedoissa
+    this.botName = "Bot_" + playerId;
+  }
   this.clientId = "";
   this.name = "";
   var skill = 21 - playerId; // Botteja hieman eritasoisiksi vissiinkin?
