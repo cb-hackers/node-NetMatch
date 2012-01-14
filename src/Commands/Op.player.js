@@ -1,5 +1,5 @@
 /**
- * @fileOverview Toteutus komennolle Op: {@link Commands.Op}
+ * @fileOverview Toteutus komennolle op: {@link Commands.op}
  */
 
 var log = require('../Utils').log;
@@ -10,7 +10,7 @@ var log = require('../Utils').log;
  *
  * @param {player} who  Kenet opataan
  */
-var Op = {
+var op = {
   /**#nocode+*/
   params: [
     {name: 'who',  type: 'player', optional: false, help: 'Player who to op'}
@@ -45,4 +45,4 @@ var Op = {
   /**#nocode-*/
 };
 
-module.exports = Op;
+module.exports = op;

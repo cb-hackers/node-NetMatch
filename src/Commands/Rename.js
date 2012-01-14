@@ -1,5 +1,5 @@
 /**
- * @fileOverview Toteutus komennolle Rename: {@link Commands.Rename}
+ * @fileOverview Toteutus komennolle rename: {@link Commands.rename}
  */
 
 var log = require('../Utils').log;
@@ -11,7 +11,7 @@ var log = require('../Utils').log;
  * @param {Player} who   Pelaaja, joka uudelleennimetään. Nimi tai ID kelpaa
  * @param {String} name  Uusi nimi
  */
-var Rename = {
+var rename = {
   /**#nocode+*/
   params: [
     {name: 'who',  type: 'player', optional: false, help: 'Player who needs to be renamed'},
@@ -55,4 +55,4 @@ var Rename = {
   /**#nocode-*/
 };
 
-module.exports = Rename;
+module.exports = rename;

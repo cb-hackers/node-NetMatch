@@ -1,5 +1,5 @@
 /**
- * @fileOverview Toteutus komennolle AsPlayer: {@link Commands.AsPlayer}
+ * @fileOverview Toteutus komennolle asplayer: {@link Commands.asplayer}
  */
 
 var log = require('../Utils').log;
@@ -12,7 +12,7 @@ var log = require('../Utils').log;
  * @param {command} cmd  Mitä komentoa kutsutaan
  * @param {string} args  komennon parametrit
  */
-var AsPlayer = {
+var asplayer = {
   /**#nocode+*/
   params: [
     {name: 'as',   type: 'player',  optional: false, help: 'Player who to call as'},
@@ -32,4 +32,4 @@ var AsPlayer = {
   /**#nocode-*/
 };
 
-module.exports = AsPlayer;
+module.exports = asplayer;
