@@ -36,6 +36,8 @@
 		<nav>
 			<ul class="classList" id="ClassList">
 				
+					<li><a href="../symbols/BotAI.html">BotAI</a></li>
+				
 					<li><a href="../symbols/Bullet.html">Bullet</a></li>
 				
 					<li><a href="../symbols/Command.html">Command</a></li>
@@ -45,6 +47,8 @@
 					<li><a href="../symbols/Config.html">Config</a></li>
 				
 					<li><a href="../symbols/Config.defaults.html">Config<span class='break'> </span>.<span class='break'> </span>defaults</a></li>
+				
+					<li><a href="../symbols/DRAW.html">DRAW</a></li>
 				
 					<li><a href="../symbols/Game.html">Game</a></li>
 				
@@ -64,11 +68,15 @@
 				
 					<li><a href="../symbols/Player.html">Player</a></li>
 				
+					<li><a href="../symbols/PLR.html">PLR</a></li>
+				
+					<li><a href="../symbols/Registration.html">Registration</a></li>
+				
 					<li><a href="../symbols/Server.html">Server</a></li>
 				
 					<li><a href="../symbols/Utils.html">Utils</a></li>
 				
-					<li><a href="../symbols/Weapons.html">Weapons</a></li>
+					<li><a href="../symbols/Weapons.WPN.html">Weapons<span class='break'> </span>.<span class='break'> </span>WPN</a></li>
 				
 					<li><a href="../symbols/WPN.html">WPN</a></li>
 				
@@ -81,7 +89,7 @@
 			Documentation generator: <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0<br />
 			Template: <a href="http://www.thebrightlines.com/2010/05/06/new-template-for-jsdoctoolkit-codeview/" target="_blank">Codeview</a> 1.2<br />
 			Generated on:
-			<time datetime='2012-0-2' pubdate>2012-0-2 22:02</time>
+			<time datetime='2012-0-15' pubdate>2012-0-15 1:12</time>
 		</footer>
 	</div>
 </div>
@@ -148,72 +156,12 @@ Komennot muodostuvat seuraavasti:
 											</tr>
 										
 											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													Commands.<b><a href="../symbols/Commands.html#.close">close</a></b>
-													</div>
-													<div class="description">Sulkee palvelimen.</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													Commands.<b><a href="../symbols/Commands.html#.commands">commands</a></b>
-													</div>
-													<div class="description">Listaa kaikki komennot.</div>
-												</td>
-											</tr>
-										
-											<tr>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
 													<b><a href="../symbols/Commands.html#help">help</a></b>
 													</div>
 													<div class="description">Mihin komentoa käytetään</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													Commands.<b><a href="../symbols/Commands.html#.help">help</a></b>
-													</div>
-													<div class="description">Help-komento tulostaa tietoja halutusta komennosta.</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													Commands.<b><a href="../symbols/Commands.html#.kick">kick</a></b>
-													</div>
-													<div class="description">Heittää pelaajan pellolle</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													Commands.<b><a href="../symbols/Commands.html#.list">list</a></b>
-													</div>
-													<div class="description">Listaa paikalla olevat pelaajat.</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													Commands.<b><a href="../symbols/Commands.html#.login">login</a></b>
-													</div>
-													<div class="description">Kirjaa pelaajan sisään adminiksi.</div>
 												</td>
 											</tr>
 										
@@ -238,12 +186,12 @@ Komennot muodostuvat seuraavasti:
 											</tr>
 										
 											<tr>
-												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													Commands.<b><a href="../symbols/Commands.html#.say">say</a></b>
+													<b><a href="../symbols/Commands.html#sub">sub</a></b>
 													</div>
-													<div class="description">Lähettää NET.SERVERMSG paketin klienteille.</div>
+													<div class="description">Lista alikomentojen nimistä, jos niitä on.</div>
 												</td>
 											</tr>
 										
@@ -259,6 +207,155 @@ Komennot muodostuvat seuraavasti:
 	<!--
 	#### METHODS SUMMARY
 	-->
+			
+				<section>
+					
+					
+					<div class="props">
+						<h2 class="sectionTitle">Method Summary</h2>
+						
+						
+							<nav>
+								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Commands.">
+									<thead>
+										<tr>
+											<th scope="col">Method Attributes</th>
+											<th scope="col">Method Name and Description</th>
+										</tr>
+									</thead>
+									
+									<tbody>
+										
+										
+											<tr
+												 class='item0'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.AsPlayer">AsPlayer</a></b>(as, cmd, args)
+													</div>
+													<div class="description">Suorittaa komennon toisena pelaajana.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item1'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.close">close</a></b>()
+													</div>
+													<div class="description">Sulkee palvelimen.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item2'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.commands">commands</a></b>(verbose)
+													</div>
+													<div class="description">Listaa kaikki komennot.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item3'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.help">help</a></b>(command)
+													</div>
+													<div class="description">Help-komento tulostaa tietoja halutusta komennosta.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item4'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.kick">kick</a></b>(who, reason)
+													</div>
+													<div class="description">Heittää pelaajan pellolle</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item5'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.list">list</a></b>()
+													</div>
+													<div class="description">Listaa paikalla olevat pelaajat.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item6'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.login">login</a></b>(who, pass)
+													</div>
+													<div class="description">Kirjaa pelaajan sisään adminiksi.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item7'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.Op">Op</a></b>(who)
+													</div>
+													<div class="description">Tekee pelaajasta adminin.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item8'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.Rename">Rename</a></b>(who, name)
+													</div>
+													<div class="description">Uudelleennimeää pelaajan.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item9'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.say">say</a></b>(message)
+													</div>
+													<div class="description">Lähettää NET.SERVERMSG paketin klienteille.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item10'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Commands.<b><a href="../symbols/Commands.html#.Uptime">Uptime</a></b>()
+													</div>
+													<div class="description">Kertoo kauanko palvelin on ollut päällä.</div>
+												</td>
+											</tr>
+										
+									</tbody>
+								</table>
+							</nav>
+						
+					
+						
+					</div>
+				</section>
 			
 			
 	<!--
@@ -303,50 +400,6 @@ Komennot muodostuvat seuraavasti:
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".close">
-									<span class='lighter'>
-									&lt;static&gt; 
-									</span>
-									
-									
-									
-									<span class="light">Commands.</span><b>close</b>							
-								</div>
-								
-								<div class="description">
-									Sulkee palvelimen.
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id=".commands">
-									<span class='lighter'>
-									&lt;static&gt; 
-									</span>
-									
-									
-									
-									<span class="light">Commands.</span><b>commands</b>							
-								</div>
-								
-								<div class="description">
-									Listaa kaikki komennot.
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
 								<div class="fixedFont heading" id="help">
 									<span class='lighter'>
 									
@@ -369,94 +422,6 @@ Komennot muodostuvat seuraavasti:
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".help">
-									<span class='lighter'>
-									&lt;static&gt; 
-									</span>
-									
-									
-									
-									<span class="light">Commands.</span><b>help</b>							
-								</div>
-								
-								<div class="description">
-									Help-komento tulostaa tietoja halutusta komennosta.
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id=".kick">
-									<span class='lighter'>
-									&lt;static&gt; 
-									</span>
-									
-									
-									
-									<span class="light">Commands.</span><b>kick</b>							
-								</div>
-								
-								<div class="description">
-									Heittää pelaajan pellolle
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id=".list">
-									<span class='lighter'>
-									&lt;static&gt; 
-									</span>
-									
-									
-									
-									<span class="light">Commands.</span><b>list</b>							
-								</div>
-								
-								<div class="description">
-									Listaa paikalla olevat pelaajat.
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id=".login">
-									<span class='lighter'>
-									&lt;static&gt; 
-									</span>
-									
-									
-									
-									<span class="light">Commands.</span><b>login</b>							
-								</div>
-								
-								<div class="description">
-									Kirjaa pelaajan sisään adminiksi.
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
 								<div class="fixedFont heading" id="params">
 									<span class='lighter'>
 									
@@ -469,10 +434,10 @@ Komennot muodostuvat seuraavasti:
 								
 								<div class="description">
 									Parametrit listassa. Jokaisella parametrilla on seuraavat kentät:<br>
-                               - name: Parametrin nimi<br>
-                               - type: Parametrin tyyppi (esim. string)<br>
-                               - optional: Voiko parametrin jättää antamatta<br>
-                               - help: Parametrin ohje, mitä tämä parametri tekee
+                               - {String} name: Parametrin nimi<br>
+                               - {String} type: Parametrin tyyppi (esim. string tai player) käytetään täydennyksessä<br>
+                               - {Boolean} optional: Voiko parametrin jättää antamatta<br>
+                               - {String} help: Parametrin ohje, mitä tämä parametri tekee
 									
 									
 									
@@ -505,18 +470,20 @@ Komennot muodostuvat seuraavasti:
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".say">
+								<div class="fixedFont heading" id="sub">
 									<span class='lighter'>
-									&lt;static&gt; 
+									
 									</span>
 									
+									<span class="light">{Array}</span>
 									
-									
-									<span class="light">Commands.</span><b>say</b>							
+									<b>sub</b>							
 								</div>
 								
 								<div class="description">
-									Lähettää NET.SERVERMSG paketin klienteille.
+									Lista alikomentojen nimistä, jos niitä on.
+                             Esim config get/set/save -> sub: ['get', 'set', 'save']
+                             Tätä käytetään täydennyksessä.
 									
 									
 									
@@ -534,6 +501,470 @@ Komennot muodostuvat seuraavasti:
 	<!--
 	#### METHOD DETAILS
 	-->		
+			
+				<section>
+					<div class="details props">
+						<div class="innerProps">
+							<h2 class="sectionTitle">
+								Method Detail
+							</h2>
+							
+							<ul class="methodDetail" id="MethodDetail">
+								
+								
+									<li 
+										 class='item0'
+									>
+										<div class="fixedFont heading" id=".AsPlayer">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>AsPlayer</b>(as, cmd, args)
+										</div>
+										
+										<div class="description">
+											Suorittaa komennon toisena pelaajana. >:)
+											
+											
+												<br />
+												<i>Defined in: </i> <a href="../symbols/src/src_nm_Commands_AsPlayer.useless.js.html">AsPlayer.useless.js</a>.
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{player}</span> <b>as</b>
+														
+													</dt>
+													<dd>Kenenä komentoa kutsutaan</dd>
+												
+													<dt>
+														<span class="light fixedFont">{command}</span> <b>cmd</b>
+														
+													</dt>
+													<dd>Mitä komentoa kutsutaan</dd>
+												
+													<dt>
+														<span class="light fixedFont">{string}</span> <b>args</b>
+														
+													</dt>
+													<dd>komennon parametrit</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item1'
+									>
+										<div class="fixedFont heading" id=".close">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>close</b>()
+										</div>
+										
+										<div class="description">
+											Sulkee palvelimen.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item2'
+									>
+										<div class="fixedFont heading" id=".commands">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>commands</b>(verbose)
+										</div>
+										
+										<div class="description">
+											Listaa kaikki komennot.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Boolean}</span> <b>verbose</b>
+														<i>Optional</i>
+													</dt>
+													<dd>Tulostetaanko samalla helpit.</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item3'
+									>
+										<div class="fixedFont heading" id=".help">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>help</b>(command)
+										</div>
+										
+										<div class="description">
+											Help-komento tulostaa tietoja halutusta komennosta.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>command</b>
+														<i>Optional</i>
+													</dt>
+													<dd>Minkä komennot salat paljastetaan</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item4'
+									>
+										<div class="fixedFont heading" id=".kick">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>kick</b>(who, reason)
+										</div>
+										
+										<div class="description">
+											Heittää pelaajan pellolle
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{<a href="../symbols/Player.html">Player</a>}</span> <b>who</b>
+														
+													</dt>
+													<dd>Pelaaja, joka potkaistaan. Nimi tai ID kelpaa</dd>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>reason</b>
+														
+													</dt>
+													<dd>Selitys tälle hirmuteolle</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item5'
+									>
+										<div class="fixedFont heading" id=".list">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>list</b>()
+										</div>
+										
+										<div class="description">
+											Listaa paikalla olevat pelaajat.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item6'
+									>
+										<div class="fixedFont heading" id=".login">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>login</b>(who, pass)
+										</div>
+										
+										<div class="description">
+											Kirjaa pelaajan sisään adminiksi.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{<a href="../symbols/Player.html">Player</a>}</span> <b>who</b>
+														
+													</dt>
+													<dd>Pelaaja, joka kirjautuu</dd>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>pass</b>
+														
+													</dt>
+													<dd>Salasana</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item7'
+									>
+										<div class="fixedFont heading" id=".Op">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>Op</b>(who)
+										</div>
+										
+										<div class="description">
+											Tekee pelaajasta adminin.
+											
+											
+												<br />
+												<i>Defined in: </i> <a href="../symbols/src/src_nm_Commands_Op.player.js.html">Op.player.js</a>.
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{player}</span> <b>who</b>
+														
+													</dt>
+													<dd>Kenet opataan</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item8'
+									>
+										<div class="fixedFont heading" id=".Rename">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>Rename</b>(who, name)
+										</div>
+										
+										<div class="description">
+											Uudelleennimeää pelaajan.
+											
+											
+												<br />
+												<i>Defined in: </i> <a href="../symbols/src/src_nm_Commands_Rename.js.html">Rename.js</a>.
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{<a href="../symbols/Player.html">Player</a>}</span> <b>who</b>
+														
+													</dt>
+													<dd>Pelaaja, joka uudelleennimetään. Nimi tai ID kelpaa</dd>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>name</b>
+														
+													</dt>
+													<dd>Uusi nimi</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item9'
+									>
+										<div class="fixedFont heading" id=".say">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>say</b>(message)
+										</div>
+										
+										<div class="description">
+											Lähettää NET.SERVERMSG paketin klienteille.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>message</b>
+														<i>Optional</i>
+													</dt>
+													<dd>Viesti, joka lähetetään</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item10'
+									>
+										<div class="fixedFont heading" id=".Uptime">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											
+											
+											<span class="light">Commands.</span><b>Uptime</b>()
+										</div>
+										
+										<div class="description">
+											Kertoo kauanko palvelin on ollut päällä.
+											
+											
+												<br />
+												<i>Defined in: </i> <a href="../symbols/src/src_nm_Commands_Uptime.js.html">Uptime.js</a>.
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										
+									</li>
+								
+							</ul>
+						</div>
+					</div>
+				</section>
 			
 			
 	<!--

@@ -3,9 +3,9 @@
  */
 
 /**#nocode+*/
-var log = require('./Utils').log
-  , NET = require('./Constants').NET
-  , fs = require('fs');
+var log  = require('./Utils').log
+  , join = require('./Utils').join
+  , NET = require('./Constants').NET;
 /**#nocode-*/
 
 /**
@@ -14,13 +14,16 @@ var log = require('./Utils').log
  *
  * Komennot muodostuvat seuraavasti:
  * @property {Object[]} params  Parametrit listassa. Jokaisella parametrilla on seuraavat kentät:<br>
- *                                - name: Parametrin nimi<br>
- *                                - type: Parametrin tyyppi (esim. string)<br>
- *                                - optional: Voiko parametrin jättää antamatta<br>
- *                                - help: Parametrin ohje, mitä tämä parametri tekee
+ *                                - {String} name: Parametrin nimi<br>
+ *                                - {String} type: Parametrin tyyppi (esim. string tai player) käytetään täydennyksessä<br>
+ *                                - {Boolean} optional: Voiko parametrin jättää antamatta<br>
+ *                                - {String} help: Parametrin ohje, mitä tämä parametri tekee
  * @property {String}   help    Mihin komentoa käytetään
  * @property {Boolean}  remote  Voiko komentoa kutsua klientillä
  * @property {Function} action  Komennon logiikka
+ * @property {Array}    [sub]   Lista alikomentojen nimistä, jos niitä on.
+ *                              Esim config get/set/save -> sub: ['get', 'set', 'save']
+ *                              Tätä käytetään täydennyksessä.
  */
 var Commands = {};
 
@@ -28,6 +31,7 @@ var Commands = {};
 
 /**
  * Help-komento tulostaa tietoja halutusta komennosta.
+ * @methodOf Commands
  * @param {String} [command]  Minkä komennot salat paljastetaan
  */
 Commands.help = {
@@ -37,22 +41,21 @@ Commands.help = {
   help: 'Shows help about this server\'s commands. See ´commands´ for list of available commands.',
   remote: true,
   action: function commandsHelp() {
-    var server = this;
-    if (!arguments[1]) {
-      arguments[1] = 'help';
-    }
+    var server = this,
+      command = arguments[1] || 'help';
     if (arguments[0]) {
-      this.commands.getHelpString(arguments[1]).split('\n').forEach(function (m) {
-      server.serverMessage(m, arguments[0].playerId);
-    });
+      this.commands.getHelpString(command).split('\n').forEach(function (m) {
+        server.serverMessage(m, arguments[0]);
+      });
     } else {
-      console.log(this.commands.getHelpString(arguments[1]));
+      console.log(this.commands.getHelpString(command, true));
     }
   }
 };
 
 /**
  * Listaa kaikki komennot.
+ * @methodOf Commands
  * @param {Boolean} [verbose]  Tulostetaanko samalla helpit.
  */
 Commands.commands = {
@@ -65,14 +68,14 @@ Commands.commands = {
     var server = this;
     if (!arguments[1]) {
       if (arguments[0]) {
-        this.serverMessage('Commands: ' + Object.keys(Commands).join(', '), arguments[0].playerId);
+        this.serverMessage('Commands: ' + Object.keys(Commands).join(', '), arguments[0]);
       } else {
         console.log('Commands: '.green + Object.keys(Commands).join(', '));
       }
     } else { // Verbose
       Object.keys(Commands).map(function (i) {
         console.log(i.toUpperCase().green);
-        console.log(server.commands.getHelpString(i));
+        console.log(server.commands.getHelpString(i, true));
       });
     }
   }
@@ -80,6 +83,7 @@ Commands.commands = {
 
 /**
  * Lähettää NET.SERVERMSG paketin klienteille.
+ * @methodOf Commands
  * @param {String} [message]  Viesti, joka lähetetään
  */
 Commands.say = {
@@ -94,7 +98,10 @@ Commands.say = {
   }
 };
 
-/** Sulkee palvelimen. */
+/**
+ * Sulkee palvelimen.
+ * @methodOf Commands
+ */
 Commands.close = {
   params: [],
   help: 'Closes the server.',
@@ -104,7 +111,10 @@ Commands.close = {
   }
 };
 
-/** Listaa paikalla olevat pelaajat. */
+/**
+ * Listaa paikalla olevat pelaajat.
+ * @methodOf Commands
+ */
 Commands.list = {
   params: [],
   help: 'Lists all connected players.',
@@ -121,6 +131,7 @@ Commands.list = {
 
 /**
  * Heittää pelaajan pellolle
+ * @methodOf Commands
  * @param {Player} who     Pelaaja, joka potkaistaan. Nimi tai ID kelpaa
  * @param {String} reason  Selitys tälle hirmuteolle
  */
@@ -142,18 +153,20 @@ Commands.kick = {
     }
 
     player = this.getPlayer(plrName);
-    if (!player) {
-      log.notice('Sorry, player couldn\'t be found.');
+    if (!player || !player.active || player.zombie) {
+      log.notice('Sorry, player couldn\'t be found or you tried to kick a bot.');
     } else {
       // Vaihdetaan toinen parametri nollaksi, jos kutsut tulee palvelimelta, kun klientti on pätsätty, muuten MAV.
-      this.kickPlayer(player.playerId, argument[0] && arguments[0].playerId || player.playerId, reason);
+      this.kickPlayer(player, // Kicker id joko komennon kutsujan ID tai serveri.
+        arguments[0], reason);
     }
 
   }
-}
+};
 
 /**
  * Kirjaa pelaajan sisään adminiksi.
+ * @methodOf Commands
  * @param {Player} who    Pelaaja, joka kirjautuu
  * @param {String} pass   Salasana
  */
@@ -171,12 +184,12 @@ Commands.login = {
       return;
     }
     if (player.admin) {
-      this.serverMessage('You are already an admin!', player.playerId);
+      this.serverMessage('You are already an admin!', player);
       return;
     }
     if (pass === this.config.password) {
       player.admin = true;
-      this.serverMessage('You are now an admin!', player.playerId)
+      this.serverMessage('You are now an admin!', player);
     } else {
       log.warn('Incorrect password!');
     }
@@ -185,19 +198,34 @@ Commands.login = {
 
 /**#nocode+*/
 // Ladataan lisää komentoja Commands-kansiosta, jos semmoisia löytyy.
-files = fs.readdirSync(__dirname + '/Commands');
-log.info('Found and loaded %0 command-modules: %1', String(files.length).magenta,
-  files.map(function loadCommands(fn) {
-    var cmd = fn.toLowerCase().split('.')[0];
-    Commands[cmd] = require(__dirname + '/Commands/' + fn);
-    return cmd;
-  }).join(', ').green
-);
+(function () { // Ei vuodeta muuttujia
+  var fs = require('fs')
+  , path = require('path')
+  , files = fs.readdirSync(__dirname + '/Commands')
+  , cmds = files
+    // Filtteröi ei-js-filut.
+    .filter(function (fn) { return path.extname(fn) === '.js'; })
+    // Kartoita loput
+    .map(function loadCommands(fn) {
+      // Komennon nimi on filun ensimmäinen osa esim. asd.lol.js -> asd
+      var cmd = fn.toLowerCase().split('.')[0];
+      try {
+        Commands[cmd] = require(__dirname + '/Commands/' + fn);
+        return cmd.green;
+      } catch (e) {
+        log.error('Failed to load module "%0". See --debug (-d) for stack trace.', cmd.red);
+        log.debug(e.stack);
+        return cmd.red;
+      }
+    });
+  log.info('Found %0 command-module(s): %1',
+    String(cmds.length).magenta, cmds.join(', '));
+}());
 /**#nocode-*/
 
 
 /**
- * Hoitaa komentojen sisäisen käsittelyn ja toteutuksen
+ * Hoitaa komentojen sisäisen käsittelyn.
  * @class Komentojen käsittely
  *
  * @param {Server} server  NetMatch-palvelin, johon tämä instanssi kuuluu
@@ -213,120 +241,154 @@ function Command(server) {
  * @param {Player} [player]  Kuka kutsui komentoa (undefined mikäli konsolista)
  */
 Command.prototype.call = function (name, args, player) {
-  var c = Commands[name];
-  if (!c) {
-    log.error('Command "%0" not recognized. You need ´help´.', name.yellow);
-    return;
-  }
+  var cmd = Commands[name], param;
+  if (!cmd) { log.error('Command "%0" not recognized. You need ´help´.', name.yellow); return; }
+
   // Tarkistetaan sallitaanko komento klienteillä
-  if (player && !c.remote) {
+  if (player && !cmd.remote) {
     log.warn('Player %0 tried to call ´%1´, denied.', player.name.green, name);
+    this.server.serverMessage('The command you tried to call is server-side only.', player);
     return;
   }
 
-  // Validoidaan argumentit - parametrien tyyppejä ei tarkasteta tässä vaan se on tehtävä manuaalisesti
-  for (var i = 0; i < c.params.length; i++) {
-    var p = c.params[i];
+  // Validoidaan argumentit - parametrien tyyppejä ei tarkasteta vaan se on tehtävä manuaalisesti.
+  for (var i = 0; i < cmd.params.length; i++) {
+    param = cmd.params[i];
     // Jos parametri ei ole valinnainen ja argumentteja on liian vähän
-    if (!p.optional && args.length <= i) {
-      log.error('You must give parameter %0 %1. For more information see ´help %2´', ('{' + p.type + '}').grey, p.name.red, name);
+    if (!param.optional && args.length <= i) {
+      if (player) {
+        this.server.serverMessage('You must give parameter {' + param.type + '} ' +
+          param.name + '. See ´help ' + name + '´', player);
+      } else {
+        log.error('You must give parameter %0 %1. For more information see ´help %2´',
+          ('{' + param.type + '}').grey, param.name.red, name);
+      }
       return;
     }
   }
+
   // Kutsutaan funktiota
   args.unshift(player); // Lisätään pelaaja ensimmäiseksi parametriksi
-  c.action.apply(this.server, args);
+  try {
+    cmd.action.apply(this.server, args);
+  } catch (e) {
+    log.error('Failed to call command %0 as %1 with [%2]. See --debug (-d) for stack trace.',
+      name.yellow, (player && player.name || 'server').green, args.join(', ').green);
+    log.debug(e.stack);
+    // Also notify player if any
+    if (player) {
+      this.server.serverMessage('Oops, narrowly escaped a crash! Just whoa..', player);
+    }
+  }
 };
 
 /**
- * Luo merkkijonon, joka kertoo komennon tiedot hienosti muotoiltuna.
- * @param {String} name  Komento, jonka tiedot haluat
+ * Palauttaa komennon tiedot merkkijonona.
+ * @param {String}  name    Komento, jonka tiedot haluat
+ * @param {Boolean} format  Formatoidaanko? (värit & wtf-8)
+ * @return {String}  Hienosti muotoiltu merkkijono.
  */
-Command.prototype.getHelpString = function (name) {
-  var c = Commands[name];
-  if (!c) {
-    return 'Could not find help about "' + name + '". You need ´help´.';
+Command.prototype.getHelpString = function (name, format) {
+  /**#nocode+*/
+  var cmd = Commands[name], help
+    // Merkkijonojen täyttäminen ilmalla
+    , pad = function (s, l, r) {
+      if (r) { return new Array(Math.max(l - s.length + 1, 0)).join(' ') + s; }
+      else   { return s + new Array(Math.max(l - s.length + 1, 0)).join(' '); }
+    };
+  if (!cmd) { return 'Could not find help about "' + name + '". You need ´help´.'; }
+  if (format) {
+    help = ' Description: '.yellow + cmd.help +
+      // Jos on parametrejä
+      (cmd.params.length ? '\n Params\n   '.yellow +
+        // Jos niitä on useampi niin muotoillaan wtf-8:lla
+        (cmd.params.length > 1 ? '├→' : '└→').yellow +
+        // Listataan ne
+        join(cmd.params.map(function paramLoop(param) {
+          return pad((' {' + param.type + '} ').grey, 21, false)  // Tyyppi
+              +  pad((param.optional ? '[' + param.name + ']' : ' ' + param.name).green, 19, false) // Nimi
+              +  ' – ' + param.help; // Selitys
+        // Muotoillaan wtf-8:lla taulukosta merkkijono.
+        }), '\n   ├→'.yellow, '\n   └→'.yellow)
+      : ''); // Ei parametrejä
+  } else {
+    help = ' Description: ' + cmd.help +
+      (cmd.params.length ? '\n  Parameters:\n' : '') + // Sitten listataan parametrit mikäli niitä on.
+      (cmd.params.map(function paramLoop(param) {
+        return pad('  {' + param.type + '} ', 15, true) + // Tyyppi
+               pad((param.optional ? '[' + param.name + ']' : param.name), 18, false) + // Nimi
+               ' -- ' + param.help; // Selitys
+      }).join('\n'));
   }
-  var h =                     ' Description: ' + c.help +
-    (c.params.length ?      '\n  Parameters: ' : '');
-  // List parameters
-  for (var i = 0; i < c.params.length; i++) {
-    var p = c.params[i];
-    h += '\n' +
-      // Type
-      padString('  {' + p.type + '} ', 15, true) +
-      // Name
-      padString((p.optional ? '[' + p.name + ']' : p.name), 10, false) +
-      // Description
-      ' – ' + p.help;
-  }
-  return h;
+  return help;
+  /**#nocode-*/
 };
 
 /**
- * Hoitaa komentojen ja pelaajien nimimerkkien täydentämisen annetun parametrin perusteella
- * @param {String}  partial
- * @returns {Array}  Löydetyt ehdotukset
+ * Palauttaa listan ehdotuksista annetulle komentorivin alulle. esim 'l' -> ['list', 'login']
+ * @param {String}   partial   Käyttäjän aloittama rivi, kun hän painaa tabia.
+ * @returns {Array}  Löydetyt  ehdotukset, jos niitä on vain yksi, sillä korvataan koko rivi.
  */
 Command.prototype.suggest = function (partial) {
-  var suggestions = [], plr
-    , server = this.server
-    , cmds = Object.keys(Commands)
-    , cmdPart = partial.split(' ')[0]
-    , args = partial.split(' ').slice(1)
-    , playerIds = Object.keys(this.server.players)
-    , c = Commands[cmdPart]; // Se saattaa alkaa jo täydellisellä komennolla
+  /**#nocode+*/
+  var startsWith = function (str1, str2) { return str1.slice(0, str2.length) === str2; }
+    // Yhdistetään komento-osa, välissä olevat parametrit sekä ehdotus.
+    , merge = function (cmd, args, suggestion) {
+      return [cmd].concat(args.slice(0, args.length - 1), suggestion).join(' ') + ' ';
+    }
+    , suggestions = [], param, plr
+    , cmdPart = partial.split(' ')[0]             // Rivin ensimmäinen sana on tietenkin komento-osa.
+    , cmd = Commands[cmdPart]                     // Yritetään lukea komento, jos se on täydellinen.
+    , argPart = partial.split(' ').slice(1)       // Parametriosa talteen
+    , lastArg = argPart[argPart.length - 1] || '' // Viimeinen parametri, sitä täydennetään.
+    , server = this.server                        // Otetaan talteen closurea varten
+    , cmds = Object.keys(Commands)                // Otetaan talteen lista komentojen nimistä
+    , plrIds = Object.keys(this.server.players);  // ja lista pelaajien tunnisteista
 
-  // Jos rivi alkaa komennolla.
-  if (c) {
-    // Luupataan sen argumentit ja lisätään ehdotuksiin
-    c.params.forEach(function paramLoop(p, i) {
-      // Valitaan, mitä pitää tarkistaa parametrin tyypin perusteella
-      switch (p.type) {
-      case "player": // Pelaajien nikit on hyvä täydentää
-        for (var j = playerIds.length; j--;) {
-          plr = server.players[playerIds[j]];
-          if (plr.name && startsWith(plr.name, args[i]) && plr.active) {
-            // Pelaajan nimi alkaa argumentin alulla.
-            suggestions.push(cmdPart + ' ' + plr.name);
-          }
+  // Jos rivi alkaa komennolla ja sillä on parametrejä.
+  if (cmd && cmd.params) {
+    // Valitaan parametri, jota ollaan kirjoittamassa (tai eka, jos mitään ei ole vielä.)
+    param = cmd.params[argPart.length > 0 ? argPart.length - 1 : 0];
+    if (!param) { return; } // Parametriä ei löydy, eli kaikki parametrit on jo täytetty!
+
+    switch (param.type) {
+    // Täydennetään pelaajien nimimerkit
+    case 'player':
+      for (var j = plrIds.length; j--;) {
+        plr = server.players[plrIds[j]];
+        if (plr.active && plr.name && startsWith(plr.name, lastArg)) {
+          suggestions.push(merge(cmdPart, argPart, plr.name));
         }
-        break;
-      case "command": // Samoin komentojen nimet
-        cmds.forEach(function commandLoop(s) {
-          if (startsWith(s, args[i])) {
-            // Komento alkaa argumentint alulla.
-            suggestions.push(cmdPart + ' ' + s);
-          }
-        });
-        break;
-        // TODO: Muut + säätö
       }
-    });
-  } else { // Muussa tapauksessa täydennetään komennoksi.
-    Object.keys(Commands).map(function (i) {
-      if (startsWith(i, partial)) {
-        suggestions.push(i + ' ');
+      break;
+    // Täydennetään komentojen nimet esim. help/commands/kick
+    case 'command':
+      cmds.map(function commandLoop(cmdName) {
+        if (startsWith(cmdName, lastArg)) {
+          suggestions.push(merge(cmdPart, argPart, cmdName));
+        }
+      });
+      break;
+    // Täydennetään alakomennot esim. config get/set/save
+    case 'sub':
+      cmd.sub.map(function commandLoop(cmdName) {
+        if (startsWith(cmdName, lastArg)) {
+          suggestions.push(merge(cmdPart, argPart, cmdName));
+        }
+      });
+    }
+  } else {
+    // Jos rivi ei ala komennolla täydennetään rivin alku komennoksi.
+    cmds.map(function commandLoop(cmdName) {
+      if (startsWith(cmdName, partial)) {
+        suggestions.push(cmdName + ' ');
       }
     });
   }
 
   return suggestions;
+  /**#nocode-*/
 };
 
-/** @ignore */
-function startsWith(str1, str) {
-  return str1.slice(0, str.length) === str;
-}
-
-// Thanks for benvie at #node for help!
-/** @ignore */
-function padString(s, l, r) {
-  if (r) {
-    return Array(Math.max(l - s.length + 1, 0)).join(' ') + s;
-  } else {
-    return s + Array(Math.max(l - s.length + 1, 0)).join(' ')
-  }
-}
 
 module.exports = Command;

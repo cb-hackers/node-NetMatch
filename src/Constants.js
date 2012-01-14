@@ -1,5 +1,6 @@
 /**
- * @fileOverview Pitää sisällään eri vakioita: {@link NET}
+ * @fileOverview Pitää sisällään eri vakioita: {@link NET}, {@link WPN}, {@link ITM}, {@link DRAW},
+ * {@link PLR}
  */
 
 /*
@@ -93,9 +94,12 @@ var NET = {
   /** Nopeuden huijaus havaittu */
   SPEEDHACK: 24,
 
+  /** Piirtelyjä debug-tarkoituksia varten */
+  DEBUGDRAWING: 25,
+
   /** Viestin loppu */
   END: 255
-}
+};
 
 /**
  * @namespace Aseet
@@ -121,7 +125,7 @@ var WPN = {
 
   /** Aseiden lukumäärä */
   COUNT: 6
-}
+};
 
 /**
  * @namespace Itemit omana kokoelmanaan eroteltuna OBJ kokoelmasta.
@@ -144,8 +148,41 @@ var ITM = {
 
   /** Kranaatteja */
   LAUNCHER: 34
-}
+};
+
+/**
+ * @namespace Piirrettävien tavaroiden tyypit, debuggailua varten.
+ */
+var DRAW = {
+  /** Viiva */
+  LINE: 1,
+
+  /** Origokeskinen ympyrä */
+  CIRCLE: 2,
+
+  /** Laatikko */
+  BOX: 3,
+
+  /** Clientille käsky tyhjentää piirrokset muistista */
+  CLEAR: 127
+};
+
+/**
+ * @namespace Pelaajiin liittyvät rajoitukset
+ */
+var PLR = {
+  /** Nopeus eteen (pikseliä sekunnissa) */
+  FORWARD_SPEED: 250,
+
+  /** Nopeus taakse (pikseliä sekunnissa) */
+  BACKWARD_SPEED: 150,
+
+  /** Nopeus sivulle (pikseliä sekunnissa) */
+  SIDESTEP_SPEED: 160,
+};
 
 exports.NET = NET;
 exports.WPN = WPN;
 exports.ITM = ITM;
+exports.DRAW = DRAW;
+exports.PLR = PLR;

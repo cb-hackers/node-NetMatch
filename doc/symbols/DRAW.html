@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
-		<title>Config | JsDoc Reference</title>
+		<title>DRAW | JsDoc Reference</title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta name="mobileoptimized" content="0" />
@@ -102,12 +102,12 @@
 			<header>
 				<h1 class="classTitle">
 					
-					Class <span>Config</span>
+					Namespace <span>DRAW</span>
 				</h1>
 				
 				<div class="intro">
 					<p class="description summary">
-						Asetukset
+						Piirrettävien tavaroiden tyypit, debuggailua varten.
 					</p>
 						
 					
@@ -115,7 +115,7 @@
 							
 							
 							
-								<li>Defined in: <a href="../symbols/src/src_nm_Config.js.html">Config.js</a></li>
+								<li>Defined in: <a href="../symbols/src/src_nm_Constants.js.html">Constants.js</a></li>
 							
 							
 						</ul>
@@ -124,35 +124,69 @@
 			</header>
 			
 			
-				<section>
-					<div class="props">
-						<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Config.">
-							<caption class="sectionTitle">Class Summary</caption>
-							<thead>
-								<tr>
-									<th scope="col">Constructor Attributes</th>
-									<th scope="col">Constructor Name and Description</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td class="attributes">&nbsp;</td>
-									<td class="nameDescription" >
-										<div class="fixedFont">
-											<b><a href="../symbols/Config.html#constructor">Config</a></b>(server)
-										</div>
-										<div class="description">Alustaa luokan käyttöä varten, lataa <a href="../symbols/Config.defaults.html">Config.defaults</a> kentät tämän instanssin kentiksi</div>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</section>
-			
 			
 			
 				
 				<section>
+					
+						<nav>
+							<div class="props">
+								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class DRAW.">
+									<caption class="sectionTitle">Field Summary</caption>
+									
+									<thead>
+										<tr>
+											<th scope="col">Field Attributes</th>
+											<th scope="col">Field Name and Description</th>
+										</tr>
+									</thead>
+									
+									<tbody>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													DRAW.<b><a href="../symbols/DRAW.html#.BOX">BOX</a></b>
+													</div>
+													<div class="description">Laatikko</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													DRAW.<b><a href="../symbols/DRAW.html#.CIRCLE">CIRCLE</a></b>
+													</div>
+													<div class="description">Origokeskinen ympyrä</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													DRAW.<b><a href="../symbols/DRAW.html#.CLEAR">CLEAR</a></b>
+													</div>
+													<div class="description">Clientille käsky tyhjentää piirrokset muistista</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													DRAW.<b><a href="../symbols/DRAW.html#.LINE">LINE</a></b>
+													</div>
+													<div class="description">Viiva</div>
+												</td>
+											</tr>
+										
+									</tbody>
+								</table>
+							</div>
+						</nav>
 					
 					
 					
@@ -161,45 +195,6 @@
 	<!--
 	#### METHODS SUMMARY
 	-->
-			
-				<section>
-					
-					
-					<div class="props">
-						<h2 class="sectionTitle">Method Summary</h2>
-						
-						
-							<nav>
-								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Config.">
-									<thead>
-										<tr>
-											<th scope="col">Method Attributes</th>
-											<th scope="col">Method Name and Description</th>
-										</tr>
-									</thead>
-									
-									<tbody>
-										
-										
-											<tr
-												 class='item0'
-											>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Config.html#load">load</a></b>(config)
-													</div>
-													<div class="description">Lataa asetukset annetusta tiedostosta.</div>
-												</td>
-											</tr>
-										
-									</tbody>
-								</table>
-							</nav>
-						
-					
-						
-					</div>
-				</section>
 			
 			
 	<!--
@@ -210,104 +205,113 @@
 	#### CONSTRUCTOR DETAILS
 	-->
 			
-				<section>
-					<div class="details props">
-						<div class="innerProps">
-							<h2 class="sectionTitle" id="constructor">
-								Class Detail
-							</h2>
-							
-							<div class="fixedFont">
-								<b>Config</b>(server)
-							</div>
-							
-							<div class="description">
-								Alustaa luokan käyttöä varten, lataa <a href="../symbols/Config.defaults.html">Config.defaults</a> kentät tämän instanssin kentiksi
-								
-							</div>
-							
-							
-						
-							
-								<dl class="detailList params">
-									<dt class="heading">Parameters:</dt>
-									
-										<dt>
-											<span class="light fixedFont">{<a href="../symbols/Server.html">Server</a>}</span>  <b>server</b>
-											
-										</dt>
-										<dd>NetMatch-palvelin, joka kutsuu tätä konstruktoria</dd>
-									
-								</dl>
-							
-							
-							
-						</div>
-					</div>
-				</section>
-			
 	<!--
 	#### FIELD DETAILS
 	-->
-			
-	<!--
-	#### METHOD DETAILS
-	-->		
 			
 				<section>
 					<div class="details props">
 						<div class="innerProps">
 							<h2 class="sectionTitle">
-								Method Detail
+								Field Detail
 							</h2>
 							
-							<ul class="methodDetail" id="MethodDetail">
+							
+								<div class="fixedFont heading" id=".BOX">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									
+									
+									<span class="light">DRAW.</span><b>BOX</b>							
+								</div>
+								
+								<div class="description">
+									Laatikko
+									
+									
+									
+								</div>
 								
 								
-									<li 
-										 class='item0'
-									>
-										<div class="fixedFont heading" id="load">
-											<span class='lighter'>
-											
-											</span>
-											
-											
-											
-											<b>load</b>(config)
-										</div>
-										
-										<div class="description">
-											Lataa asetukset annetusta tiedostosta. Tämä metodi hakee tiedostoa node-NetMatchin juuresta.
-											
-											
-											
-											
-										</div>
-										
-										
-										
-										
-											<dl class="detailList params">
-												<dt class="heading">Parameters:</dt>
-												
-													<dt>
-														<span class="light fixedFont">{String}</span> <b>config</b>
-														<i>Optional, Default: "config"</i>
-													</dt>
-													<dd>Asetustiedoston nimi, ilman .json päätettä.</dd>
-												
-											</dl>
-										
-										
-										
-										
-									</li>
+									
 								
-							</ul>
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".CIRCLE">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									
+									
+									<span class="light">DRAW.</span><b>CIRCLE</b>							
+								</div>
+								
+								<div class="description">
+									Origokeskinen ympyrä
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".CLEAR">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									
+									
+									<span class="light">DRAW.</span><b>CLEAR</b>							
+								</div>
+								
+								<div class="description">
+									Clientille käsky tyhjentää piirrokset muistista
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".LINE">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									
+									
+									<span class="light">DRAW.</span><b>LINE</b>							
+								</div>
+								
+								<div class="description">
+									Viiva
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								
+							
 						</div>
 					</div>
 				</section>
+			
+	<!--
+	#### METHOD DETAILS
+	-->		
 			
 			
 	<!--

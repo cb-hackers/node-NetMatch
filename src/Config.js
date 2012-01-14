@@ -11,6 +11,19 @@ var log = require('./Utils').log
 /**#nocode-*/
 
 /**
+ * Alustaa luokan käyttöä varten, lataa {@link Config.defaults} kentät tämän instanssin kentiksi
+ * @class Asetukset
+ *
+ * @param {Server} server  NetMatch-palvelin, joka kutsuu tätä konstruktoria
+ */
+function Config(server) {
+  this.server = server;
+
+  // Laajennetaan tämän Configin ominaisuuksia oletusconfigeilla
+  cjson.extend(this, Config.defaults);
+}
+
+/**
  * @namespace Sisältää NetMatch-palvelimen oletusasetukset. Näitä voi muuttaa antamalla
  * {@link Server}-konstruktorille parametrina objektin, jonka avaimet sopivat tämän muotoon.
  */
@@ -48,9 +61,9 @@ Config.defaults = {
   /**
    * Maksimimäärä pelaajia
    * @type Number
-   * @default 5
+   * @default 10
    */
-  maxPlayers: 5,
+  maxPlayers: 10,
   /**
    * Pelimoodi, DM = 1 ja TDM = 2
    * @type Byte
@@ -86,21 +99,14 @@ Config.defaults = {
    * @type String
    * @default password
    */
-  password: "password"
-}
-
-/**
- * Alustaa luokan käyttöä varten, lataa {@link Config.defaults} kentät tämän instanssin kentiksi
- * @class Asetukset
- *
- * @param {Server} server  NetMatch-palvelin, joka kutsuu tätä konstruktoria
- */
-function Config(server) {
-  this.server = server;
-
-  // Laajennetaan tämän Configin ominaisuuksia oletusconfigeilla
-  cjson.extend(this, Config.defaults);
-}
+  password: "password",
+  /**
+   * Onko palvelin kehitysversio
+   * @type Boolean
+   * @default false
+   */
+  devBuild: false
+};
 
 /**
  * Lataa asetukset annetusta tiedostosta. Tämä metodi hakee tiedostoa node-NetMatchin juuresta.
@@ -112,14 +118,14 @@ Config.prototype.load = function (config) {
     , loadedConfig;
 
   if (!path.existsSync(filePath)) {
-    log.error('Config %0 doesn\'t exist in %1', config.green, filePath.green);
+    log.error('Config %0 doesn\'t exist', filePath.green);
     return;
   }
 
-  log.info('Loading config %0" from %1', config.green, filePath.green);
+  log.info('Loading config from %0', filePath.green);
   loadedConfig = cjson.load(filePath);
   // Laajennetaan tämän Configin ominaisuuksia ladatulla json-tiedostolla
   cjson.extend(this, loadedConfig);
-}
+};
 
-exports = module.exports = Config;
+module.exports = Config;

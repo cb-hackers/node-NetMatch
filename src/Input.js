@@ -7,7 +7,8 @@ var log = require('./Utils').log
   , NET = require('./Constants').NET
   , colors = require('colors')
   , tty = require('tty')
-  , readline = require('readline');
+  , readline = require('readline')
+  , splitString = require('./Utils').splitString;
 /**#nocode-*/
 
 /**
@@ -41,14 +42,14 @@ function Input(server) {
   });
 
   rli.on('line', function rliLine(input){
-    msg = input.trim();
+    var msg = input.trim();
     if (!msg) { return; }
     // Käsitellään serverikomennot
-    server.commands.call(msg.split(' ')[0], msg.split(' ').splice(1));
+    server.commands.call(msg.split(' ')[0], splitString(msg).splice(1));
   });
 
   // Tästä eteenpäin dokumentoidaan taas jos on jotain dokumentoitavaa
   /**#nocode-*/
 }
 
-exports = module.exports = Input;
+module.exports = Input;

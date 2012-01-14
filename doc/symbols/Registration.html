@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
-		<title>Item | JsDoc Reference</title>
+		<title>Registration | JsDoc Reference</title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta name="mobileoptimized" content="0" />
@@ -102,12 +102,12 @@
 			<header>
 				<h1 class="classTitle">
 					
-					Class <span>Item</span>
+					Class <span>Registration</span>
 				</h1>
 				
 				<div class="intro">
 					<p class="description summary">
-						Tavaroiden toteutus
+						Palvelinlistauksen päivittelyyn liittyvät toiminnot.
 					</p>
 						
 					
@@ -115,7 +115,7 @@
 							
 							
 							
-								<li>Defined in: <a href="../symbols/src/src_nm_Item.js.html">Item.js</a></li>
+								<li>Defined in: <a href="../symbols/src/src_nm_Registration.js.html">Registration.js</a></li>
 							
 							
 						</ul>
@@ -126,7 +126,7 @@
 			
 				<section>
 					<div class="props">
-						<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Item.">
+						<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Registration.">
 							<caption class="sectionTitle">Class Summary</caption>
 							<thead>
 								<tr>
@@ -139,9 +139,9 @@
 									<td class="attributes">&nbsp;</td>
 									<td class="nameDescription" >
 										<div class="fixedFont">
-											<b><a href="../symbols/Item.html#constructor">Item</a></b>(server, map, itemId, itemType)
+											<b><a href="../symbols/Registration.html#constructor">Registration</a></b>(server)
 										</div>
-										<div class="description">Luo uuden tavaran ja etsii sille paikan.</div>
+										<div class="description">Alustaa moduulin.</div>
 									</td>
 								</tr>
 							</tbody>
@@ -156,7 +156,7 @@
 					
 						<nav>
 							<div class="props">
-								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Item.">
+								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Registration.">
 									<caption class="sectionTitle">Field Summary</caption>
 									
 									<thead>
@@ -172,39 +172,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#id">id</a></b>
+													<b><a href="../symbols/Registration.html#registered">registered</a></b>
 													</div>
-													<div class="description">Tavaran tunnus</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#type">type</a></b>
-													</div>
-													<div class="description">Tavaran tyyppi, kts.</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#x">x</a></b>
-													</div>
-													<div class="description">Tavaran sijainti</div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Item.html#y">y</a></b>
-													</div>
-													<div class="description">Tavaran sijainti</div>
+													<div class="description">Onko palvelin rekisteröity vai ei</div>
 												</td>
 											</tr>
 										
@@ -229,7 +199,7 @@
 						
 						
 							<nav>
-								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Item.">
+								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Registration.">
 									<thead>
 										<tr>
 											<th scope="col">Method Attributes</th>
@@ -245,9 +215,31 @@
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Item.html#pick">pick</a></b>()
+													<div class="fixedFont"><b><a href="../symbols/Registration.html#apply">apply</a></b>(callback)
 													</div>
-													<div class="description">Siirtää tavaran toiseen paikkaan ja palauttaa siirretyn tavaran tyypin.</div>
+													<div class="description">Pyytää päästä palvelinlistaukseen.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item1'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Registration.html#remove">remove</a></b>(callback)
+													</div>
+													<div class="description">Pyytää, että poistetaan palvelin listauksesta.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item2'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Registration.html#update">update</a></b>(callback)
+													</div>
+													<div class="description">Päivittää palvelimen listauksen.</div>
 												</td>
 											</tr>
 										
@@ -277,11 +269,11 @@
 							</h2>
 							
 							<div class="fixedFont">
-								<b>Item</b>(server, map, itemId, itemType)
+								<b>Registration</b>(server)
 							</div>
 							
 							<div class="description">
-								Luo uuden tavaran ja etsii sille paikan. Lisää tavaran Server.items listaan
+								Alustaa moduulin. Kun haluat lisätä palvelimen palvelinlistaukseen, käytä metodia #add.
 								
 							</div>
 							
@@ -295,25 +287,7 @@
 											<span class="light fixedFont">{<a href="../symbols/Server.html">Server</a>}</span>  <b>server</b>
 											
 										</dt>
-										<dd>Käynnissä oleva NetMatch-palvelin</dd>
-									
-										<dt>
-											<span class="light fixedFont">{<a href="../symbols/Map.html">Map</a>}</span>  <b>map</b>
-											
-										</dt>
-										<dd>Kartta johon uusi tavara luodaan</dd>
-									
-										<dt>
-											<span class="light fixedFont">{Byte}</span>  <b>itemId</b>
-											
-										</dt>
-										<dd>Tavaran tunnus</dd>
-									
-										<dt>
-											<span class="light fixedFont">{Byte}</span>  <b>itemType</b>
-											
-										</dt>
-										<dd>Tavaran tyyppi, kts. <a href="../symbols/ITM.html">ITM</a></dd>
+										<dd>Tähän rekisteröintiin liittyvä NetMatch-palvelin.</dd>
 									
 								</dl>
 							
@@ -335,84 +309,18 @@
 							</h2>
 							
 							
-								<div class="fixedFont heading" id="id">
+								<div class="fixedFont heading" id="registered">
 									<span class='lighter'>
 									
 									</span>
 									
-									<span class="light">{Byte}</span>
+									<span class="light">{Boolean}</span>
 									
-									<b>id</b>							
+									<b>registered</b>							
 								</div>
 								
 								<div class="description">
-									Tavaran tunnus
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="type">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Byte}</span>
-									
-									<b>type</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran tyyppi, kts. <a href="../symbols/ITM.html">ITM</a>
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="x">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Number}</span>
-									
-									<b>x</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran sijainti
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="y">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Number}</span>
-									
-									<b>y</b>							
-								</div>
-								
-								<div class="description">
-									Tavaran sijainti
+									Onko palvelin rekisteröity vai ei
 									
 									
 									
@@ -444,19 +352,18 @@
 									<li 
 										 class='item0'
 									>
-										<div class="fixedFont heading" id="pick">
+										<div class="fixedFont heading" id="apply">
 											<span class='lighter'>
 											
 											</span>
 											
-											<span class="light">{Byte}</span>
 											
-											<b>pick</b>()
+											
+											<b>apply</b>(callback)
 										</div>
 										
 										<div class="description">
-											Siirtää tavaran toiseen paikkaan ja palauttaa siirretyn tavaran tyypin.
-Lähettää kaikille clienteille tiedon uudesta sijainnista.
+											Pyytää päästä palvelinlistaukseen. Kutsuu automaattisesti metodia #update.
 											
 											
 											
@@ -466,33 +373,104 @@ Lähettää kaikille clienteille tiedon uudesta sijainnista.
 										
 										
 										
-										
-										
-											<dl class="detailList nomargin">
-											
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
 												
+													<dt>
+														<span class="light fixedFont">{Function}</span> <b>callback</b>
+														<i>Optional</i>
+													</dt>
+													<dd>Tätä funktiota kutsutaan, kun rekisteröinti on saatu päätökseen.
+                              Jos rekisteröinti epäonnistui, annetaan funktiolle parametrina
+                              virheilmoitus merkkijonona.</dd>
 												
-												
-												
-												
-												
-												
-													<dt class="heading">Returns:</dt>
-													
-														<dd><span class="light fixedFont">{Byte}</span> Siirretyn tavaran tyyppi</dd>
-													
-												
-												
-												
-												
-												
-													<dt class="heading">See:</dt>
-													
-														<dd><a href="../symbols/ITM.html">ITM</a></dd>
-													
-												
-											
 											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item1'
+									>
+										<div class="fixedFont heading" id="remove">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>remove</b>(callback)
+										</div>
+										
+										<div class="description">
+											Pyytää, että poistetaan palvelin listauksesta.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Function}</span> <b>callback</b>
+														<i>Optional</i>
+													</dt>
+													<dd>Tätä funktiota kutsutaan, kun epä-rekisteröinti on saatu päätökseen.
+                              Jos epä-rekisteröinti epäonnistui, annetaan funktiolle parametrina
+                              virheilmoitus merkkijonona.</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item2'
+									>
+										<div class="fixedFont heading" id="update">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>update</b>(callback)
+										</div>
+										
+										<div class="description">
+											Päivittää palvelimen listauksen.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Function}</span> <b>callback</b>
+														<i>Optional</i>
+													</dt>
+													<dd>Tätä funktiota kutsutaan, kun päivitys on saatu päätökseen.
+                              Jos päivitys epäonnistui, annetaan funktiolle parametrina
+                              virheilmoitus merkkijonona.</dd>
+												
+											</dl>
+										
+										
 										
 										
 									</li>

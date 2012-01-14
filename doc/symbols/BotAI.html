@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
-		<title>Bullet | JsDoc Reference</title>
+		<title>BotAI | JsDoc Reference</title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta name="mobileoptimized" content="0" />
@@ -102,12 +102,12 @@
 			<header>
 				<h1 class="classTitle">
 					
-					Class <span>Bullet</span>
+					Class <span>BotAI</span>
 				</h1>
 				
 				<div class="intro">
 					<p class="description summary">
-						Ammus
+						Bottien tekoäly
 					</p>
 						
 					
@@ -115,10 +115,8 @@
 							
 							
 							
-								<li>Defined in: <a href="../symbols/src/src_nm_Bullet.js.html">Bullet.js</a></li>
+								<li>Defined in: <a href="../symbols/src/src_nm_BotAI.js.html">BotAI.js</a></li>
 							
-							<li>Extends <span class="fixedFont">
-								<a href="../symbols/Obj.html">Obj</a></span></li>
 							
 						</ul>
 					
@@ -128,7 +126,7 @@
 			
 				<section>
 					<div class="props">
-						<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Bullet.">
+						<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class BotAI.">
 							<caption class="sectionTitle">Class Summary</caption>
 							<thead>
 								<tr>
@@ -141,9 +139,9 @@
 									<td class="attributes">&nbsp;</td>
 									<td class="nameDescription" >
 										<div class="fixedFont">
-											<b><a href="../symbols/Bullet.html#constructor">Bullet</a></b>(server, player, newId, mirrored)
+											<b><a href="../symbols/BotAI.html#constructor">BotAI</a></b>(server, player)
 										</div>
-										<div class="description">Luo uuden ammuksen.</div>
+										<div class="description">Alustaa uuden tekoälyn.</div>
 									</td>
 								</tr>
 							</tbody>
@@ -158,7 +156,7 @@
 					
 						<nav>
 							<div class="props">
-								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Bullet.">
+								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class BotAI.">
 									<caption class="sectionTitle">Field Summary</caption>
 									
 									<thead>
@@ -174,9 +172,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Bullet.html#angle">angle</a></b>
+													<b><a href="../symbols/BotAI.html#config">config</a></b>
 													</div>
-													<div class="description">Ammuksen kulma</div>
+													<div class="description">Botin tekoälyä ohjaavat asetukset: <a href="../symbols/BotAI.html#initConfig">BotAI#initConfig</a></div>
 												</td>
 											</tr>
 										
@@ -184,9 +182,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Bullet.html#id">id</a></b>
+													<b><a href="../symbols/BotAI.html#fightRotate">fightRotate</a></b>
 													</div>
-													<div class="description">Ammuksen tunnus</div>
+													<div class="description">Kääntymisnopeus kun ollaan havaittu vastustaja</div>
 												</td>
 											</tr>
 										
@@ -194,9 +192,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Bullet.html#moved">moved</a></b>
+													<b><a href="../symbols/BotAI.html#lastAngle">lastAngle</a></b>
 													</div>
-													<div class="description">Onko ammusta vielä liikutettu yhtään</div>
+													<div class="description">Kuinka paljon botin ja kohdekulman ero oli edellisellä kierroksella</div>
 												</td>
 											</tr>
 										
@@ -204,9 +202,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Bullet.html#player">player</a></b>
+													<b><a href="../symbols/BotAI.html#nextAction">nextAction</a></b>
 													</div>
-													<div class="description">Kuka ampui</div>
+													<div class="description">Ajankohta jolloin botille arvotaan uusi suunta</div>
 												</td>
 											</tr>
 										
@@ -214,9 +212,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Bullet.html#prevPosX">prevPosX</a></b>
+													<b><a href="../symbols/BotAI.html#nextAngle">nextAngle</a></b>
 													</div>
-													<div class="description">Ammuksen edellinen paikka</div>
+													<div class="description">Kulma johon botin pitäisi liikkua</div>
 												</td>
 											</tr>
 										
@@ -224,9 +222,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Bullet.html#prevPosY">prevPosY</a></b>
+													<b><a href="../symbols/BotAI.html#player">player</a></b>
 													</div>
-													<div class="description">Ammuksen edellinen paikka</div>
+													<div class="description">Player-luokan instanssi johon tämä tekoäly kuuluu.</div>
 												</td>
 											</tr>
 										
@@ -234,9 +232,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Bullet.html#timeShooted">timeShooted</a></b>
+													<b><a href="../symbols/BotAI.html#rotation">rotation</a></b>
 													</div>
-													<div class="description">Milloin ammus on ammuttu</div>
+													<div class="description">Tällä käännetään objektia (TurnObject)</div>
 												</td>
 											</tr>
 										
@@ -244,9 +242,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Bullet.html#weapon">weapon</a></b>
+													<b><a href="../symbols/BotAI.html#shootingAngle">shootingAngle</a></b>
 													</div>
-													<div class="description">Millä aseella tämä on ammuttu</div>
+													<div class="description">Ammutaan kun uhri on tämän kulman sisällä botin edessä</div>
 												</td>
 											</tr>
 										
@@ -254,9 +252,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Bullet.html#x">x</a></b>
+													<b><a href="../symbols/BotAI.html#sideStep">sideStep</a></b>
 													</div>
-													<div class="description">Paikkatietoa</div>
+													<div class="description">Botin sivuaskeleet</div>
 												</td>
 											</tr>
 										
@@ -264,9 +262,9 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Bullet.html#y">y</a></b>
+													<b><a href="../symbols/BotAI.html#tooClose">tooClose</a></b>
 													</div>
-													<div class="description">Paikkatietoa</div>
+													<div class="description">Botti on liian lähellä seinää tai toista pelaajaa</div>
 												</td>
 											</tr>
 										
@@ -276,12 +274,6 @@
 						</nav>
 					
 					
-					
-						<nav>
-							<dl class="inheritsList">
-							
-							</dl>
-						</nav>
 					
 				</section>
 			
@@ -297,7 +289,7 @@
 						
 						
 							<nav>
-								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class Bullet.">
+								<table class="summaryTable" id="MethodsList" cellspacing="0" summary="A summary of the methods documented in the class BotAI.">
 									<thead>
 										<tr>
 											<th scope="col">Method Attributes</th>
@@ -313,9 +305,9 @@
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Bullet.html#checkExplosion">checkExplosion</a></b>(x, y)
+													<div class="fixedFont"><b><a href="../symbols/BotAI.html#debugRayCast">debugRayCast</a></b>(collision, picker)
 													</div>
-													<div class="description">Tutkii onko pelaajia räjähdyksen vaikutusalueella.</div>
+													<div class="description">Debuggaa raycastia</div>
 												</td>
 											</tr>
 										
@@ -324,9 +316,9 @@
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Bullet.html#checkPlayerHit">checkPlayerHit</a></b>(player)
+													<div class="fixedFont"><b><a href="../symbols/BotAI.html#initConfig">initConfig</a></b>()
 													</div>
-													<div class="description">Tutkii osuiko ammus pelaajaan.</div>
+													<div class="description">Alustaa botin tekoälyä ohjaavat asetukset.</div>
 												</td>
 											</tr>
 										
@@ -335,20 +327,9 @@
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Bullet.html#initialize">initialize</a></b>()
+													<div class="fixedFont"><b><a href="../symbols/BotAI.html#update">update</a></b>()
 													</div>
-													<div class="description">Alustaa ammuksen.</div>
-												</td>
-											</tr>
-										
-											<tr
-												 class='item3'
-											>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Bullet.html#update">update</a></b>()
-													</div>
-													<div class="description">Päivittää yksittäisen ammuksen.</div>
+													<div class="description">Yksittäisen botin tekoälyn päivitys.</div>
 												</td>
 											</tr>
 										
@@ -357,12 +338,6 @@
 							</nav>
 						
 					
-						
-							<nav>
-								<dl class="inheritsList" id="MethodsListInherited">
-								<dt>Methods borrowed from class <span class='fixedFont'><a href="../symbols/Obj.html">Obj</a></span>: </dt><dd><span class='fixedFont'><a href="../symbols/Obj.html#move">move</a></span></dd> <dd><span class='fixedFont'><a href="../symbols/Obj.html#turn">turn</a></span></dd>
-								</dl>
-							</nav>
 						
 					</div>
 				</section>
@@ -384,11 +359,11 @@
 							</h2>
 							
 							<div class="fixedFont">
-								<b>Bullet</b>(server, player, newId, mirrored)
+								<b>BotAI</b>(server, player)
 							</div>
 							
 							<div class="description">
-								Luo uuden ammuksen.
+								Alustaa uuden tekoälyn.
 								
 							</div>
 							
@@ -402,25 +377,13 @@
 											<span class="light fixedFont">{<a href="../symbols/Server.html">Server</a>}</span>  <b>server</b>
 											
 										</dt>
-										<dd>Palvelimen sisältävä muuttuja, instanssi luokasta <a href="../symbols/Server.html">Server</a>.</dd>
+										<dd>NetMatch-palvelin</dd>
 									
 										<dt>
 											<span class="light fixedFont">{<a href="../symbols/Player.html">Player</a>}</span>  <b>player</b>
 											
 										</dt>
-										<dd>Pelaaja joka ampui ammuksen</dd>
-									
-										<dt>
-											<span class="light fixedFont">{Integer}</span>  <b>newId</b>
-											
-										</dt>
-										<dd>Uuden ammuksen ID</dd>
-									
-										<dt>
-											<span class="light fixedFont">{Boolean}</span>  <b>mirrored</b>
-											<i>Optional, Default: false</i>
-										</dt>
-										<dd>Peilataanko ammuksen lähtösuunta (kranaatinlaukaisimen 2. ammus)</dd>
+										<dd><a href="../symbols/Player.html">Player</a>-luokan instanssi johon tämä tekoäly kuuluu.</dd>
 									
 								</dl>
 							
@@ -442,18 +405,18 @@
 							</h2>
 							
 							
-								<div class="fixedFont heading" id="angle">
+								<div class="fixedFont heading" id="config">
 									<span class='lighter'>
 									
 									</span>
 									
-									<span class="light">{Integer}</span>
+									<span class="light">{Object}</span>
 									
-									<b>angle</b>							
+									<b>config</b>							
 								</div>
 								
 								<div class="description">
-									Ammuksen kulma
+									Botin tekoälyä ohjaavat asetukset: <a href="../symbols/BotAI.html#initConfig">BotAI#initConfig</a>
 									
 									
 									
@@ -464,18 +427,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id="id">
+								<div class="fixedFont heading" id="fightRotate">
 									<span class='lighter'>
 									
 									</span>
 									
-									<span class="light">{Short}</span>
+									<span class="light">{Number}</span>
 									
-									<b>id</b>							
+									<b>fightRotate</b>							
 								</div>
 								
 								<div class="description">
-									Ammuksen tunnus
+									Kääntymisnopeus kun ollaan havaittu vastustaja
 									
 									
 									
@@ -486,18 +449,62 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id="moved">
+								<div class="fixedFont heading" id="lastAngle">
 									<span class='lighter'>
 									
 									</span>
 									
-									<span class="light">{Byte}</span>
+									<span class="light">{Number}</span>
 									
-									<b>moved</b>							
+									<b>lastAngle</b>							
 								</div>
 								
 								<div class="description">
-									Onko ammusta vielä liikutettu yhtään
+									Kuinka paljon botin ja kohdekulman ero oli edellisellä kierroksella
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="nextAction">
+									<span class='lighter'>
+									
+									</span>
+									
+									<span class="light">{Number}</span>
+									
+									<b>nextAction</b>							
+								</div>
+								
+								<div class="description">
+									Ajankohta jolloin botille arvotaan uusi suunta
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="nextAngle">
+									<span class='lighter'>
+									
+									</span>
+									
+									<span class="light">{Number}</span>
+									
+									<b>nextAngle</b>							
+								</div>
+								
+								<div class="description">
+									Kulma johon botin pitäisi liikkua
 									
 									
 									
@@ -519,7 +526,7 @@
 								</div>
 								
 								<div class="description">
-									Kuka ampui
+									Player-luokan instanssi johon tämä tekoäly kuuluu.
 									
 									
 									
@@ -530,18 +537,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id="prevPosX">
+								<div class="fixedFont heading" id="rotation">
 									<span class='lighter'>
 									
 									</span>
 									
-									<span class="light">{Float}</span>
+									<span class="light">{Number}</span>
 									
-									<b>prevPosX</b>							
+									<b>rotation</b>							
 								</div>
 								
 								<div class="description">
-									Ammuksen edellinen paikka
+									Tällä käännetään objektia (TurnObject)
 									
 									
 									
@@ -552,18 +559,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id="prevPosY">
+								<div class="fixedFont heading" id="shootingAngle">
 									<span class='lighter'>
 									
 									</span>
 									
-									<span class="light">{Float}</span>
+									<span class="light">{Number}</span>
 									
-									<b>prevPosY</b>							
+									<b>shootingAngle</b>							
 								</div>
 								
 								<div class="description">
-									Ammuksen edellinen paikka
+									Ammutaan kun uhri on tämän kulman sisällä botin edessä
 									
 									
 									
@@ -574,18 +581,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id="timeShooted">
+								<div class="fixedFont heading" id="sideStep">
 									<span class='lighter'>
 									
 									</span>
 									
-									<span class="light">{Integer}</span>
+									<span class="light">{Number}</span>
 									
-									<b>timeShooted</b>							
+									<b>sideStep</b>							
 								</div>
 								
 								<div class="description">
-									Milloin ammus on ammuttu
+									Botin sivuaskeleet
 									
 									
 									
@@ -596,62 +603,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id="weapon">
+								<div class="fixedFont heading" id="tooClose">
 									<span class='lighter'>
 									
 									</span>
 									
-									<span class="light">{Byte}</span>
+									<span class="light">{Boolean}</span>
 									
-									<b>weapon</b>							
+									<b>tooClose</b>							
 								</div>
 								
 								<div class="description">
-									Millä aseella tämä on ammuttu
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="x">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Integer}</span>
-									
-									<b>x</b>							
-								</div>
-								
-								<div class="description">
-									Paikkatietoa
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="y">
-									<span class='lighter'>
-									
-									</span>
-									
-									<span class="light">{Integer}</span>
-									
-									<b>y</b>							
-								</div>
-								
-								<div class="description">
-									Paikkatietoa
+									Botti on liian lähellä seinää tai toista pelaajaa
 									
 									
 									
@@ -683,18 +646,18 @@
 									<li 
 										 class='item0'
 									>
-										<div class="fixedFont heading" id="checkExplosion">
+										<div class="fixedFont heading" id="debugRayCast">
 											<span class='lighter'>
 											
 											</span>
 											
-											<span class="light">{Boolean}</span>
 											
-											<b>checkExplosion</b>(x, y)
+											
+											<b>debugRayCast</b>(collision, picker)
 										</div>
 										
 										<div class="description">
-											Tutkii onko pelaajia räjähdyksen vaikutusalueella. Tai moottorisahan (lol?).
+											Debuggaa raycastia
 											
 											
 											
@@ -708,41 +671,20 @@
 												<dt class="heading">Parameters:</dt>
 												
 													<dt>
-														<span class="light fixedFont">{Number}</span> <b>x</b>
-														<i>Optional, Default: this.x</i>
+														<b>collision</b>
+														
 													</dt>
-													<dd>Tarkistuspisteen x-koordinaatti</dd>
+													<dd></dd>
 												
 													<dt>
-														<span class="light fixedFont">{Number}</span> <b>y</b>
-														<i>Optional, Default: this.y</i>
+														<b>picker</b>
+														
 													</dt>
-													<dd>Tarkistuspisteen y-koordinaatti</dd>
+													<dd></dd>
 												
 											</dl>
 										
 										
-										
-											<dl class="detailList nomargin">
-											
-												
-												
-												
-												
-												
-												
-												
-													<dt class="heading">Returns:</dt>
-													
-														<dd><span class="light fixedFont">{Boolean}</span> Räjähtikö ammus</dd>
-													
-												
-												
-												
-												
-												
-											
-											</dl>
 										
 										<div class="hr"></div>
 									</li>
@@ -750,18 +692,18 @@
 									<li 
 										 class='item1'
 									>
-										<div class="fixedFont heading" id="checkPlayerHit">
+										<div class="fixedFont heading" id="initConfig">
 											<span class='lighter'>
 											
 											</span>
 											
-											<span class="light">{Boolean}</span>
 											
-											<b>checkPlayerHit</b>(player)
+											
+											<b>initConfig</b>()
 										</div>
 										
 										<div class="description">
-											Tutkii osuiko ammus pelaajaan.
+											Alustaa botin tekoälyä ohjaavat asetukset.
 											
 											
 											
@@ -771,96 +713,13 @@
 										
 										
 										
-											<dl class="detailList params">
-												<dt class="heading">Parameters:</dt>
-												
-													<dt>
-														<span class="light fixedFont">{<a href="../symbols/Player.html">Player</a>}</span> <b>player</b>
-														
-													</dt>
-													<dd>Pelaaja, kehen tarkistus kohdistuu.</dd>
-												
-											</dl>
 										
-										
-										
-											<dl class="detailList nomargin">
-											
-												
-												
-												
-												
-												
-												
-												
-													<dt class="heading">Returns:</dt>
-													
-														<dd><span class="light fixedFont">{Boolean}</span> Osuiko vai eikö</dd>
-													
-												
-												
-												
-												
-												
-											
-											</dl>
 										
 										<div class="hr"></div>
 									</li>
 								
 									<li 
 										 class='item2'
-									>
-										<div class="fixedFont heading" id="initialize">
-											<span class='lighter'>
-											
-											</span>
-											
-											<span class="light">{Boolean}</span>
-											
-											<b>initialize</b>()
-										</div>
-										
-										<div class="description">
-											Alustaa ammuksen.
-											
-											
-											
-											
-										</div>
-										
-										
-										
-										
-										
-										
-											<dl class="detailList nomargin">
-											
-												
-												
-												
-												
-												
-												
-												
-													<dt class="heading">Returns:</dt>
-													
-														<dd><span class="light fixedFont">{Boolean}</span> Onnistuiko ammuksen alustus. Jos palautusarvo on false, ei ammusta tulisi
-                    lisätä palvelimelle muistiin.</dd>
-													
-												
-												
-												
-												
-												
-											
-											</dl>
-										
-										<div class="hr"></div>
-									</li>
-								
-									<li 
-										 class='item3'
 									>
 										<div class="fixedFont heading" id="update">
 											<span class='lighter'>
@@ -873,7 +732,7 @@
 										</div>
 										
 										<div class="description">
-											Päivittää yksittäisen ammuksen.
+											Yksittäisen botin tekoälyn päivitys.
 											
 											
 											

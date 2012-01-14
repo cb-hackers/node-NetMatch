@@ -36,6 +36,8 @@
 		<nav>
 			<ul class="classList" id="ClassList">
 				
+					<li><a href="../symbols/BotAI.html">BotAI</a></li>
+				
 					<li><a href="../symbols/Bullet.html">Bullet</a></li>
 				
 					<li><a href="../symbols/Command.html">Command</a></li>
@@ -45,6 +47,8 @@
 					<li><a href="../symbols/Config.html">Config</a></li>
 				
 					<li><a href="../symbols/Config.defaults.html">Config<span class='break'> </span>.<span class='break'> </span>defaults</a></li>
+				
+					<li><a href="../symbols/DRAW.html">DRAW</a></li>
 				
 					<li><a href="../symbols/Game.html">Game</a></li>
 				
@@ -64,11 +68,15 @@
 				
 					<li><a href="../symbols/Player.html">Player</a></li>
 				
+					<li><a href="../symbols/PLR.html">PLR</a></li>
+				
+					<li><a href="../symbols/Registration.html">Registration</a></li>
+				
 					<li><a href="../symbols/Server.html">Server</a></li>
 				
 					<li><a href="../symbols/Utils.html">Utils</a></li>
 				
-					<li><a href="../symbols/Weapons.html">Weapons</a></li>
+					<li><a href="../symbols/Weapons.WPN.html">Weapons<span class='break'> </span>.<span class='break'> </span>WPN</a></li>
 				
 					<li><a href="../symbols/WPN.html">WPN</a></li>
 				
@@ -81,7 +89,7 @@
 			Documentation generator: <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0<br />
 			Template: <a href="http://www.thebrightlines.com/2010/05/06/new-template-for-jsdoctoolkit-codeview/" target="_blank">Codeview</a> 1.2<br />
 			Generated on:
-			<time datetime='2012-0-2' pubdate>2012-0-2 22:02</time>
+			<time datetime='2012-0-15' pubdate>2012-0-15 1:12</time>
 		</footer>
 	</div>
 </div>
@@ -193,9 +201,9 @@
 											>
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont">Utils.<b><a href="../symbols/Utils.html#.rand">rand</a></b>(minVal, maxVal, floatVal)
+													<div class="fixedFont">Utils.<b><a href="../symbols/Utils.html#.getAngle">getAngle</a></b>(x1, y1, x2, y2)
 													</div>
-													<div class="description">Palauttaa satunnaisen luvun väliltä minVal.</div>
+													<div class="description">Palauttaa kahden pisteen välisen kulman asteina</div>
 												</td>
 											</tr>
 										
@@ -204,14 +212,47 @@
 											>
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont">Utils.<b><a href="../symbols/Utils.html#.timer">timer</a></b>()
+													<div class="fixedFont">Utils.<b><a href="../symbols/Utils.html#.join">join</a></b>(arr, delim, delim2)
 													</div>
-													<div class="description">Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().</div>
+													<div class="description">Kuten Array.prototype.join, mutta tukee viimeisen erottimen vaihtoa.</div>
 												</td>
 											</tr>
 										
 											<tr
 												 class='item3'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Utils.<b><a href="../symbols/Utils.html#.rand">rand</a></b>(minVal, maxVal, floatVal)
+													</div>
+													<div class="description">Palauttaa satunnaisen luvun väliltä minVal.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item4'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Utils.<b><a href="../symbols/Utils.html#.splitString">splitString</a></b>(str)
+													</div>
+													<div class="description">Palauttaa taulukon, jossa on merkkijono paloiteltuna sanoiksi, ottaa huomioon "merkki jonot"</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item5'
+											>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">Utils.<b><a href="../symbols/Utils.html#.truncateNumber">truncateNumber</a></b>(num)
+													</div>
+													<div class="description">Poistaa numeron perästä desimaalit riippumatta numeron etumerkistä.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item6'
 											>
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
@@ -275,11 +316,11 @@ Voit käyttää tätä näin:
 										<pre class="code">var log = Utils.log;
 
 log.write('Perusviesti, tämä on ilman värejä.');
-log.info('Jotain tiedotettavaa tapahtui. Tulostuu vihreänä.');
-log.warn('Varoitus! Tulostuu keltaisena.');
-log.notice('Ilmoitus! Tulostuu keltaisena.');
-log.error('VIRHE! Tulostuu punaisena ja lihavoituna.');
-log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');</pre>
+log.info('Jotain tiedotettavaa tapahtui. Tulostuu vihreän INFO-tagin kanssa.');
+log.warn('Varoitus! Tulostuu keltaisen WARN-tagin kanssa.');
+log.notice('Ilmoitus! Tulostuu keltaisen NOTICE-tagin kanssa.');
+log.error('VIRHE! Tulostuu punaisen ja lihavoidun ERROR-tagin kanssa.');
+log.fatal('KRIITTINEN VIRHE! Tulostuu punaisen ja lihavoidun FATAL-tagin kanssa.');</pre>
 									
 								
 									
@@ -386,6 +427,158 @@ log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');</pre>
 									<li 
 										 class='item1'
 									>
+										<div class="fixedFont heading" id=".getAngle">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											<span class="light">{Number}</span>
+											
+											<span class="light">Utils.</span><b>getAngle</b>(x1, y1, x2, y2)
+										</div>
+										
+										<div class="description">
+											Palauttaa kahden pisteen välisen kulman asteina
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>x1</b>
+														
+													</dt>
+													<dd>Ensimmäisen pisteen x-koordinaatti</dd>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>y1</b>
+														
+													</dt>
+													<dd>Ensimmäisen pisteen y-koordinaatti</dd>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>x2</b>
+														
+													</dt>
+													<dd>Toisen pisteen x-koordinaatti</dd>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>y2</b>
+														
+													</dt>
+													<dd>Toisen pisteen y-koordinaatti</dd>
+												
+											</dl>
+										
+										
+										
+											<dl class="detailList nomargin">
+											
+												
+												
+												
+												
+												
+												
+												
+													<dt class="heading">Returns:</dt>
+													
+														<dd><span class="light fixedFont">{Number}</span> Pisteiden välinen kulma asteina välillä 0...360º</dd>
+													
+												
+												
+												
+												
+												
+											
+											</dl>
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item2'
+									>
+										<div class="fixedFont heading" id=".join">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											<span class="light">{String}</span>
+											
+											<span class="light">Utils.</span><b>join</b>(arr, delim, delim2)
+										</div>
+										
+										<div class="description">
+											Kuten Array.prototype.join, mutta tukee viimeisen erottimen vaihtoa.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Array}</span> <b>arr</b>
+														
+													</dt>
+													<dd>Lista, joka yhdistetään</dd>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>delim</b>
+														
+													</dt>
+													<dd>Ensimmäinen erotin, jota käytetään muihin kuin viimeiseen väliin</dd>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>delim2</b>
+														
+													</dt>
+													<dd>Erotin, joka laitetaan viimeiseen väliin</dd>
+												
+											</dl>
+										
+										
+										
+											<dl class="detailList nomargin">
+											
+												
+												
+												
+												
+												
+												
+												
+													<dt class="heading">Returns:</dt>
+													
+														<dd><span class="light fixedFont">{String}</span> Yhdistetty jono</dd>
+													
+												
+												
+												
+												
+												
+											
+											</dl>
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item3'
+									>
 										<div class="fixedFont heading" id=".rand">
 											<span class='lighter'>
 											&lt;static&gt; 
@@ -397,7 +590,7 @@ log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');</pre>
 										</div>
 										
 										<div class="description">
-											Palauttaa satunnaisen luvun väliltä minVal...maxVal tarkkuudella floatVal
+											Palauttaa satunnaisen luvun väliltä minVal...maxVal, mahdollisesti liukulukuna
 											
 											
 											
@@ -423,11 +616,11 @@ log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');</pre>
 													<dd>Suurin mahdollinen luku</dd>
 												
 													<dt>
-														<span class="light fixedFont">{Number}</span> <b>floatVal</b>
+														<span class="light fixedFont">{Boolean}</span> <b>floatVal</b>
 														<i>Optional</i>
 													</dt>
-													<dd>Palautettavan satunnaisen luvun tarkkuus. Mikäli tätä ei anneta,
-                            palautetaan kokonaisluku.</dd>
+													<dd>Palautetaanko liukulukuna. Jos tätä ei anneta, palautetaan
+                             kokonaislukuna.</dd>
 												
 											</dl>
 										
@@ -437,20 +630,81 @@ log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');</pre>
 									</li>
 								
 									<li 
-										 class='item2'
+										 class='item4'
 									>
-										<div class="fixedFont heading" id=".timer">
+										<div class="fixedFont heading" id=".splitString">
+											<span class='lighter'>
+											&lt;static&gt; 
+											</span>
+											
+											<span class="light">{Array}</span>
+											
+											<span class="light">Utils.</span><b>splitString</b>(str)
+										</div>
+										
+										<div class="description">
+											Palauttaa taulukon, jossa on merkkijono paloiteltuna sanoiksi, ottaa huomioon "merkki jonot"
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{String}</span> <b>str</b>
+														
+													</dt>
+													<dd>Merkkijono, joka paloitellaan</dd>
+												
+											</dl>
+										
+										
+										
+											<dl class="detailList nomargin">
+											
+												
+												
+												
+												
+												
+												
+												
+													<dt class="heading">Returns:</dt>
+													
+														<dd><span class="light fixedFont">{Array}</span> Paloiteltu jono</dd>
+													
+												
+												
+												
+												
+												
+											
+											</dl>
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item5'
+									>
+										<div class="fixedFont heading" id=".truncateNumber">
 											<span class='lighter'>
 											&lt;static&gt; 
 											</span>
 											
 											
 											
-											<span class="light">Utils.</span><b>timer</b>()
+											<span class="light">Utils.</span><b>truncateNumber</b>(num)
 										</div>
 										
 										<div class="description">
-											Palauttaa nykyisen palvelimen ajan millisekunteina, toimii kuten CoolBasicin Timer().
+											Poistaa numeron perästä desimaalit riippumatta numeron etumerkistä.
 											
 											
 											
@@ -459,6 +713,17 @@ log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');</pre>
 										
 										
 										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>num</b>
+														
+													</dt>
+													<dd>Numero, jonka perästä desimaalit poistetaan</dd>
+												
+											</dl>
 										
 										
 										
@@ -466,7 +731,7 @@ log.fatal('KRIITTINEN VIRHE! Tulostuu punaisena ja lihavoituna.');</pre>
 									</li>
 								
 									<li 
-										 class='item3'
+										 class='item6'
 									>
 										<div class="fixedFont heading" id=".wrapAngle">
 											<span class='lighter'>

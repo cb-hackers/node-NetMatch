@@ -2,37 +2,48 @@
  * @fileOverview Ajettava palvelin
  */
 
-// Tämän filun sisältämiä funktiota yms. ei dokumentoida.
 /**#nocode+*/
-
-// Vaatii cbNetwork ja node-optimist-paketin: https://github.com/substack/node-optimist
-
 var argv = require('optimist')
-    .default({p : 1337, a : undefined, d: false})
-    .alias({'p' : 'port', 'a' : 'address', 'd' : 'debug'})
-    .argv
+    .default({d: false, c: 'config'})
+    .alias({'p' : 'port', 'a' : 'address', 'd' : 'debug', 'c': 'config', 'h': 'help'})
+    .describe({
+      'h': 'Shows this help and exits.',
+      'c': 'Load config from this file default is `config`, do not use file extension.',
+      'p': 'Port to listen to. Clients must connect to this port (overrides config).',
+      'a': 'Address to bind to defaults to all addresses (overrides config).',
+      'd': 'Spam a lot.'})
+    .usage('Run NetMatch server: $0')
+    .check(function (a) {return !a.h;}) // Näytetään helppi, jos -h tai --help
+    .argv // Palautetaan parametrit opjektina, jotta niitä
+  // Nettimättö-juttuja
   , Packet = require('cbNetwork').Packet
+  , Server = require('./Server')
+  , Bullet = require('./Bullet')
+  // Vakioita
   , NET = require('./Constants').NET
   , ITM = require('./Constants').ITM
-  , Server = require('./Server')
-  , log = require('./Utils').log
-  , colors = require('colors')
-  , timer = require('./Utils').timer
-  , Bullet = require('./Weapon').Bullet;
+  // Utilsseja
+  , split  = require('./Utils').splitString
+  , log    = require('./Utils').log
+  , colors = require('colors');
 
 process.title = "NetMatch server";
 
+var VERSION = "v2.4a";
+
 // Tehdään uusi palvelin.
-var server = new Server(argv.p, argv.a, argv.d);
+var server = new Server(argv, VERSION);
+
+// Käsitellään viestejä klienteiltä
 
 server.on(NET.LOGIN, function NetLogin(client) {
   // Joku pyrkii sisään
   server.login(client);
 });
 
-server.on(NET.LOGOUT, function NetLogout(client, playerId) {
+server.on(NET.LOGOUT, function NetLogout(client, player) {
   // Heitä pelaaja pellolle
-  server.logout(playerId);
+  server.logout(player);
 });
 
 server.on(NET.PLAYER, function NetPlayer(client, player) {
@@ -64,7 +75,7 @@ server.on(NET.PLAYER, function NetPlayer(client, player) {
     // speedhack
 
     if (shooting === 1) {
-      new Bullet(server, player.playerId);
+      server.createBullet(player);
     }
 
     // Poimittiinko jotain
@@ -97,14 +108,15 @@ server.on(NET.TEXTMESSAGE, function NetTextMessage(client, player) {
     // Komennot vaativat admin-oikeudet
     if (player.admin) {
       log.notice('Player %0 called ´%1´', player.name.green, txtMessage);
-      server.commands.call(cmd, txtMessage.split(' ').splice(1), player);
+      server.commands.call(cmd, split(txtMessage).splice(1), player);
+    // Sallitaan kirjautumisen yrittäminen kuitenkin. :P
     } else if (cmd === 'login') {
       cmd = txtMessage.split(' ').splice(1);
       log.notice('Player %0 is trying to login with password ´%1´.', player.name.green, String(cmd[0]).red);
       server.commands.call('login', cmd, player);
     } else {
       log.warn('Player %0 tried to call ´%1´ without admin rights, access denied.', player.name.green, cmd);
-      server.serverMessage('You need to login as admin to use commands.', player.playerId);
+      server.serverMessage('You need to login as admin to use commands.', player);
     }
   } else {
     // Ei ollut komento, logataanpas tämä.
@@ -112,7 +124,7 @@ server.on(NET.TEXTMESSAGE, function NetTextMessage(client, player) {
 
     var msgData = {
       msgType: NET.TEXTMESSAGE,
-      playerId: player.playerId,
+      player: player,
       msgText: txtMessage
     };
     // Lähetetään kaikille muille paitsi boteille

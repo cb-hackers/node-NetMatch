@@ -11,6 +11,7 @@ var log = require('./Utils').log
  * @class Tavaroiden toteutus
  *
  * @param {Server} server  Käynnissä oleva NetMatch-palvelin
+ * @param {Map} map        Kartta johon uusi tavara luodaan
  * @param {Byte} itemId    Tavaran tunnus
  * @param {Byte} itemType  Tavaran tyyppi, kts. {@link ITM}
  *
@@ -19,10 +20,8 @@ var log = require('./Utils').log
  * @property {Number} x   Tavaran sijainti
  * @property {Number} y   Tavaran sijainti
  */
-function Item(server, itemId, itemType) {
-  var map = server.gameState.map
-    , randX
-    , randY;
+function Item(server, map, itemId, itemType) {
+  var randX, randY;
 
   this.server = server;
 
@@ -59,6 +58,6 @@ Item.prototype.pick = function () {
   });
 
   return this.type;
-}
+};
 
-exports = module.exports = Item;
+module.exports = Item;

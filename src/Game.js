@@ -5,7 +5,8 @@
 /**#nocode+*/
 var log = require('./Utils').log
   , colors = require('colors')
-  , timer = require('./Utils').timer;
+  , NET = require('./Constants').NET
+  , DRAW = require('./Constants').DRAW;
 /**#nocode-*/
 
 /**
@@ -18,15 +19,23 @@ function Game(server) {
   this.server = server;
   this.lastUpdate = 0;
   this.frameTime = 0;
-  this.interval = setInterval(this.update, 1000 / server.gameState.updatesPerSecond, this);
 }
+
+/**
+ * Käynnistää palvelimen
+ *
+ * @param {Number} updatesPerSecond  Kuinka monta kertaa sekunnissa palvelinta päivitetään
+ */
+Game.prototype.start = function (updatesPerSecond) {
+  this.interval = setInterval(this.update, 1000 / updatesPerSecond, this);
+};
 
 /**
  * Pysäyttää pelimekaniikan päivityksen.
  */
 Game.prototype.stop = function () {
   clearInterval(this.interval);
-}
+};
 
 /**
  * Päivittää pelimekaniikan, mikäli viime päivityksestä on kulunut tarpeeksi aikaa ja
@@ -41,32 +50,54 @@ Game.prototype.update = function (self) {
   self.updatePlayers();
   self.updateTimeouts();
   self.updateBotsAmount();
-  self.updateRegistration();
   self.updateBullets();
 
-  self.lastUpdate = timer();
-}
+  self.lastUpdate = Date.now();
+};
 
 /**
  * Päivittää vakionopeusajastimen
  * @private
  */
 Game.prototype.updateFrameTimer = function () {
-  var curTime = timer();
+  var curTime = Date.now();
   if (!this.lastUpdate) {
     this.lastUpdate = curTime;
   }
   this.frameTime = (curTime - this.lastUpdate) / 1000;
   this.lastUpdate = curTime;
-}
+};
 
 /**
- * Hoitaa bottien tekoälyn.
+ * Käy botit läpi ja kutsuu jokaisen päivitysrutiinia.
  * @private
  */
 Game.prototype.updateBotsAI = function () {
+  var self = this;
+  // Tarkistetaan onko pelaajia pelissä. Jos ei, niin ei päivitetä botteja.
+  if (this.server.gameState.playerCount <= 0) {
+    return;
+  }
 
-}
+  // Pyyhitään jokaiselta pelaajalta debuggaukset, jos debugataan.
+  if (this.server.debug) {
+    this.server.loopPlayers (function (player) {
+      if (!player.zombie && player.active && player.loggedIn && !player.debugState) {
+        self.server.messages.add(player.id, {
+          msgType: NET.DEBUGDRAWING,
+          drawType: DRAW.CLEAR
+        });
+        player.debugState = 1;
+      }
+    });
+  }
+
+  this.server.loopPlayers (function (player) {
+    if (player.zombie && player.active && !player.isDead) {
+      player.botAI.update();
+    }
+  });
+};
 
 /**
  * Tarkistaa onko erä päättynyt ja hoitaa vastaavat päivitykset, jos on
@@ -74,7 +105,7 @@ Game.prototype.updateBotsAI = function () {
  */
 Game.prototype.updateRoundTime = function () {
 
-}
+};
 
 /**
  * Päivittää pelaajien ja joukkueiden statsit, pelaajien määrän yms.
@@ -82,7 +113,7 @@ Game.prototype.updateRoundTime = function () {
  */
 Game.prototype.updateStats = function () {
 
-}
+};
 
 /**
  * Päivittää pelaajat. Hoitaa kuolleista herätykset ja sen etteivät pelaajat ole kartan sisällä.
@@ -107,14 +138,16 @@ Game.prototype.updatePlayers = function () {
       player.hackTestX = player.x;
       player.hackTestY = player.y;
       player.spawnTime = Date.now();
-      // UNIMPLEMENTED
-      // Jos tämä on botti niin arvotaan ase
+      if (player.zombie) {
+        player.isDead = false;
+        player.weapon = this.server.getBotWeapon();
+      }
     }
 
     // UNIMPLEMENTED
     // Onko pelajaa kartalla
   }
-}
+};
 
 /**
  * Poistaa pelaajat, joista ei ole hetkeen kuulunut mitään.
@@ -122,7 +155,7 @@ Game.prototype.updatePlayers = function () {
  */
 Game.prototype.updateTimeouts = function () {
 
-}
+};
 
 /**
  * Pitää bottien lukumäärän oikeana
@@ -130,15 +163,7 @@ Game.prototype.updateTimeouts = function () {
  */
 Game.prototype.updateBotsAmount = function () {
 
-}
-
-/**
- * Pitää palvelimen rekisteröinnin kunnossa
- * @private
- */
-Game.prototype.updateRegistration = function () {
-
-}
+};
 
 /**
  * Hoitaa ammusten siirtelyn, osumisen ja poistamisen.
@@ -153,7 +178,7 @@ Game.prototype.updateBullets = function () {
     bullet = this.server.bullets[bulletIds[i]];
     bullet.update();
   }
-}
+};
 
 /**
  * Palauttaa siirtymän tai kääntymän (pikseliä tai astetta sekunnissa)
@@ -162,6 +187,6 @@ Game.prototype.updateBullets = function () {
  */
 Game.prototype.movePerSec = function (amount) {
   return amount * this.frameTime;
-}
+};
 
-exports = module.exports = Game;
+module.exports = Game;

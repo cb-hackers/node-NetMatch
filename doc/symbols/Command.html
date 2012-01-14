@@ -36,6 +36,8 @@
 		<nav>
 			<ul class="classList" id="ClassList">
 				
+					<li><a href="../symbols/BotAI.html">BotAI</a></li>
+				
 					<li><a href="../symbols/Bullet.html">Bullet</a></li>
 				
 					<li><a href="../symbols/Command.html">Command</a></li>
@@ -45,6 +47,8 @@
 					<li><a href="../symbols/Config.html">Config</a></li>
 				
 					<li><a href="../symbols/Config.defaults.html">Config<span class='break'> </span>.<span class='break'> </span>defaults</a></li>
+				
+					<li><a href="../symbols/DRAW.html">DRAW</a></li>
 				
 					<li><a href="../symbols/Game.html">Game</a></li>
 				
@@ -64,11 +68,15 @@
 				
 					<li><a href="../symbols/Player.html">Player</a></li>
 				
+					<li><a href="../symbols/PLR.html">PLR</a></li>
+				
+					<li><a href="../symbols/Registration.html">Registration</a></li>
+				
 					<li><a href="../symbols/Server.html">Server</a></li>
 				
 					<li><a href="../symbols/Utils.html">Utils</a></li>
 				
-					<li><a href="../symbols/Weapons.html">Weapons</a></li>
+					<li><a href="../symbols/Weapons.WPN.html">Weapons<span class='break'> </span>.<span class='break'> </span>WPN</a></li>
 				
 					<li><a href="../symbols/WPN.html">WPN</a></li>
 				
@@ -81,7 +89,7 @@
 			Documentation generator: <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0<br />
 			Template: <a href="http://www.thebrightlines.com/2010/05/06/new-template-for-jsdoctoolkit-codeview/" target="_blank">Codeview</a> 1.2<br />
 			Generated on:
-			<time datetime='2012-0-2' pubdate>2012-0-2 22:02</time>
+			<time datetime='2012-0-15' pubdate>2012-0-15 1:12</time>
 		</footer>
 	</div>
 </div>
@@ -133,7 +141,7 @@
 										<div class="fixedFont">
 											<b><a href="../symbols/Command.html#constructor">Command</a></b>(server)
 										</div>
-										<div class="description">Hoitaa komentojen sisäisen käsittelyn ja toteutuksen</div>
+										<div class="description">Hoitaa komentojen sisäisen käsittelyn.</div>
 									</td>
 								</tr>
 							</tbody>
@@ -182,9 +190,9 @@
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/Command.html#getHelpString">getHelpString</a></b>(name)
+													<div class="fixedFont"><b><a href="../symbols/Command.html#getHelpString">getHelpString</a></b>(name, format)
 													</div>
-													<div class="description">Luo merkkijonon, joka kertoo komennon tiedot hienosti muotoiltuna.</div>
+													<div class="description">Palauttaa komennon tiedot merkkijonona.</div>
 												</td>
 											</tr>
 										
@@ -195,7 +203,7 @@
 												<td class="nameDescription">
 													<div class="fixedFont"><b><a href="../symbols/Command.html#suggest">suggest</a></b>(partial)
 													</div>
-													<div class="description">Hoitaa komentojen ja pelaajien nimimerkkien täydentämisen annetun parametrin perusteella</div>
+													<div class="description">Palauttaa listan ehdotuksista annetulle komentorivin alulle.</div>
 												</td>
 											</tr>
 										
@@ -229,7 +237,7 @@
 							</div>
 							
 							<div class="description">
-								Hoitaa komentojen sisäisen käsittelyn ja toteutuksen
+								Hoitaa komentojen sisäisen käsittelyn.
 								
 							</div>
 							
@@ -331,13 +339,13 @@
 											
 											</span>
 											
+											<span class="light">{String}</span>
 											
-											
-											<b>getHelpString</b>(name)
+											<b>getHelpString</b>(name, format)
 										</div>
 										
 										<div class="description">
-											Luo merkkijonon, joka kertoo komennon tiedot hienosti muotoiltuna.
+											Palauttaa komennon tiedot merkkijonona.
 											
 											
 											
@@ -356,9 +364,36 @@
 													</dt>
 													<dd>Komento, jonka tiedot haluat</dd>
 												
+													<dt>
+														<span class="light fixedFont">{Boolean}</span> <b>format</b>
+														
+													</dt>
+													<dd>Formatoidaanko? (värit & wtf-8)</dd>
+												
 											</dl>
 										
 										
+										
+											<dl class="detailList nomargin">
+											
+												
+												
+												
+												
+												
+												
+												
+													<dt class="heading">Returns:</dt>
+													
+														<dd><span class="light fixedFont">{String}</span> Hienosti muotoiltu merkkijono.</dd>
+													
+												
+												
+												
+												
+												
+											
+											</dl>
 										
 										<div class="hr"></div>
 									</li>
@@ -377,7 +412,7 @@
 										</div>
 										
 										<div class="description">
-											Hoitaa komentojen ja pelaajien nimimerkkien täydentämisen annetun parametrin perusteella
+											Palauttaa listan ehdotuksista annetulle komentorivin alulle. esim 'l' -> ['list', 'login']
 											
 											
 											
@@ -394,7 +429,7 @@
 														<span class="light fixedFont">{String}</span> <b>partial</b>
 														
 													</dt>
-													<dd></dd>
+													<dd>Käyttäjän aloittama rivi, kun hän painaa tabia.</dd>
 												
 											</dl>
 										
@@ -411,7 +446,7 @@
 												
 													<dt class="heading">Returns:</dt>
 													
-														<dd><span class="light fixedFont">{Array}</span> Löydetyt ehdotukset</dd>
+														<dd><span class="light fixedFont">{Array}</span> Löydetyt  ehdotukset, jos niitä on vain yksi, sillä korvataan koko rivi.</dd>
 													
 												
 												

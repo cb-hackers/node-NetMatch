@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
-		<title>ITM | JsDoc Reference</title>
+		<title>Weapons.WPN | JsDoc Reference</title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta name="mobileoptimized" content="0" />
@@ -102,12 +102,27 @@
 			<header>
 				<h1 class="classTitle">
 					
-					Namespace <span>ITM</span>
+					Namespace <span>Weapons.WPN</span>
 				</h1>
 				
 				<div class="intro">
 					<p class="description summary">
-						Itemit omana kokoelmanaan eroteltuna OBJ kokoelmasta.
+						Sisältää aseet ja niiden ominaisuudet. Jokaisella aseella on alla olevat kentät:
+<table>
+<tr><td> reloadTime   </td><td>  Latausaika  </td></tr>
+<tr><td> bulletSpeed  </td><td>  Paljonko ammus liikkuu yhdessä sekunnissa  </td></tr>
+<tr><td> bulletForth  </td><td>  Ammuksen lähtöpaikka pelaajan etupuolella  </td></tr>
+<tr><td> bulletYaw    </td><td>  Ammuksen lähtöpaikka sivusuunnassa  </td></tr>
+<tr><td> damage       </td><td>  Ammuksen aiheuttama tuho  </td></tr>
+<tr><td> damageRange  </td><td>  Tuhoalueen laajuus  </td></tr>
+<tr><td> spread       </td><td>  Hajonta asteina  </td></tr>
+<tr><td> maxAmmo      </td><td>  Ammusten maksimimäärä  </td></tr>
+<tr><td> pickCount    </td><td>  Kuinka paljon tavaraa saa poimittaessa  </td></tr>
+<tr><td> safeRange    </td><td>  Etäisyys jonka alle kohteesta oleva botti ei ammu  </td></tr>
+<tr><td> shootRange   </td><td>  Etäisyys jonka alle kohteesta oleva botti ampuu  </td></tr>
+<tr><td> weight       </td><td>  Aseen paino, vaikuttaa liikkumisen nopeuteen. 100 = normaali  </td></tr>
+<tr><td> name         </td><td>  Aseen nimi merkkijonona, debuggailua varten  </td></tr>
+</table>
 					</p>
 						
 					
@@ -115,7 +130,7 @@
 							
 							
 							
-								<li>Defined in: <a href="../symbols/src/src_nm_Constants.js.html">Constants.js</a></li>
+								<li>Defined in: <a href="../symbols/src/src_nm_Weapon.js.html">Weapon.js</a></li>
 							
 							
 						</ul>
@@ -131,7 +146,7 @@
 					
 						<nav>
 							<div class="props">
-								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class ITM.">
+								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Weapons.WPN.">
 									<caption class="sectionTitle">Field Summary</caption>
 									
 									<thead>
@@ -147,9 +162,9 @@
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													ITM.<b><a href="../symbols/ITM.html#.AMMO">AMMO</a></b>
+													Weapons.WPN.<b><a href="../symbols/Weapons.WPN.html#.BAZOOKA">BAZOOKA</a></b>
 													</div>
-													<div class="description">Konekiväärin ammuksia</div>
+													<div class="description">Sinko, <code>Weapons[WPN.BAZOOKA]</code></div>
 												</td>
 											</tr>
 										
@@ -157,9 +172,9 @@
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													ITM.<b><a href="../symbols/ITM.html#.FUEL">FUEL</a></b>
+													Weapons.WPN.<b><a href="../symbols/Weapons.WPN.html#.CHAINSAW">CHAINSAW</a></b>
 													</div>
-													<div class="description">Moottorisahan bensaa</div>
+													<div class="description">Moottorisaha, <code>Weapons[WPN.CHAINSAW]</code></div>
 												</td>
 											</tr>
 										
@@ -167,9 +182,9 @@
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													ITM.<b><a href="../symbols/ITM.html#.HEALTH">HEALTH</a></b>
+													Weapons.WPN.<b><a href="../symbols/Weapons.WPN.html#.LAUNCHER">LAUNCHER</a></b>
 													</div>
-													<div class="description">Healthpack</div>
+													<div class="description">Kranaatinlaukaisin, <code>Weapons[WPN.LAUNCHER]</code></div>
 												</td>
 											</tr>
 										
@@ -177,9 +192,9 @@
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													ITM.<b><a href="../symbols/ITM.html#.LAUNCHER">LAUNCHER</a></b>
+													Weapons.WPN.<b><a href="../symbols/Weapons.WPN.html#.MGUN">MGUN</a></b>
 													</div>
-													<div class="description">Kranaatteja</div>
+													<div class="description">Konekivääri, <code>Weapons[WPN.MGUN]</code></div>
 												</td>
 											</tr>
 										
@@ -187,9 +202,9 @@
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													ITM.<b><a href="../symbols/ITM.html#.ROCKET">ROCKET</a></b>
+													Weapons.WPN.<b><a href="../symbols/Weapons.WPN.html#.PISTOL">PISTOL</a></b>
 													</div>
-													<div class="description">Singon ammuksia</div>
+													<div class="description">Pistooli, <code>Weapons[WPN.PISTOL]</code></div>
 												</td>
 											</tr>
 										
@@ -197,9 +212,9 @@
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													ITM.<b><a href="../symbols/ITM.html#.SHOTGUN">SHOTGUN</a></b>
+													Weapons.WPN.<b><a href="../symbols/Weapons.WPN.html#.SHOTGUN">SHOTGUN</a></b>
 													</div>
-													<div class="description">Haulikon ammuksia</div>
+													<div class="description">Haulikko, <code>Weapons[WPN.SHOTGUN]</code></div>
 												</td>
 											</tr>
 										
@@ -237,18 +252,18 @@
 							</h2>
 							
 							
-								<div class="fixedFont heading" id=".AMMO">
+								<div class="fixedFont heading" id=".BAZOOKA">
 									<span class='lighter'>
 									&lt;static&gt; 
 									</span>
 									
 									
 									
-									<span class="light">ITM.</span><b>AMMO</b>							
+									<span class="light">Weapons.WPN.</span><b>BAZOOKA</b>							
 								</div>
 								
 								<div class="description">
-									Konekiväärin ammuksia
+									Sinko, <code>Weapons[WPN.BAZOOKA]</code>
 									
 									
 									
@@ -259,40 +274,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".FUEL">
+								<div class="fixedFont heading" id=".CHAINSAW">
 									<span class='lighter'>
 									&lt;static&gt; 
 									</span>
 									
 									
 									
-									<span class="light">ITM.</span><b>FUEL</b>							
+									<span class="light">Weapons.WPN.</span><b>CHAINSAW</b>							
 								</div>
 								
 								<div class="description">
-									Moottorisahan bensaa
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id=".HEALTH">
-									<span class='lighter'>
-									&lt;static&gt; 
-									</span>
-									
-									
-									
-									<span class="light">ITM.</span><b>HEALTH</b>							
-								</div>
-								
-								<div class="description">
-									Healthpack
+									Moottorisaha, <code>Weapons[WPN.CHAINSAW]</code>
 									
 									
 									
@@ -310,11 +303,11 @@
 									
 									
 									
-									<span class="light">ITM.</span><b>LAUNCHER</b>							
+									<span class="light">Weapons.WPN.</span><b>LAUNCHER</b>							
 								</div>
 								
 								<div class="description">
-									Kranaatteja
+									Kranaatinlaukaisin, <code>Weapons[WPN.LAUNCHER]</code>
 									
 									
 									
@@ -325,18 +318,40 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".ROCKET">
+								<div class="fixedFont heading" id=".MGUN">
 									<span class='lighter'>
 									&lt;static&gt; 
 									</span>
 									
 									
 									
-									<span class="light">ITM.</span><b>ROCKET</b>							
+									<span class="light">Weapons.WPN.</span><b>MGUN</b>							
 								</div>
 								
 								<div class="description">
-									Singon ammuksia
+									Konekivääri, <code>Weapons[WPN.MGUN]</code>
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".PISTOL">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									
+									
+									<span class="light">Weapons.WPN.</span><b>PISTOL</b>							
+								</div>
+								
+								<div class="description">
+									Pistooli, <code>Weapons[WPN.PISTOL]</code>
 									
 									
 									
@@ -354,11 +369,11 @@
 									
 									
 									
-									<span class="light">ITM.</span><b>SHOTGUN</b>							
+									<span class="light">Weapons.WPN.</span><b>SHOTGUN</b>							
 								</div>
 								
 								<div class="description">
-									Haulikon ammuksia
+									Haulikko, <code>Weapons[WPN.SHOTGUN]</code>
 									
 									
 									

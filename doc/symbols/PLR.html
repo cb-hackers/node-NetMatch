@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
-		<title>Weapons | JsDoc Reference</title>
+		<title>PLR | JsDoc Reference</title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta name="mobileoptimized" content="0" />
@@ -36,6 +36,8 @@
 		<nav>
 			<ul class="classList" id="ClassList">
 				
+					<li><a href="../symbols/BotAI.html">BotAI</a></li>
+				
 					<li><a href="../symbols/Bullet.html">Bullet</a></li>
 				
 					<li><a href="../symbols/Command.html">Command</a></li>
@@ -45,6 +47,8 @@
 					<li><a href="../symbols/Config.html">Config</a></li>
 				
 					<li><a href="../symbols/Config.defaults.html">Config<span class='break'> </span>.<span class='break'> </span>defaults</a></li>
+				
+					<li><a href="../symbols/DRAW.html">DRAW</a></li>
 				
 					<li><a href="../symbols/Game.html">Game</a></li>
 				
@@ -64,11 +68,15 @@
 				
 					<li><a href="../symbols/Player.html">Player</a></li>
 				
+					<li><a href="../symbols/PLR.html">PLR</a></li>
+				
+					<li><a href="../symbols/Registration.html">Registration</a></li>
+				
 					<li><a href="../symbols/Server.html">Server</a></li>
 				
 					<li><a href="../symbols/Utils.html">Utils</a></li>
 				
-					<li><a href="../symbols/Weapons.html">Weapons</a></li>
+					<li><a href="../symbols/Weapons.WPN.html">Weapons<span class='break'> </span>.<span class='break'> </span>WPN</a></li>
 				
 					<li><a href="../symbols/WPN.html">WPN</a></li>
 				
@@ -81,7 +89,7 @@
 			Documentation generator: <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0<br />
 			Template: <a href="http://www.thebrightlines.com/2010/05/06/new-template-for-jsdoctoolkit-codeview/" target="_blank">Codeview</a> 1.2<br />
 			Generated on:
-			<time datetime='2012-0-2' pubdate>2012-0-2 22:02</time>
+			<time datetime='2012-0-15' pubdate>2012-0-15 1:12</time>
 		</footer>
 	</div>
 </div>
@@ -94,27 +102,12 @@
 			<header>
 				<h1 class="classTitle">
 					
-					Namespace <span>Weapons</span>
+					Namespace <span>PLR</span>
 				</h1>
 				
 				<div class="intro">
 					<p class="description summary">
-						Sisältää aseet ja niiden ominaisuudet. Jokaisella aseella on alla olevat kentät:
-<table>
-<tr><td> reloadTime   </td><td>  Latausaika  </td></tr>
-<tr><td> bulletSpeed  </td><td>  Paljonko ammus liikkuu yhdessä sekunnissa  </td></tr>
-<tr><td> bulletForth  </td><td>  Ammuksen lähtöpaikka pelaajan etupuolella  </td></tr>
-<tr><td> bulletYaw    </td><td>  Ammuksen lähtöpaikka sivusuunnassa  </td></tr>
-<tr><td> damage       </td><td>  Ammuksen aiheuttama tuho  </td></tr>
-<tr><td> damageRange  </td><td>  Tuhoalueen laajuus  </td></tr>
-<tr><td> spread       </td><td>  Hajonta asteina  </td></tr>
-<tr><td> maxAmmo      </td><td>  Ammusten maksimimäärä  </td></tr>
-<tr><td> pickCount    </td><td>  Kuinka paljon tavaraa saa poimittaessa  </td></tr>
-<tr><td> safeRange    </td><td>  Etäisyys jonka alle kohteesta oleva botti ei ammu  </td></tr>
-<tr><td> shootRange   </td><td>  Etäisyys jonka alle kohteesta oleva botti ampuu  </td></tr>
-<tr><td> weight       </td><td>  Aseen paino, vaikuttaa liikkumisen nopeuteen. 100 = normaali  </td></tr>
-<tr><td> name         </td><td>  Aseen nimi merkkijonona, debuggailua varten  </td></tr>
-</table>
+						Pelaajiin liittyvät rajoitukset
 					</p>
 						
 					
@@ -122,7 +115,7 @@
 							
 							
 							
-								<li>Defined in: <a href="../symbols/src/src_nm_Weapon.js.html">Weapon.js</a></li>
+								<li>Defined in: <a href="../symbols/src/src_nm_Constants.js.html">Constants.js</a></li>
 							
 							
 						</ul>
@@ -138,7 +131,7 @@
 					
 						<nav>
 							<div class="props">
-								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Weapons.">
+								<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class PLR.">
 									<caption class="sectionTitle">Field Summary</caption>
 									
 									<thead>
@@ -151,62 +144,32 @@
 									<tbody>
 										
 											<tr>
-												<td class="attributes">&nbsp;</td>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Weapons.html#1">1</a></b>
+													PLR.<b><a href="../symbols/PLR.html#.BACKWARD_SPEED">BACKWARD_SPEED</a></b>
 													</div>
-													<div class="description">Pistooli, <code>Weapons[WPN.PISTOL]</code></div>
+													<div class="description">Nopeus taakse (pikseliä sekunnissa)</div>
 												</td>
 											</tr>
 										
 											<tr>
-												<td class="attributes">&nbsp;</td>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Weapons.html#2">2</a></b>
+													PLR.<b><a href="../symbols/PLR.html#.FORWARD_SPEED">FORWARD_SPEED</a></b>
 													</div>
-													<div class="description">Konekivääri, <code>Weapons[WPN.MGUN]</code></div>
+													<div class="description">Nopeus eteen (pikseliä sekunnissa)</div>
 												</td>
 											</tr>
 										
 											<tr>
-												<td class="attributes">&nbsp;</td>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
-													<b><a href="../symbols/Weapons.html#3">3</a></b>
+													PLR.<b><a href="../symbols/PLR.html#.SIDESTEP_SPEED">SIDESTEP_SPEED</a></b>
 													</div>
-													<div class="description">Sinko, <code>Weapons[WPN.BAZOOKA]</code></div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Weapons.html#4">4</a></b>
-													</div>
-													<div class="description">Haulikko, <code>Weapons[WPN.SHOTGUN]</code></div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Weapons.html#5">5</a></b>
-													</div>
-													<div class="description">Kranaatinlaukaisin, <code>Weapons[WPN.LAUNCHER]</code></div>
-												</td>
-											</tr>
-										
-											<tr>
-												<td class="attributes">&nbsp;</td>
-												<td class="nameDescription">
-													<div class="fixedFont">
-													<b><a href="../symbols/Weapons.html#6">6</a></b>
-													</div>
-													<div class="description">Moottorisaha, <code>Weapons[WPN.CHAINSAW]</code></div>
+													<div class="description">Nopeus sivulle (pikseliä sekunnissa)</div>
 												</td>
 											</tr>
 										
@@ -244,18 +207,18 @@
 							</h2>
 							
 							
-								<div class="fixedFont heading" id="1">
+								<div class="fixedFont heading" id=".BACKWARD_SPEED">
 									<span class='lighter'>
-									
+									&lt;static&gt; 
 									</span>
 									
 									
 									
-									<b>1</b>							
+									<span class="light">PLR.</span><b>BACKWARD_SPEED</b>							
 								</div>
 								
 								<div class="description">
-									Pistooli, <code>Weapons[WPN.PISTOL]</code>
+									Nopeus taakse (pikseliä sekunnissa)
 									
 									
 									
@@ -266,18 +229,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id="2">
+								<div class="fixedFont heading" id=".FORWARD_SPEED">
 									<span class='lighter'>
-									
+									&lt;static&gt; 
 									</span>
 									
 									
 									
-									<b>2</b>							
+									<span class="light">PLR.</span><b>FORWARD_SPEED</b>							
 								</div>
 								
 								<div class="description">
-									Konekivääri, <code>Weapons[WPN.MGUN]</code>
+									Nopeus eteen (pikseliä sekunnissa)
 									
 									
 									
@@ -288,84 +251,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id="3">
+								<div class="fixedFont heading" id=".SIDESTEP_SPEED">
 									<span class='lighter'>
-									
+									&lt;static&gt; 
 									</span>
 									
 									
 									
-									<b>3</b>							
+									<span class="light">PLR.</span><b>SIDESTEP_SPEED</b>							
 								</div>
 								
 								<div class="description">
-									Sinko, <code>Weapons[WPN.BAZOOKA]</code>
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="4">
-									<span class='lighter'>
-									
-									</span>
-									
-									
-									
-									<b>4</b>							
-								</div>
-								
-								<div class="description">
-									Haulikko, <code>Weapons[WPN.SHOTGUN]</code>
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="5">
-									<span class='lighter'>
-									
-									</span>
-									
-									
-									
-									<b>5</b>							
-								</div>
-								
-								<div class="description">
-									Kranaatinlaukaisin, <code>Weapons[WPN.LAUNCHER]</code>
-									
-									
-									
-								</div>
-								
-								
-									
-								
-								<div class="hr"></div>
-							
-								<div class="fixedFont heading" id="6">
-									<span class='lighter'>
-									
-									</span>
-									
-									
-									
-									<b>6</b>							
-								</div>
-								
-								<div class="description">
-									Moottorisaha, <code>Weapons[WPN.CHAINSAW]</code>
+									Nopeus sivulle (pikseliä sekunnissa)
 									
 									
 									
