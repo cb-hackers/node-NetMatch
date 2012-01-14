@@ -186,7 +186,7 @@ Server.prototype.initialize = function (port, address, config) {
   }
 
   // Käynnistetään pelimekaniikka, joka päivittyy 60 kertaa sekunnissa
-  this.game.start(60);
+  this.game.start(30);
 };
 
 /**
@@ -554,7 +554,7 @@ Server.prototype.logout = function (player) {
   this.registration.update();
 
   // Lähetetään viesti kaikille muille paitsi boteille ja itselle
-  this.messages.addToAll({msgType: NET.LOGOUT, playerId: player.id}, player.id);
+  this.messages.addToAll({msgType: NET.LOGOUT, player: player}, player.id);
 };
 
 /**
