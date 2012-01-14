@@ -712,7 +712,7 @@ Server.prototype.createBullet = function (player) {
       // Toinen ammus kranaatinlaukaisimesta lähtee peilattuna
       bullet = new Bullet(this, player, ++this.lastBulletId, true);
     } else {
-      bullet = new Bullet(this, player, ++this.lastBulletId, true);
+      bullet = new Bullet(this, player, ++this.lastBulletId);
     }
     if (bullet.initialize()) {
       // Jos ammuksen alustus onnistui (esim. ei ammuttu seinän sisällä), lisätään se listaan.
