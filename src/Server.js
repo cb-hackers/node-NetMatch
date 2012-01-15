@@ -185,8 +185,8 @@ Server.prototype.initialize = function (port, address, config) {
     });
   }
 
-  // Käynnistetään pelimekaniikka, joka päivittyy 60 kertaa sekunnissa
-  this.game.start(30);
+  // Käynnistetään pelimekaniikka, joka päivittyy configeissa määriteltyyn tahtiin.
+  this.game.start(this.config.updatesPerSec);
 };
 
 /**
