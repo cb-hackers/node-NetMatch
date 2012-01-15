@@ -131,7 +131,7 @@ BotAI.prototype.update = function () {
 
     // Poimitaan botin nenän edestä mahdollinen seinä
     pickWall = map.findWall(picker.x, picker.y, picker.angle, wakeupDist);
-    this.debugRayCast(pickWall, picker);
+    this.debugRayCast(pickWall, picker, true);
     if (pickWall) {
       minDist = distance(picker.x, picker.y, pickWall.x, pickWall.y);
     }
@@ -139,17 +139,17 @@ BotAI.prototype.update = function () {
     // Poimitaan botin vasemman reunan puolelta seinä
     picker.move(0, -15);
     pickWall = map.findWall(picker.x, picker.y, picker.angle, wakeupDist);
-    this.debugRayCast(pickWall, picker);
+    this.debugRayCast(pickWall, picker, true);
     if (pickWall) {
-      minDist = Math.min(minDist, distance(picker.x, picker.y, pickWall.x, pickWall.y));
+      minDist = Math.min(minDist || 99999, distance(picker.x, picker.y, pickWall.x, pickWall.y));
     }
 
     // Poimitaan botin oikean reunan puolelta seinä
     picker.move(0, 30);
     pickWall = map.findWall(picker.x, picker.y, picker.angle, wakeupDist);
-    this.debugRayCast(pickWall, picker);
+    this.debugRayCast(pickWall, picker, true);
     if (pickWall) {
-      minDist = Math.min(minDist, distance(picker.x, picker.y, pickWall.x, pickWall.y));
+      minDist = Math.min(minDist || 99999, distance(picker.x, picker.y, pickWall.x, pickWall.y));
     }
 
     // Jos tarpeeksi lähellä on seinä niin reagoidaan siihen nyt
@@ -160,13 +160,13 @@ BotAI.prototype.update = function () {
       // Käännetään katsetta toiselle sivulle ja lasketaan etäisyys lähimpään esteeseen
       picker.turn(-this.config.exploreAngle);
       pickWall = map.findWall(picker.x, picker.y, picker.angle, superLargeDist);
-      this.debugRayCast(pickWall, picker);
+      this.debugRayCast(pickWall, picker, true);
       dist1 = distance(picker.x, picker.y, pickWall.x, pickWall.y);
 
       // Ja sitten vielä toiseen suuntaan.
       picker.turn(this.config.exploreAngle * 2);
       pickWall = map.findWall(picker.x, picker.y, picker.angle, superLargeDist);
-      this.debugRayCast(pickWall, picker);
+      this.debugRayCast(pickWall, picker, true);
       dist2 = distance(picker.x, picker.y, pickWall.x, pickWall.y);
 
       // Tutkitaan kumpaan suuntaan on pidempi matka seuraavaan esteeseen ja suunnataan sinne.
@@ -219,20 +219,25 @@ BotAI.prototype.update = function () {
 /**
  * Debuggaa raycastia
  */
-BotAI.prototype.debugRayCast = function (collision, picker) {
-  if (!this.server.debug) {
-    return;
-  }
+BotAI.prototype.debugRayCast = function (collision, picker, drawLineToCollision) {
+  if (!this.server.debug) { return; }
+  if (!collision && drawLineToCollision) { return; }
   var self = this
     , startX, startY, endX, endY, colX, colY;
 
   startX = Math.round(picker.x);
   startY = Math.round(picker.y);
-  endX = Math.round(picker.x + Math.cos(picker.angle / 180 * Math.PI) * this.config.wakeupDist);
-  endY = Math.round(picker.y + Math.sin(picker.angle / 180 * Math.PI) * this.config.wakeupDist);
   if (collision) {
     colX = Math.round(collision.x);
     colY = Math.round(collision.y);
+    if (drawLineToCollision) {
+      endX = colX;
+      endY = colY;
+    }
+  }
+  if (!collision || !drawLineToCollision) {
+    endX = Math.round(picker.x + Math.cos(picker.angle / 180 * Math.PI) * this.config.wakeupDist);
+    endY = Math.round(picker.y + Math.sin(picker.angle / 180 * Math.PI) * this.config.wakeupDist);
   }
 
   this.server.loopPlayers(function (player) {
@@ -248,7 +253,7 @@ BotAI.prototype.debugRayCast = function (collision, picker) {
           endY
         ]
       });
-      if (!collision) { return; }
+      if (drawLineToCollision || !collision) { return; }
       self.server.messages.add(player.id, {
         msgType: NET.DEBUGDRAWING,
         drawType: DRAW.CIRCLE,
