@@ -41,11 +41,11 @@ var log = require('./Utils').log
  * @property {Integer} tileSize               Yhden tilen leveys/korkeus pikseleissä
  * @property {Integer} width                  Kartan leveys
  * @property {Integer} height                 Kartan korkeus
- * @property {Array}   data                   Törmäyskerroksen data kaksiulotteisessa xy-taulukossa
+ * @property {Array}   data                   Törmäyskerroksen data yksiulotteisessa taulukossa
 */
 function Map(server, name) {
   var filePath = path.resolve(__dirname, '..', 'maps', name + '.json')
-    , data;
+    , data, buffer, uint8View;
 
   this.server = server;
   this.loaded = false;
@@ -59,6 +59,17 @@ function Map(server, name) {
   data = cjson.load(filePath);
   // Laajennetaan tämän kartan ominaisuuksia ladatulla json-tiedostolla
   cjson.extend(this, data);
+
+  // Muunnetaan törmäyskerroksen data 8-bittiseksi, yksiulotteiseksi taulukoksi
+  buffer = new ArrayBuffer(this.width * this.height);
+  uint8View = new Uint8Array(buffer);
+  for (var y = 0; y < this.height; ++y) {
+    for (var x = 0; x < this.width; ++x) {
+      var index = y * this.width + x;
+      uint8View[index] = this.data[y][x];
+    }
+  }
+  this.data = uint8View;
 
   // Alustetaan kartan tavarat
   this.initItems();
@@ -74,23 +85,25 @@ function Map(server, name) {
  */
 Map.prototype.isColliding = function (x, y) {
   var tileX = Math.ceil((x + this.width * this.tileSize / 2) / this.tileSize) - 1
-    , tileY = Math.ceil((-y + this.height * this.tileSize / 2) / this.tileSize) - 1;
+    , tileY = Math.ceil((-y + this.height * this.tileSize / 2) / this.tileSize) - 1
+    , index;
 
   if (tileX < 0 || tileX >= this.width || tileY < 0 || tileY >= this.height) {
     // Ollaan kartan ulkopuolella, eli törmätään.
     return true;
   }
 
+  // Lasketaan tilen paikka yksiulotteisessa taulukossa
+  index = tileY * this.width + tileX;
+
   if (this.server.debug) {
-    if ('undefined' === typeof this.data ||
-        'undefined' === typeof this.data[tileY] ||
-        'undefined' === typeof this.data[tileY][tileX] ) {
-      log.error('Map.data[%0][%1] is undefined', tileY, tileX);
+    if ('undefined' === typeof this.data || 'undefined' === typeof this.data[index]) {
+      log.error('Map.data[%0] (%1, %2) is undefined', index, tileY, tileX);
     }
   }
 
   // Nyt tarkistetaan että ollaanko seinän sisällä
-  if (this.data[tileY][tileX]) {
+  if (this.data[index]) {
     return true;
   }
 
@@ -105,12 +118,15 @@ Map.prototype.isColliding = function (x, y) {
  * @returns {Object}  Objekti, jolla on kentät x ja y, jotka ovat löydetyn paikan koordinaatit
  */
 Map.prototype.findSpot = function () {
-  var randTileX, randTileY, returnObj = {};
+  var randTileX, randTileY, index, returnObj = {};
   // Etsitään vapaata paikkaa kartalta "vain" 10 000 kertaa
   for (var i = 9999; --i;) {
     randTileX = rand(0, this.width - 1);
     randTileY = rand(0, this.height - 1);
-    if (!this.data[randTileY][randTileX]) {
+    // Lasketaan tilen paikka yksiulotteisessa taulukossa
+    index = randTileY * this.width + randTileX;
+
+    if (!this.data[index]) {
       // Ei ollut seinän sisällä
       returnObj.x = (randTileX * this.tileSize)
                   - (this.width * this.tileSize) / 2
@@ -203,7 +219,8 @@ Map.prototype.rayCast = function (origP1, origP2) {
     , maxX, maxY
     , endTile
     , hit
-    , colP;
+    , colP
+    , index;
 
   // Ylitetäänkö minkään laatan rajoja
   if (truncateNumber(p1.x) === truncateNumber(p2.x) && truncateNumber(p1.y) === truncateNumber(p2.y)) {
@@ -262,8 +279,10 @@ Map.prototype.rayCast = function (origP1, origP2) {
         // Ollaan kartan ulkopuolella, eli törmätään.
         hit = 1;
       } else {
+        // Lasketaan tilen paikka yksiulotteisessa taulukossa
+        index = testTile.y * this.width + testTile.x;
         // Tarkistetaan onko tilekerroksessa hit-dataa
-        hit = this.data[testTile.y][testTile.x];
+        hit = this.data[index];
       }
       if (hit) {
         // Raycast löysi törmäyksen
@@ -283,8 +302,10 @@ Map.prototype.rayCast = function (origP1, origP2) {
         // Ollaan kartan ulkopuolella, eli törmätään.
         hit = 0;
       } else {
+        // Lasketaan tilen paikka yksiulotteisessa taulukossa
+        index = testTile.y * this.width + testTile.x;
         // Tarkistetaan onko tilekerroksessa hit-dataa
-        hit = this.data[testTile.y][testTile.x];
+        hit = this.data[index];
       }
       if (hit) {
         // Raycast löysi törmäyksen
