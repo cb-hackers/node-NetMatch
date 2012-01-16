@@ -99,12 +99,14 @@ Player.prototype.constructor = Player;
 Player.prototype.kill = function (bullet) {
   var killer, weapon;
 
-  // Logataan kuka tappoi kenet.
-  if (bullet && this.server.players[bullet.player.id].name !== this.name) {
-    log.info('%0 was killed by player %1', this.name.green,
-      this.server.players[bullet.player.id].name.green, String(bullet.id).magenta);
-  } else {
-    log.info('%0 committed suicide.', this.name.green);
+  if (this.server.config.logKillMessages) {
+    // Logataan kuka tappoi kenet.
+    if (bullet && this.server.players[bullet.player.id].name !== this.name) {
+      log.info('%0 was killed by player %1', this.name.green,
+        this.server.players[bullet.player.id].name.green, String(bullet.id).magenta);
+    } else {
+      log.info('%0 committed suicide.', this.name.green);
+    }
   }
 
   this.isDead = true;

@@ -89,6 +89,12 @@ Config.defaults = {
    */
   deathDelay: 3000,
   /**
+   * Näytetäänkö palvelimen konsolissa tappoviestit
+   * @type Boolean
+   * @default true
+   */
+  logKillMessages: true,
+  /**
    * Ovatko tutkanuolet käytössä vai ei
    * @type Boolean
    * @default true
