@@ -2,6 +2,8 @@
  * @fileOverview Serverikomentoihin liittyvät toiminnot
  */
 
+"use strict";
+
 /**#nocode+*/
 var log  = require('./Utils').log
   , join = require('./Utils').join

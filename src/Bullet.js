@@ -2,6 +2,8 @@
  * @fileOverview Sisältää {@link Bullet}-luokan toteutuksen.
  */
 
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , rand = require('./Utils').rand

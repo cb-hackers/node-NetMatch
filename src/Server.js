@@ -2,6 +2,8 @@
  * @fileOverview Pitää sisällään {@link Server} nimiavaruuden.
  */
 
+"use strict";
+
 /**#nocode+*/
 var cbNetwork = require('cbNetwork')
   , Packet = cbNetwork.Packet
@@ -390,7 +392,7 @@ Server.prototype.sendReply = function (client, player) {
   if (player.sendNames) {
     player.sendNames = false;
     var itemIds = Object.keys(this.items);
-    for (i = itemIds.length; i--;) {
+    for (var i = itemIds.length; i--;) {
       var item = this.items[itemIds[i]];
       this.messages.add(player.id, {
         msgType: NET.ITEM,
@@ -451,7 +453,7 @@ Server.prototype.login = function (client) {
     , playerIds
     , randomPlace
     , player
-    , reds = 0, greens = 0;
+    , teamCheckLoop, reds = 0, greens = 0;
 
   // Täsmääkö clientin ja serverin versiot
   if (version !== this.VERSION) {
@@ -788,7 +790,7 @@ Server.prototype.createBullet = function (player) {
       log.debug('Failed to initialize a new bullet shot by %0', player.name.green);
     }
   }
-}
+};
 
 // Tapahtumien dokumentaatio
 /**

@@ -3,6 +3,8 @@
  * {@link BotAI}-luokan toteutuksen.
  */
 
+"use strict";
+
 /**#nocode+*/
 var log       = require('./Utils').log
   , rand      = require('./Utils').rand
@@ -97,7 +99,7 @@ BotAI.prototype.initBotAI = function () {
 
   /** Kun botti on pelaajaan nähden tässä kulmassa, aloittaa se ampumisen */
   this.shootingAngle = 32;
-}
+};
 
 /**
  * Muuttaa botin asetuksia riippuen annetusta parametrista.
@@ -111,7 +113,7 @@ BotAI.prototype.setSkill = function (param) {
   this.fightRotate = 1.5 + (skill / 4.8);
   this.shootingAngle = 4.0 + (param * 4.8);
   this.fov = 58 + (skill * 2);
-}
+};
 
 /**
  * Yksittäisen botin tekoälyn päivitys.
@@ -298,8 +300,8 @@ BotAI.prototype.update = function () {
     // Ammutaan vain jos kulma on riittävän pieni eikä pelaajalle ole nakkina
     sAngle = this.shootingAngle;
     if (this.player.weapon === WPN.CHAINSAW) { sAngle *= 2; }
-    if (!(pickedPlayer.spawnTime + this.server.config.spawnProtection > Date.now()) &&
-        !(this.player.spawnTime + this.server.config.spawnProtection > Date.now()) &&
+    if ((pickedPlayer.spawnTime + this.server.config.spawnProtection <= Date.now()) &&
+        (this.player.spawnTime + this.server.config.spawnProtection <= Date.now()) &&
         Math.abs(pickedDirection) < sAngle &&
         pickedDist > weaponConfig.safeRange / 2 && pickedDist <= weaponConfig.shootRange)
     {

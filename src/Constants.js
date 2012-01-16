@@ -3,6 +3,8 @@
  * {@link PLR}
  */
 
+"use strict";
+
 /*
 // Voit kutsua tätä näin:
 var C = require('./Constants);

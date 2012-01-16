@@ -2,6 +2,8 @@
  * @fileOverview Konsoliin kirjoittamiseen liittyvät komennot
  */
 
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , NET = require('./Constants').NET

@@ -2,6 +2,8 @@
  * @fileOverview Sisältää {@link Player}-luokan toteutuksen.
  */
 
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , Obj = require('./Object')

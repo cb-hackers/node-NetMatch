@@ -2,6 +2,8 @@
  * @fileOverview Sisältää {@link Obj}-luokan toteutuksen.
  */
 
+"use strict";
+
 /**#nocode+*/
 var wrapAngle = require('./Utils').wrapAngle;
 /**#nocode-*/

@@ -2,6 +2,8 @@
  * @fileOverview Sisältää {@link Map}-luokan toteutuksen.
  */
 
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , rand = require('./Utils').rand
@@ -210,7 +212,7 @@ Map.prototype.findWall = function (x, y, angle, dist) {
 
   // Palautetaan piste
   return returnP;
-}
+};
 
 /**
  * Tarkistaa onko annettujen koordinaattien välillä seinää ja jos väliltä löytyy seinä,
@@ -248,7 +250,7 @@ Map.prototype.findWall2 = function (x1, y1, x2, y2) {
 
   // Palautetaan piste
   return returnP;
-}
+};
 
 /** Raycast */
 Map.prototype.rayCast = function (origP1, origP2) {
@@ -366,6 +368,6 @@ Map.prototype.rayCast = function (origP1, origP2) {
   }
 
   // Jos tänne asti ollaan päästy, niin törmäystä ei ole löydetty. Ei siis palauteta mitään.
-}
+};
 
 module.exports = Map;

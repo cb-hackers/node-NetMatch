@@ -1,10 +1,16 @@
 /**
  * @fileOverview Sisältää hyödyllisiä funktioita, eli {@link Utils}-nimiavaruuden toteutuksen.
  */
+
+
+"use strict";
+
+/**#nocode+*/
 var argv = require('optimist')
   .default({d: false}).alias({'d' : 'debug'}).argv
   , colors = require('colors')
   , Logger = require('cbNetwork').Logger;
+/**#nocode-*/
 
 /**
  * @namespace Sisältää hyödyllisiä funktioita.
@@ -80,8 +86,8 @@ var Utils = {
    * @param {Number} num  Numero, jonka perästä desimaalit poistetaan
    */
   truncateNumber: function (num) {
-    if (num<0) return Math.ceil(num);
-    else return Math.floor(num);
+    if (num<0) { return Math.ceil(num); }
+    return Math.floor(num);
   },
 
   /**

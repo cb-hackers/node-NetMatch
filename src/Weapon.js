@@ -2,6 +2,8 @@
  * @fileOverview Sisältää {@link Weapons} nimiavaruuden.
  */
 
+"use strict";
+
 /**#nocode+*/
 var WPN = require('./Constants').WPN;
 /**#nocode-*/

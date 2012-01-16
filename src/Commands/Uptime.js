@@ -2,6 +2,8 @@
  * @fileOverview Toteutus komennolle uptime: {@link Commands.uptime}
  */
 
+"use strict";
+
 /**
  * Kertoo kauanko palvelin on ollut päällä.
  * @methodOf Commands

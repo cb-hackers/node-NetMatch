@@ -3,6 +3,8 @@
  * Kts. {@link Config} ja {@link Config.defaults}
  */
 
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , cjson = require('cjson')

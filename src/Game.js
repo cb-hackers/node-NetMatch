@@ -2,6 +2,8 @@
  * @fileOverview Pitää sisällään {@link Game}-luokan toteutuksen.
  */
 
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , colors = require('colors')

@@ -2,6 +2,8 @@
  * @fileOverview Viestien säilytykseen liittyvät toiminnot
  */
 
+"use strict";
+
 /**#nocode+*/
 var NET = require('./Constants').NET
   , WPN = require('./Constants').WPN

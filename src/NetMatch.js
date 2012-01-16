@@ -2,6 +2,8 @@
  * @fileOverview Ajettava palvelin
  */
 
+"use strict";
+
 /**#nocode+*/
 var argv = require('optimist')
     .default({d: false, c: 'config'})

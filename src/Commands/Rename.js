@@ -2,6 +2,8 @@
  * @fileOverview Toteutus komennolle rename: {@link Commands.rename}
  */
 
+"use strict";
+
 var log = require('../Utils').log;
 
 /**

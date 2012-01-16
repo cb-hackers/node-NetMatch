@@ -1,6 +1,9 @@
 /**
  * @fileOverview Sisältää {@link Item}-luokan toteutuksen.
  */
+
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , NET = require('./Constants').NET;

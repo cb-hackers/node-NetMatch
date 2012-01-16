@@ -2,6 +2,8 @@
  * @fileOverview Toteutus komennolle op: {@link Commands.op}
  */
 
+"use strict";
+
 var log = require('../Utils').log;
 
 /**
