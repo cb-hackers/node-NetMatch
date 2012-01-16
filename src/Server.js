@@ -700,16 +700,16 @@ Server.prototype.initBots = function () {
  * Arpoo aseen boteille sallittujen listalta.
  */
 Server.prototype.getBotWeapon = function () {
-  var weapons = [1, 2, 3, 4, 5, 6];;
-/*
-  if ('undefined' === this.gameState.map.config.botWeapons) {
+  var weapons;
+
+  if (this.config.botWeapons && this.config.botWeapons.length > 0) {
+    weapons = this.config.botWeapons;
+  } else if ('undefined' === this.gameState.map.config.botWeapons) {
     weapons = [1, 2, 3, 4, 5, 6];
   } else {
     weapons = this.gameState.map.config.botWeapons;
   }
-*/
   return weapons[rand(0, weapons.length - 1)];
-  //return WPN.PISTOL;
 };
 
 /**

@@ -71,6 +71,19 @@ Config.defaults = {
    */
   botCount: -1,
   /**
+   * Bottien käytössä olevat aseet. Jos tämä on tyhjä, käytetään kartan asetuksissa olevia aseita.
+   * Jos niitäkään ei ole, on käytössä kaikki aseet.
+   *  - 1 = Pistooli
+   *  - 2 = Konepistooli
+   *  - 3 = Sinko
+   *  - 4 = Haulikko
+   *  - 5 = Kranaatinlaukaisin
+   *  - 6 = Moottorisaha
+   * @type Array
+   * @default []
+   */
+  botWeapons: [],
+  /**
    * Pelimoodi, DM = 1 ja TDM = 2
    * @type Byte
    * @default 1
