@@ -42,6 +42,7 @@ function Bullet(server, player, newId, mirrored) {
 
   // Jos pelaaja on nakkina niin ei anneta sen luoda uutta ammusta
   if (player.spawnTime + server.config.spawnProtection > Date.now()) {
+    this.failed = true;
     return;
   }
 
@@ -74,12 +75,18 @@ Bullet.prototype.initialize = function () {
   // UNIMPLEMENTED
   // Ei tehdä ammusta jos erä on päättynyt
 
+  if ('undefined' === typeof this.player) {
+    log.error("Tried to shoot a bullet from an undefined player!");
+    return false;
+  }
+
   weaponConfig = Weapons[this.weapon];
 
   // Debugataan
-  log.debug('Created bullet %0 (%1), shot by %2',
-    String(this.id).magenta, weaponConfig.name.yellow, this.player.name.green);
-
+  if (this.server.debug > 1) {
+    log.debug('Created bullet %0 (%1), shot by %2',
+      String(this.id).magenta, weaponConfig.name.yellow, this.player.name.green);
+  }
   // Mistä ammus lähtee pelaajaan nähden
   bPos = weaponConfig.bulletYaw;
   if (this.weapon === WPN.PISTOL) {
@@ -124,7 +131,10 @@ Bullet.prototype.initialize = function () {
   }
   // Jos mentiin edellinen for-looppi loppuun asti, niin failataan ammuksen luonti.
   if (i < 0) {
-    log.warn("Player %0 tried to shoot a bullet while inside of a wall!", this.player.name.green);
+    if (!this.player.zombie || this.server.debug) {
+      // Jos kyseessä oli ihmispelaaja niin heitetään varoitusta (tai jos debug)
+      log.warn("Player %0 tried to shoot a bullet while inside of a wall!", this.player.name.green);
+    }
     return false;
   }
 
@@ -186,7 +196,9 @@ Bullet.prototype.update = function () {
 
   if (hit) {
     // Jos ollaan törmätty johonkin, poistetaan ammus.
-    log.debug('Deleted bullet %0 (%1).', String(this.id).magenta, weaponConfig.name.yellow);
+    if (this.server.debug > 1) {
+      log.debug('Deleted bullet %0 (%1).', String(this.id).magenta, weaponConfig.name.yellow);
+    }
     delete this.server.bullets[this.id];
   } else {
     this.prevPosX = this.x;
@@ -221,9 +233,11 @@ Bullet.prototype.checkExplosion = function (x, y) {
     y = this.y;
   }
 
-  log.debug('Checking explosion from %0 (%1) at (%2, %3).',
-    String(this.id).magenta, Weapons[this.weapon].name.yellow,
-    this.x.toFixed(1).blue, this.y.toFixed(1).blue);
+  if (this.server.debug > 1) {
+    log.debug('Checking explosion from %0 (%1) at (%2, %3).',
+      String(this.id).magenta, Weapons[this.weapon].name.yellow,
+      this.x.toFixed(1).blue, this.y.toFixed(1).blue);
+  }
 
   playerIds = Object.keys(this.server.players);
   for (var i = playerIds.length; i--; true) {

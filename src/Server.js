@@ -109,9 +109,17 @@ function Server(args, version) {
   this.registration = new Registration(this);
 
   // Alustetaan palvelin (esim. kartta, pelaajat, tavarat)
-  this.initialize(args.p, args.a, args.c);
-
-  log.info('Server initialized successfully.');
+  if (this.initialize(args.p, args.a, args.c)) {
+    log.info('Server initialized successfully.');
+  } else {
+    log.fatal('Server initialization failed!');
+    if ('undefined' === typeof this.server) {
+      // cbNetworkkia ei keretty alustaa
+      this.close(true);
+    } else {
+      this.close();
+    }
+  }
 }
 
 util.inherits(Server, events.EventEmitter);
@@ -121,7 +129,7 @@ Server.prototype.initialize = function (port, address, config) {
   var self = this;
 
   // Ladataan konffit
-  this.config.load(config);
+  if (!this.config.load(config)) { return false; }
   // Komentoriviparametrit voittaa.
   if (port) { this.config.port = port; }
   if (address) { this.config.address = address; }
@@ -148,7 +156,7 @@ Server.prototype.initialize = function (port, address, config) {
 
   // Alustetaan pelitilanne
   this.gameState.playerCount = 0;
-  this.gameState.botCount = 5;
+  this.gameState.botCount = this.config.botCount;
   this.gameState.gameMode = this.config.gameMode;
   this.gameState.maxPlayers = this.config.maxPlayers;
   this.gameState.radarArrows = this.config.radarArrows;
@@ -156,13 +164,13 @@ Server.prototype.initialize = function (port, address, config) {
   // Ladataan kartta
   this.gameState.map = new Map(this, this.config.map);
   if (!this.gameState.map.loaded) {
+    // Kartan lataus epäonnistui
     log.fatal('Could not load map "%0"', this.config.map);
-    this.close();
-    return;
+    return false;
   }
 
-  // Jos kartalla on botCount-asetus, overridaa se configin
-  if ('number' === typeof this.gameState.map.config.botCount) {
+  // Jos kartalla on botCount-asetus, asetetaan se botCountiksi, mikäli nykyinen on < 0
+  if ('number' === typeof this.gameState.map.config.botCount && this.gameState.botCount < 0) {
     this.gameState.botCount = this.gameState.map.config.botCount;
   }
 
@@ -170,7 +178,7 @@ Server.prototype.initialize = function (port, address, config) {
   this.maps[this.gameState.map.name] = this.gameState.map;
 
   // Alustetaan pelaajat
-  for (var i = 1; i <= this.gameState.maxPlayers; ++i) {
+  for (var i = 1; i <= 64; ++i) {
     this.players[i] = new Player(this, i);
   }
 
@@ -187,6 +195,8 @@ Server.prototype.initialize = function (port, address, config) {
 
   // Käynnistetään pelimekaniikka, joka päivittyy configeissa määriteltyyn tahtiin.
   this.game.start(this.config.updatesPerSec);
+
+  return true;
 };
 
 /**
@@ -460,7 +470,7 @@ Server.prototype.login = function (client) {
 
   // Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa
   playerIds = Object.keys(this.players);
-  for (var i = playerIds.length; i--;) {
+  for (var i = 0; i < playerIds.length; i++) {
     player = this.players[playerIds[i]];
     if (player.name.toLowerCase() === nickname.toLowerCase()) {
       if (player.kicked || !player.active) {
@@ -479,7 +489,7 @@ Server.prototype.login = function (client) {
   }
 
   // Etsitään inaktiivinen pelaaja
-  for (i = playerIds.length; i--;) {
+  for (i = 0; i < playerIds.length; i++) {
     player = this.players[playerIds[i]];
     if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
       // Tyhjä paikka löytyi
@@ -612,7 +622,7 @@ Server.prototype.getPlayer = function (name) {
  */
 Server.prototype.loopPlayers = function (callback) {
   var playerIds = Object.keys(this.players), plr;
-  for (var i = playerIds.length; i--;) {
+  for (var i = 0; i < playerIds.length; i++) {
     callback(this.players[playerIds[i]]);
   }
 };
@@ -643,7 +653,9 @@ Server.prototype.close = function (now) {
 
   var self = this;
   setTimeout(function closeServer() {
-    self.server.close();
+    if (self.server) {
+      self.server.close();
+    }
     self.emit('closed');
     process.exit();
   }, now ? 0 : 1000);
@@ -656,7 +668,8 @@ Server.prototype.initBots = function () {
   var count = this.gameState.botCount
     , bot
     , map = this.gameState.map
-    , randomPlace;
+    , randomPlace
+    , skill;
 
   for (var i = 1; i <= count; i++) {
     bot = this.players[i];
@@ -677,7 +690,9 @@ Server.prototype.initBots = function () {
     // UNIMPLEMENTED: boteille tiimit tasaisesti
     bot.team = 1;
 
+    // Luodaan botille tekoäly ja asetetaan sen taitotaso samaksi kuin pelaaja-ID
     bot.botAI = new BotAI(this, bot);
+    bot.botAI.setSkill(i);
   }
 };
 
@@ -685,15 +700,16 @@ Server.prototype.initBots = function () {
  * Arpoo aseen boteille sallittujen listalta.
  */
 Server.prototype.getBotWeapon = function () {
-  var weapons;
-
+  var weapons = [1, 2, 3, 4, 5, 6];;
+/*
   if ('undefined' === this.gameState.map.config.botWeapons) {
     weapons = [1, 2, 3, 4, 5, 6];
   } else {
     weapons = this.gameState.map.config.botWeapons;
   }
-
+*/
   return weapons[rand(0, weapons.length - 1)];
+  //return WPN.PISTOL;
 };
 
 /**
@@ -703,6 +719,11 @@ Server.prototype.getBotWeapon = function () {
  */
 Server.prototype.createBullet = function (player) {
   var bullet, bulletAmount;
+
+  if ('undefined' === typeof player) {
+    log.error("Tried to create a bullet for an undefined player!");
+    return;
+  }
 
   switch (player.weapon) {
     case WPN.LAUNCHER:
@@ -725,7 +746,7 @@ Server.prototype.createBullet = function (player) {
     } else {
       bullet = new Bullet(this, player, ++this.lastBulletId);
     }
-    if (bullet.initialize()) {
+    if (!bullet.failed && bullet.initialize()) {
       // Jos ammuksen alustus onnistui (esim. ei ammuttu seinän sisällä), lisätään se listaan.
       this.bullets[bullet.id] = bullet;
       // Lisätään ammusviesti lähetettäväksi jokaiselle pelaajalle

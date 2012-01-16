@@ -170,15 +170,22 @@ Map.prototype.initItems = function () {
  * Etsii annettujen koordinaattien ja kulman muodostavalta suoralta lähimmän seinän koordinaatit
  * ja palauttaa ne objektin kenttinä x ja y.
  *
- * @param {Number} x      Aloituspisteen x-koordinaatti
- * @param {Number} y      Aloituspisteen y-koordinaatti
- * @param {Number} angle  Mihin suuntaan suora muodostuu (asteina)
+ * @param {Number} x       Aloituspisteen x-koordinaatti
+ * @param {Number} y       Aloituspisteen y-koordinaatti
+ * @param {Number} angle   Mihin suuntaan suora muodostuu (asteina)
+ * @param {Number} [dist]  Kuinka pitkältä katsotaan. Jos tätä ei anneta, niin etäisyyttä ei
+ *                         rajoiteta.
  *
  * @returns {Object}  Palauttaa objektin jolla on kentät x ja y jotka sisältävät lähimmän seinän
  *                    koordinaatit.
  */
 Map.prototype.findWall = function (x, y, angle, dist) {
   var startP = {}, endP = {}, returnP;
+
+  // Tarkistetaan etäisyys
+  if ('number' !== typeof dist) {
+    dist = (this.width + this.height) * this.tileSize;
+  }
 
   // Muunnetaan x ja y maailmankoordinaateista "näyttökoordinaateiksi"
   startP.x = x + this.width * this.tileSize / 2;
@@ -187,6 +194,44 @@ Map.prototype.findWall = function (x, y, angle, dist) {
   // Lasketaan loppupiste
   endP.x = startP.x + Math.cos((-angle / 180) * Math.PI) * dist;
   endP.y = startP.y + Math.sin((-angle / 180) * Math.PI) * dist;
+
+  // Suoritetaan raycast
+  returnP = this.rayCast(startP, endP);
+
+  if (!returnP) {
+    // Välissä ei ollut seinää, ei palauteta mitään.
+    //console.log("No hits with raycast");
+    return;
+  }
+
+  // Muunnetaan "näyttökoordinaatit" maailmankoordinaateiksi
+  returnP.x = returnP.x - (this.width * this.tileSize / 2);
+  returnP.y = (this.height * this.tileSize / 2) - returnP.y;
+
+  // Palautetaan piste
+  return returnP;
+}
+
+/**
+ * Tarkistaa onko annettujen koordinaattien välillä seinää ja jos väliltä löytyy seinä,
+ * palauttaa funktio ne objektin kenttinä x ja y.
+ *
+ * @param {Number} x1  Alkupisteen x-koordinaatti
+ * @param {Number} y1  Alkupisteen y-koordinaatti
+ * @param {Number} x2  Loppupisteen x-koordinaatti
+ * @param {Number} y2  Loppupisteen y-koordinaatti
+ *
+ * @returns {Object}  Palauttaa objektin jolla on kentät x ja y jotka sisältävät lähimmän seinän
+ *                    koordinaatit.
+ */
+Map.prototype.findWall2 = function (x1, y1, x2, y2) {
+  var startP = {}, endP = {}, returnP;
+
+  // Muunnetaan x ja y maailmankoordinaateista "näyttökoordinaateiksi"
+  startP.x = x1 + this.width * this.tileSize / 2;
+  startP.y = -y1 + this.height * this.tileSize / 2;
+  endP.x = x2 + this.width * this.tileSize / 2;
+  endP.y = -y2 + this.height * this.tileSize / 2;
 
   // Suoritetaan raycast
   returnP = this.rayCast(startP, endP);

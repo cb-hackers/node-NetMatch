@@ -65,23 +65,23 @@ var log = require('./Utils').log
  */
 function Player(server, playerId) {
   Obj.call(this, 0, 0, 0);
+  var botNames = server.gameState.map.config.botNames;
+
   this.server = server;
 
   // Alustetaan pelaaja
   this.id = playerId;
   this.team = 1;
-  this.botName = server.gameState.map.config.botNames[playerId-1];
-  if ('undefined' === typeof this.botName) {
+  if (botNames.length < playerId) {
     // Bottien nimiä ei ollut kaikkia määritelty kartan tiedoissa
     this.botName = "Bot_" + playerId;
+  } else {
+    this.botName = botNames[playerId-1];
   }
   this.clientId = "";
   this.name = "";
-  var skill = 21 - playerId; // Botteja hieman eritasoisiksi vissiinkin?
-  this.fightRotate = 1.5 + (skill / 1.5);
-  this.shootingAngle = 4.0 + (playerId * 1.5);
-  this.fov = 100 + (skill * 3.5);
   this.kickReason = "";
+  this.spawnTime = 0;
 
   // Lisätään tämä palvelimen players-kokoelmaan ja poistetaan vanha, jos sellainen oli olemassa.
   if (server.players.hasOwnProperty(playerId)) {
@@ -152,8 +152,10 @@ Player.prototype.applyExplosion = function (bullet, dist) {
   }
   var damageRange = Weapons[bullet.weapon].damageRange;
 
-  log.debug('Applying explosion from %0 (%1) to %2',
-    String(bullet.id).magenta, Weapons[bullet.weapon].name.yellow, this.name.green);
+  if (this.server.debug > 1) {
+    log.debug('Applying explosion from %0 (%1) to %2',
+      String(bullet.id).magenta, Weapons[bullet.weapon].name.yellow, this.name.green);
+  }
 
   // Uhrille tieto ampujasta
   this.shootedBy = bullet.player;

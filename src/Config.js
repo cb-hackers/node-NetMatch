@@ -59,11 +59,17 @@ Config.defaults = {
    */
   map: "Luna",
   /**
-   * Maksimimäärä pelaajia
+   * Maksimimäärä pelaajia. Suurin mahdollinen maksimimäärä on 64.
    * @type Number
    * @default 10
    */
   maxPlayers: 10,
+  /**
+   * Bottien määrä. Jos tämä on nollaa pienempi, käytetään kartan asetuksissa määriteltyä arvoa.
+   * @type Number
+   * @default -1
+   */
+  botCount: -1,
   /**
    * Pelimoodi, DM = 1 ja TDM = 2
    * @type Byte
@@ -95,11 +101,12 @@ Config.defaults = {
    */
   updatesPerSec: 60,
   /**
-   * Palvelimen salasana
+   * Palvelimen salasana. Jos tätä ei aseteta, pelaaja voi saada admin-oikeudet vain palvelimen
+   * konsolikomennon op kautta.
    * @type String
-   * @default password
+   * @default ""
    */
-  password: "password",
+  password: "",
   /**
    * Onko palvelin kehitysversio
    * @type Boolean
@@ -112,6 +119,8 @@ Config.defaults = {
  * Lataa asetukset annetusta tiedostosta. Tämä metodi hakee tiedostoa node-NetMatchin juuresta.
  *
  * @param {String} [config="config"]  Asetustiedoston nimi, ilman .json päätettä.
+ *
+ * @returns {Boolean}  Pystytäänkö peliä jatkamaan nykyisillä asetuksilla
  */
 Config.prototype.load = function (config) {
   var filePath = path.resolve(__dirname, '..', config + '.json')
@@ -119,13 +128,21 @@ Config.prototype.load = function (config) {
 
   if (!path.existsSync(filePath)) {
     log.error('Config %0 doesn\'t exist', filePath.green);
-    return;
+    return true;
   }
 
   log.info('Loading config from %0', filePath.green);
   loadedConfig = cjson.load(filePath);
   // Laajennetaan tämän Configin ominaisuuksia ladatulla json-tiedostolla
   cjson.extend(this, loadedConfig);
+
+  // Tarkistetaan onko maksimimäärä liian suuri ja kaadetaan palvelin mikäli on
+  if (this.maxPlayers > 64) {
+    log.fatal('maxPlayers set to %0 while the hardcoded maximum is %1!', this.maxPlayers, 64);
+    return false;
+  }
+
+  return true;
 };
 
 module.exports = Config;
