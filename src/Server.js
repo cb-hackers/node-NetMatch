@@ -450,7 +450,8 @@ Server.prototype.login = function (client) {
     , nickname
     , playerIds
     , randomPlace
-    , player;
+    , player
+    , reds = 0, greens = 0;
 
   // Täsmääkö clientin ja serverin versiot
   if (version !== this.VERSION) {
@@ -494,6 +495,27 @@ Server.prototype.login = function (client) {
     if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
       // Tyhjä paikka löytyi
       player.clientId = client.id;
+      if (this.gameState.gameMode > 1) {
+        // Tasainen jako joukkueihin TDM-pelimoodissa
+        this.loopPlayers(function (plr) {
+          if (!plr.loggedIn) { return; }
+          if (plr.team === 1) {
+            greens++;
+          } else {
+            reds++;
+          }
+        });
+        if (greens > reds) {
+          log.info(' -> Assigned to reds');
+          player.team = 2;
+        } else if (reds > greens) {
+          log.info(' -> Assigned to greens');
+          player.team = 1;
+        } else {
+          player.team = rand(1, 2);
+          log.info(' -> Assigned randomly to %0', (player.team === 1) ? 'greens' : 'reds');
+        }
+      }
       player.active = true;
       player.loggedIn = false;
       player.name = nickname;
@@ -513,11 +535,6 @@ Server.prototype.login = function (client) {
       player.admin = false;
       player.kicked = false;
       player.kickReason = "";
-      if (this.gameState.gameMode === 2) {
-        // UNIMPLEMENTED
-        // Tasainen jako joukkueihin TDM-pelimoodissa
-        player.team = Math.floor(Math.random() * 2 + 1) + 1; // Rand(1,2)
-      }
       this.gameState.playerCount++;
 
       // Lähetetään vastaus clientille
@@ -667,9 +684,9 @@ Server.prototype.close = function (now) {
 Server.prototype.initBots = function () {
   var count = this.gameState.botCount
     , bot
+    , team = rand(1, 2)
     , map = this.gameState.map
-    , randomPlace
-    , skill;
+    , randomPlace;
 
   for (var i = 1; i <= count; i++) {
     bot = this.players[i];
@@ -687,8 +704,13 @@ Server.prototype.initBots = function () {
     bot.x = randomPlace.x;
     bot.y = randomPlace.y;
     bot.angle = rand(0, 360);
-    // UNIMPLEMENTED: boteille tiimit tasaisesti
-    bot.team = 1;
+    if (this.gameState.gameMode > 1) {
+      bot.team = team;
+      team++;
+      if (team > 2) { team = 1; }
+    } else {
+      bot.team = 1;
+    }
 
     // Luodaan botille tekoäly ja asetetaan sen taitotaso samaksi kuin pelaaja-ID
     bot.botAI = new BotAI(this, bot);

@@ -124,7 +124,7 @@ Player.prototype.kill = function (bullet) {
 
   // Onko tappaja vielä pelissä
   if (killer.active) {
-    if (killer.id === this.id || (killer.team === this.team && this.server.gameState.playMode > 1)) {
+    if (killer.id === this.id || (killer.team === this.team && this.server.gameState.gameMode > 1)) {
       // Teamkilleri tai itsemurha, vähennetään tappo.
       killer.kills--;
     } else {
