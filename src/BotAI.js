@@ -323,6 +323,10 @@ BotAI.prototype.update = function () {
     }
   }
 
+  // Botin törmäystarkistus seiniin
+  if (map.isCircleCollision(this.player.x, this.player.y)) {
+    log.debug('Bot %0 is colliding!', this.player.name.green);
+  };
 
   // Siirretään bottia
   speed = this.maxSpeed;

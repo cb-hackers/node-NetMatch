@@ -13,7 +13,10 @@ var log = require('./Utils').log
   , cjson = require('cjson')
   , colors = require('colors')
   , Item = require('./Item')
-  , ITM = require('./Constants').ITM;
+  , ITM = require('./Constants').ITM
+  , PLR = require('./Constants').PLR
+  , NET = require('./Constants').NET
+  , DRAW = require('./Constants').DRAW;
 /**#nocode-*/
 
 /**
@@ -169,17 +172,19 @@ Map.prototype.initItems = function () {
 };
 
 /**
- * Etsii annettujen koordinaattien ja kulman muodostavalta suoralta lähimmän seinän koordinaatit
- * ja palauttaa ne objektin kenttinä x ja y.
+ * Etsii annettujen koordinaattien ja kulman muodostavalta suoralta annetulta maksimietäisyydeltä
+ * seinän koordinaatit ja palauttaa ne objektin kenttinä x ja y. Jos seinää ei löytynyt ennen
+ * maksimietäisyyden saavuttamista, ei funktio palauta mitään arvoa.
  *
- * @param {Number} x       Aloituspisteen x-koordinaatti
- * @param {Number} y       Aloituspisteen y-koordinaatti
+ * @param {Number} x       Aloituspisteen x-koordinaatti maailmankoordinaateissa
+ * @param {Number} y       Aloituspisteen y-koordinaatti maailmankoordinaateissa
  * @param {Number} angle   Mihin suuntaan suora muodostuu (asteina)
  * @param {Number} [dist]  Kuinka pitkältä katsotaan. Jos tätä ei anneta, niin etäisyyttä ei
  *                         rajoiteta.
  *
- * @returns {Object}  Palauttaa objektin jolla on kentät x ja y jotka sisältävät lähimmän seinän
- *                    koordinaatit.
+ * @returns {Object}  Palauttaa objektin jolla on kentät x ja y jotka sisältävät maksimietäisyyden
+ *                    sisältä löytyneen seinän törmäyskoordinaatit. Tätä ei palauteta, jos ei
+ *                    löytynyt seinää.
  */
 Map.prototype.findWall = function (x, y, angle, dist) {
   var startP = {}, endP = {}, returnP;
@@ -252,7 +257,17 @@ Map.prototype.findWall2 = function (x1, y1, x2, y2) {
   return returnP;
 };
 
-/** Raycast */
+/**
+ * Tekee raycastin kahden pisteen välillä ja palauttaa kohdan, jossa pisteiden välillä kulkeva
+ * suora osuu ensimmäisen kerran seinään.
+ * @private
+ *
+ * @param {Object} origP1  Alkupiste, jolla on kentissä x ja y koordinaatit
+ * @param {Object} origP2  Loppupiste, jolla on kentissä x ja y koordinaatit
+ *
+ * @returns {Object}  Ensimmäinen vastaan tullut seinä ja tarkka osumakohta. Jos pisteiden välillä
+ *                    ei ollut seinää, ei funktio palauta mitään.
+ */
 Map.prototype.rayCast = function (origP1, origP2) {
   // Pisteiden normalisaatio
   var p1 = {x: origP1.x / this.tileSize, y: origP1.y / this.tileSize}
@@ -368,6 +383,96 @@ Map.prototype.rayCast = function (origP1, origP2) {
   }
 
   // Jos tänne asti ollaan päästy, niin törmäystä ei ole löydetty. Ei siis palauteta mitään.
+};
+
+
+/**
+ * Ympyrä-tilekartta törmäys.
+ *
+ * @see http://stackoverflow.com/a/402010/1152564
+ *
+ * @param {Number} x  Ympyrän keskipisteen x-koordinaatti maailmankoordinaateissa
+ * @param {Number} y  Ympyrän keskipisteen y-koordinaatti maailmankoordinaateissa
+ * @param {Number} [r=PLR.COL_RADIUS]  Ympyrän säteen pituus
+ *
+ * @return {Boolean}  Onko törmäystä vai ei
+ */
+Map.prototype.isCircleCollision = function (origX, origY, r) {
+  var x, y
+    , tileX, tileY
+    , leftTileX, rightTileX
+    , upTileY, downTileY
+    , ret;
+
+  if ('number' !== typeof r) {
+    r = PLR.COL_RADIUS;
+  }
+
+  // Muunnetaan x ja y maailmankoordinaateista "näyttökoordinaateiksi"
+  x = origX + this.width * this.tileSize / 2;
+  y = -origY + this.height * this.tileSize / 2;
+
+  // Lasketaan ylletäänkö säteen etäisyydellä viereisiin tileihin
+  tileX = Math.floor(x / this.tileSize);
+  tileY = Math.floor(y / this.tileSize);
+  leftTileX = Math.floor((x - r) / this.tileSize);
+  rightTileX = Math.floor((x + r) / this.tileSize);
+  upTileY = Math.floor((y - r) / this.tileSize);
+  downTileY = Math.floor((y + r) / this.tileSize);
+
+
+  // Tarkistetaan mitkä tilet täytyy tarkistaa
+  if (leftTileX >= 0 && leftTileX !== tileX) {
+    // Vasemmalta täytyy tarkistaa
+    this.debugBox(leftTileX, tileY);
+  }
+  if (rightTileX < this.width && rightTileX !== tileX) {
+    // Oikealta täytyy tarkistaa
+    this.debugBox(rightTileX, tileY);
+  }
+  if (upTileY >= 0 && upTileY !== tileY) {
+    // Ylhäältä täytyy tarkistaa
+    this.debugBox(tileX, upTileY);
+  }
+  if (downTileY < this.height && downTileY !== tileY) {
+    // Alhaalta täytyy tarkistaa
+    this.debugBox(tileX, downTileY);
+  }
+
+  // Tarkistetaan varsinainen tile
+  this.debugBox(tileX, tileY);
+};
+
+/**
+ * Piirtää boksin tilen paikalle.
+ * @param {Integer} tileX
+ * @param {Integer} tileY
+ * @param {Boolean} [fill=false]  Piirretäänkö täytetty boksi
+ */
+Map.prototype.debugBox = function (tileX, tileY, fill) {
+  var boxX, boxY, self = this;
+  if (!this.server.debug) { return; }
+  if ('boolean' !== typeof fill) { fill = false; }
+
+  boxX = tileX * this.tileSize - (this.width * this.tileSize / 2);
+  boxY = (this.height * this.tileSize / 2) - tileY * this.tileSize;
+
+  this.server.loopPlayers(function (player) {
+    if (player.debugState && player.debugState < 12) {
+      player.debugState += 1;
+      self.server.messages.add(player.id, {
+        msgType: NET.DEBUGDRAWING,
+        drawType: DRAW.BOX,
+        drawVars: [
+          boxX,
+          boxY,
+          self.tileSize,
+          self.tileSize,
+          fill
+        ]
+      });
+    }
+  });
 };
 
 module.exports = Map;

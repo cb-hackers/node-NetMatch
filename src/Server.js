@@ -406,6 +406,8 @@ Server.prototype.sendReply = function (client, player) {
 
   // UNIMPLEMENTED
   // Pelisession aikatiedot
+
+  // Tieto siitä että debug-viestejä voi laittaa uudelleen
   player.debugState = 0;
 
   reply.putByte(NET.END);
