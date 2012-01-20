@@ -86,7 +86,7 @@ Config.defaults = {
    */
   botWeapons: [],
   /**
-   * Pelimoodi, DM = 1 ja TDM = 2
+   * Pelimoodi: DM = 1, TDM = 2, Zombiemode = 3
    * @type Byte
    * @default 1
    */

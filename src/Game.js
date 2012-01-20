@@ -143,6 +143,11 @@ Game.prototype.updatePlayers = function () {
       if (player.zombie) {
         player.isDead = false;
         player.weapon = this.server.getBotWeapon();
+        if (this.server.gameState.gameMode === 3) {
+          // Zombie-moodi, boteilla on vain 10hp eivätkä ne ole koskaan nakkeja
+          player.health = 10;
+          player.spawnTime = 0;
+        }
       }
     }
 

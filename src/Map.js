@@ -149,25 +149,38 @@ Map.prototype.findSpot = function () {
  * Alustaa kartalla olevat tavarat.
  */
 Map.prototype.initItems = function () {
-  var itemId = 0;
+  var i, itemId = 0;
 
-  for (var i = this.config.healthItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.HEALTH);
-  }
-  for (i = this.config.mgunItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.AMMO);
-  }
-  for (i = this.config.bazookaItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.ROCKET);
-  }
-  for (i = this.config.shotgunItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.SHOTGUN);
-  }
-  for (i = this.config.launcherItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.LAUNCHER);
-  }
-  for (i = this.config.chainsawItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.FUEL);
+  if (this.server.gameState.gameMode === 3) {
+    // Zombie-moodissa on 20 hp-pakettia ja 50 kpl haulikon ja konekiväärin ammuslootia
+    for (i = 0; i < 20; i++) {
+      new Item(this.server, this, ++itemId, ITM.HEALTH);
+    }
+    for (i = 0; i < 50; i++) {
+      new Item(this.server, this, ++itemId, ITM.AMMO);
+    }
+    for (i = 0; i < 50; i++) {
+      new Item(this.server, this, ++itemId, ITM.SHOTGUN);
+    }
+  } else {
+    for (i = 0; i < this.config.healthItems; i++) {
+      new Item(this.server, this, ++itemId, ITM.HEALTH);
+    }
+    for (i = 0; i < this.config.mgunItems; i++) {
+      new Item(this.server, this, ++itemId, ITM.AMMO);
+    }
+    for (i = 0; i < this.config.bazookaItems; i++) {
+      new Item(this.server, this, ++itemId, ITM.ROCKET);
+    }
+    for (i = 0; i < this.config.shotgunItems; i++) {
+      new Item(this.server, this, ++itemId, ITM.SHOTGUN);
+    }
+    for (i = 0; i < this.config.launcherItems; i++) {
+      new Item(this.server, this, ++itemId, ITM.LAUNCHER);
+    }
+    for (i = 0; i < this.config.chainsawItems; i++) {
+      new Item(this.server, this, ++itemId, ITM.FUEL);
+    }
   }
 };
 

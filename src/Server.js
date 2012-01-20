@@ -367,8 +367,8 @@ Server.prototype.sendReply = function (client, player) {
         }
         reply.putShort(plr.kills);      // Tapot
         reply.putShort(plr.deaths);     // Kuolemat
-      } else if (server.gameState.radarArrows || server.gameState.playMode === 2) {
-        // Ei näy. Lähetetään tutkatieto. playMode === 2 tarkoittaa TDM-pelimuotoa
+      } else if (server.gameState.radarArrows || server.gameState.playMode > 1) {
+        // Ei näy. Lähetetään tutkatieto. playMode > 1 tarkoittaa kaikkia muita kuin DM-moodeja
         if (player.team === plr.team || server.gameState.radarArrows) {
           // Lähetetään tutkatiedot jos joukkueet ovat samat tai asetuksista on laitettu että
           // kaikkien joukkueiden pelaajien tutkatiedot lähetetään
@@ -499,7 +499,10 @@ Server.prototype.login = function (client) {
     if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
       // Tyhjä paikka löytyi
       player.clientId = client.id;
-      if (this.gameState.gameMode > 1) {
+      if (this.gameState.gameMode === 3) {
+        // Zombie-moodi, kaikki botit ovat punaisilla ja ihmispelaajat vihreillä
+        player.team = 1;
+      } else if (this.gameState.gameMode > 1) {
         // Tasainen jako joukkueihin TDM-pelimoodissa
         this.loopPlayers(function (plr) {
           if (!plr.loggedIn) { return; }
@@ -546,7 +549,8 @@ Server.prototype.login = function (client) {
       replyData.putByte(NET.LOGIN);
       replyData.putByte(NET.LOGINOK);
       replyData.putByte(player.id);
-      replyData.putByte(this.gameState.gameMode);
+      // Zombiemoodi on täysin palvelinpuolen moodi joka näytetään klienteille TDM:nä
+      replyData.putByte(this.gameState.gameMode === 3 ? 2 : this.gameState.gameMode);
       replyData.putString(this.gameState.map.name);
       replyData.putInt(this.gameState.map.crc32);
       // UNIMPLEMENTED
@@ -710,7 +714,11 @@ Server.prototype.initBots = function () {
     bot.lastValidX = bot.x;
     bot.lastValidY = bot.y;
     bot.angle = rand(0, 360);
-    if (this.gameState.gameMode > 1) {
+    if (this.gameState.gameMode === 3) {
+      // Zombie-modi, botit vastaan pelaajat ja boteilla on 10hp
+      bot.team = 2;
+      bot.health = 10;
+    } else if (this.gameState.gameMode > 1) {
       bot.team = team;
       team++;
       if (team > 2) { team = 1; }
