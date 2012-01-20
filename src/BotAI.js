@@ -360,7 +360,7 @@ BotAI.prototype.checkCollisions = function () {
   }
   if (collision.up) {
     //log.debug('Bot %0 is colliding from up', this.player.name);
-    if (this.player.y < this.player.lastValidY) {
+    if (this.player.y > this.player.lastValidY) {
       this.player.y = this.player.lastValidY;
     }
     collides = true;
