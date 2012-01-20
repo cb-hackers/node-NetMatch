@@ -509,7 +509,7 @@ Map.prototype.checkCircleCollision = function (x, y, r, tileX, tileY) {
  * @param {Integer} tileY
  * @param {Boolean} [fill=false]  Piirretäänkö täytetty boksi
  */
-Map.prototype.debugBox = function (tileX, tileY,) {
+Map.prototype.debugBox = function (tileX, tileY, fill) {
   var boxX, boxY, self = this;
   if (!this.server.debug) { return; }
   if ('boolean' !== typeof fill) { fill = false; }
