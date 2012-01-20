@@ -31,7 +31,7 @@ var argv = require('optimist')
 
 process.title = "NetMatch server";
 
-var VERSION = "v2.4a";
+var VERSION = "v2.4b";
 
 // Tehdään uusi palvelin.
 var server = new Server(argv, VERSION);
