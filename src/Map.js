@@ -393,55 +393,115 @@ Map.prototype.rayCast = function (origP1, origP2) {
  *
  * @param {Number} x  Ympyrän keskipisteen x-koordinaatti maailmankoordinaateissa
  * @param {Number} y  Ympyrän keskipisteen y-koordinaatti maailmankoordinaateissa
- * @param {Number} [r=PLR.COL_RADIUS]  Ympyrän säteen pituus
+ * @param {Number} r  Ympyrän säteen pituus
  *
- * @return {Boolean}  Onko törmäystä vai ei
+ * @return {Object}  Objektilla on kentät "left", "right", "up" ja/tai "down". Jos kentän arvo on
+ *                   tosi, niin siitä suunnasta löytyy törmäys.
  */
-Map.prototype.isCircleCollision = function (origX, origY, r) {
-  var x, y
-    , tileX, tileY
-    , leftTileX, rightTileX
-    , upTileY, downTileY
-    , ret;
+Map.prototype.circleCollision = function (x, y, r) {
+  var tileX, tileY, leftTileX, rightTileX, upTileY, downTileY
+    , circleDistance
+    , ret = {left: false, right: false, up: false, down: false};
 
-  if ('number' !== typeof r) {
-    r = PLR.COL_RADIUS;
-  }
 
   // Muunnetaan x ja y maailmankoordinaateista "näyttökoordinaateiksi"
-  x = origX + this.width * this.tileSize / 2;
-  y = -origY + this.height * this.tileSize / 2;
+  x = x + this.width * this.tileSize / 2;
+  y = -y + this.height * this.tileSize / 2;
 
-  // Lasketaan ylletäänkö säteen etäisyydellä viereisiin tileihin
+  // Otetaan ylös tilekoordinaatit nykyisestä tilestä sekä viereisistä
   tileX = Math.floor(x / this.tileSize);
   tileY = Math.floor(y / this.tileSize);
-  leftTileX = Math.floor((x - r) / this.tileSize);
-  rightTileX = Math.floor((x + r) / this.tileSize);
-  upTileY = Math.floor((y - r) / this.tileSize);
-  downTileY = Math.floor((y + r) / this.tileSize);
+  leftTileX = tileX - 1;
+  rightTileX = tileX + 1;
+  upTileY = tileY - 1;
+  downTileY = tileY + 1;
 
+  // Tarkistetaan törmäykset kaikkiin nykyistä tileä ympäröiviin kahdeksaan tileen.
+  // Aloitetaan vasemmalta ylhäältä ja mennään vasemmalta oikealla, ylhäältä alas.
+  if (this.checkCircleCollision(x, y, r, leftTileX, upTileY)) {
+    ret.left = true;
+    ret.up = true;
+  }
+  if (this.checkCircleCollision(x, y, r, tileX, upTileY)) {
+    ret.up = true;
+  }
+  if (this.checkCircleCollision(x, y, r, rightTileX, upTileY)) {
+    ret.right = true;
+    ret.up = true;
+  }
+  if (this.checkCircleCollision(x, y, r, leftTileX, tileY)) {
+    ret.left = true;
+  }
+  if (this.checkCircleCollision(x, y, r, rightTileX, tileY)) {
+    ret.right = true;
+  }
+  if (this.checkCircleCollision(x, y, r, leftTileX, downTileY)) {
+    ret.left = true;
+    ret.down = true;
+  }
+  if (this.checkCircleCollision(x, y, r, tileX, downTileY)) {
+    ret.down = true;
+  }
+  if (this.checkCircleCollision(x, y, r, rightTileX, downTileY)) {
+    ret.right = true;
+    ret.down = true;
+  }
 
-  // Tarkistetaan mitkä tilet täytyy tarkistaa
-  if (leftTileX >= 0 && leftTileX !== tileX) {
-    // Vasemmalta täytyy tarkistaa
-    this.debugBox(leftTileX, tileY);
+  // Suoritetaan tarkastus vielä nykyiseen tileen
+  if (this.checkCircleCollision(x, y, r, tileX, tileY)) {
+    ret.right = true;
+    ret.left = true;
+    ret.up = true;
+    ret.down = true;
   }
-  if (rightTileX < this.width && rightTileX !== tileX) {
-    // Oikealta täytyy tarkistaa
-    this.debugBox(rightTileX, tileY);
-  }
-  if (upTileY >= 0 && upTileY !== tileY) {
-    // Ylhäältä täytyy tarkistaa
-    this.debugBox(tileX, upTileY);
-  }
-  if (downTileY < this.height && downTileY !== tileY) {
-    // Alhaalta täytyy tarkistaa
-    this.debugBox(tileX, downTileY);
-  }
-
-  // Tarkistetaan varsinainen tile
-  this.debugBox(tileX, tileY);
+  return ret;
 };
+
+/**
+ * @private
+ */
+Map.prototype.checkCircleCollision = function (x, y, r, tileX, tileY) {
+  var hit, index, halfTile, circleDist, cornedDist_sq;
+
+  if (tileX < 0 || tileY < 0 || tileX >= this.width || tileY >= this.height) {
+    // Jos tilekoordinaatti on kartan rajojen ulkopuolella, lasketaan törmäys siihen.
+    hit = 1;
+  } else {
+    // Muulloin tarkastetaan törmäysdata tiledatasta.
+    index = tileY * this.width + tileX;
+    hit = this.data[index];
+  }
+
+  // Jos tilessä ei ole törmäystä asetettuna, voidaan tarkastus jättää jo tässä vaiheessa sikseen.
+  if (!hit) {
+    return false;
+  }
+
+  // Alustetaan joitakin muuttujia
+  circleDist = {};
+  halfTile = this.tileSize / 2;
+
+  // Tästä lähtee http://stackoverflow.com/a/402010/1152564
+  circleDist.x = Math.abs(x - (tileX * this.tileSize) - halfTile);
+  circleDist.y = Math.abs(y - (tileY * this.tileSize) - halfTile);
+
+  if (circleDist.x > (halfTile + r)) { return false; }
+  if (circleDist.y > (halfTile + r)) { return false; }
+
+  if (circleDist.x <= halfTile) { this.debugBox(tileX, tileY); return true; }
+  if (circleDist.y <= halfTile) { this.debugBox(tileX, tileY); return true; }
+
+  /*
+  cornedDist_sq = Math.pow(circleDist.x - halfTile, 2) + Math.pow(circleDist.y - halfTile, 2);
+
+  if (cornedDist_sq <= Math.pow(r, 2)) {
+    this.debugBox(tileX, tileY);
+    return true;
+  }
+  */
+
+  return false;
+}
 
 /**
  * Piirtää boksin tilen paikalle.
@@ -449,7 +509,7 @@ Map.prototype.isCircleCollision = function (origX, origY, r) {
  * @param {Integer} tileY
  * @param {Boolean} [fill=false]  Piirretäänkö täytetty boksi
  */
-Map.prototype.debugBox = function (tileX, tileY, fill) {
+Map.prototype.debugBox = function (tileX, tileY,) {
   var boxX, boxY, self = this;
   if (!this.server.debug) { return; }
   if ('boolean' !== typeof fill) { fill = false; }
@@ -458,7 +518,7 @@ Map.prototype.debugBox = function (tileX, tileY, fill) {
   boxY = (this.height * this.tileSize / 2) - tileY * this.tileSize;
 
   this.server.loopPlayers(function (player) {
-    if (player.debugState && player.debugState < 12) {
+    if (player.debugState && player.debugState < 20) {
       player.debugState += 1;
       self.server.messages.add(player.id, {
         msgType: NET.DEBUGDRAWING,

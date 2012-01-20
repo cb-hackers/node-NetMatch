@@ -323,11 +323,6 @@ BotAI.prototype.update = function () {
     }
   }
 
-  // Botin törmäystarkistus seiniin
-  if (map.isCircleCollision(this.player.x, this.player.y)) {
-    log.debug('Bot %0 is colliding!', this.player.name.green);
-  };
-
   // Siirretään bottia
   speed = this.maxSpeed;
   // Jos ollaan liian lähellä jotain estettä niin pienemmällä vauhdilla
@@ -338,7 +333,53 @@ BotAI.prototype.update = function () {
   sidestepSpeed = this.sideStep * 100.0 / weaponConfig.weight;
   sidestepSpeed *= this.server.game.movePerSec(PLR.SIDESTEP_SPEED * 0.8);
   this.player.move(forwardSpeed, sidestepSpeed);
+
+  // Törmäystarkistus
+  this.checkCollisions();
 };
+
+/**
+ * Törmäystarkistus, estää botin menemisen seinien sisään.
+ */
+BotAI.prototype.checkCollisions = function () {
+  var collision = this.server.gameState.map.circleCollision(this.player.x, this.player.y, PLR.COL_RADIUS)
+    , collides;
+
+  if (collision.left) {
+    //log.debug('Bot %0 is colliding from left', this.player.name);
+    if (this.player.x < this.player.lastValidX) {
+      this.player.x = this.player.lastValidX;
+    }
+    collides = true;
+  } else if (collision.right) {
+    //log.debug('Bot %0 is colliding from right', this.player.name);
+    if (this.player.x > this.player.lastValidX) {
+      this.player.x = this.player.lastValidX;
+    }
+    collides = true;
+  }
+  if (collision.up) {
+    //log.debug('Bot %0 is colliding from up', this.player.name);
+    if (this.player.y < this.player.lastValidY) {
+      this.player.y = this.player.lastValidY;
+    }
+    collides = true;
+  } else if (collision.down) {
+    //log.debug('Bot %0 is colliding from down', this.player.name);
+    if (this.player.y < this.player.lastValidY) {
+      this.player.y = this.player.lastValidY;
+    }
+    collides = true;
+  }
+
+  this.player.lastValidX = this.player.x;
+  this.player.lastValidY = this.player.y;
+
+  if (collides) {
+    return true;
+  }
+  return false;
+}
 
 /**
  * Debuggaa raycastia

@@ -707,6 +707,8 @@ Server.prototype.initBots = function () {
     randomPlace = map.findSpot();
     bot.x = randomPlace.x;
     bot.y = randomPlace.y;
+    bot.lastValidX = bot.x;
+    bot.lastValidY = bot.y;
     bot.angle = rand(0, 360);
     if (this.gameState.gameMode > 1) {
       bot.team = team;
