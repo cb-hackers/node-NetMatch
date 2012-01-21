@@ -144,11 +144,15 @@ Config.defaults = {
  * @returns {Boolean}  Pystytäänkö peliä jatkamaan nykyisillä asetuksilla
  */
 Config.prototype.load = function (config) {
-  var filePath = path.resolve(__dirname, '..', config + '.json')
+  if (config.substr(-5) !== '.json') {
+    config += '.json';
+  }
+  var filePath = path.resolve(__dirname, '..', config)
     , loadedConfig;
 
   if (!path.existsSync(filePath)) {
     log.error('Config %0 doesn\'t exist', filePath.green);
+    log.error('Use `%0` to load your own config', 'npm set NetMatch:config /path/to/your/config.json'.yellow);
     return true;
   }
 

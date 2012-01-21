@@ -6,7 +6,7 @@
 
 /**#nocode+*/
 var argv = require('optimist')
-    .default({d: false, c: 'config'})
+    .default({d: false, c: process.env.npm_package_config_config || 'config'})
     .alias({'p' : 'port', 'a' : 'address', 'd' : 'debug', 'c': 'config', 'h': 'help'})
     .describe({
       'h': 'Shows this help and exits.',

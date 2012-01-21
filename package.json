@@ -1,0 +1,39 @@
+{
+  "name": "NetMatch",
+  "version": "0.1.0",
+  "author": "Vesa Laakso <laakso.vesa@gmail.com> (http://vesq.net)",
+  "description": "A node-server of a CoolBasic game NetMatch",
+  "contributors": [
+    "Vesa Laakso <laakso.vesa@gmail.com> (http://vesq.net)",
+    "Ville Lahdenvuo <tuhoojabotti@gmail.com> (http://tuhoojabotti.com)"
+  ],
+  "scripts": {
+    "start": "node ./src/NetMatch.js",
+    "debug": "node ./src/NetMatch.js --debug 2",
+    "debug1": "node ./src/NetMatch.js --debug 1",
+    "debug2": "node ./src/NetMatch.js --debug 2",
+    "debug3": "node ./src/NetMatch.js --debug 3"
+  },
+  "config": {
+    "config": "config"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VesQ/node-NetMatch"
+  },
+  "keywords": [
+    "game",
+    "CoolBasic"
+  ],
+  "dependencies": {
+    "cbNetwork": ">=0.2.3 <0.3.0",
+    "cjson": ">=0.0.6 <0.1.0",
+    "colors": "*",
+    "optimist": "0.3.x"
+  },
+  "preferGlobal": true,
+  "license": "MIT",
+  "engine": {
+    "node": ">=0.6.0"
+  }
+}
