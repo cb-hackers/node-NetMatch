@@ -106,9 +106,9 @@ Config.defaults = {
   /**
    * Näytetäänkö palvelimen konsolissa tappoviestit
    * @type Boolean
-   * @default true
+   * @default false
    */
-  logKillMessages: true,
+  logKillMessages: false,
   /**
    * Ovatko tutkanuolet käytössä vai ei
    * @type Boolean

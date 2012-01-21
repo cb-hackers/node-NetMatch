@@ -1,0 +1,118 @@
+// ##################################################################################
+// ## Uudelleennimeä tämä tiedostoksi config.json niin se ladataan automaattisesti ##
+// ##################################################################################
+
+{
+  /**
+   * Nämä kaksi alla olevaa määrittävät palvelimen portin ja osoitteen.
+   * Jos jätät nämä pois niin palvelin kuuntelee kaikkia IP-osoitteita ja yrittää hakea itselleen
+   * portin.
+   */
+  //"port": 21212,
+  //"address": "192.168.1.1",
+  /**
+   * GSS-palvelimen osoite
+   * @type String
+   * @default "http://netmatch.vesq.org"
+   */
+  "regHost": "http://netmatch.vesq.org",
+  /**
+   * GSS-palvelimella oleva polku gss.php tiedostoon
+   * @type String
+   * @default "/reg/gss.php"
+   */
+  "regPath": "/reg/gss.php",
+  /**
+   * Rekisteröidäänkö palvelin
+   * @type Boolean
+   * @default false
+   */
+  "register": false,
+  /**
+   * Palvelimen kuvaus, näkyy listauksessa
+   * @type String
+   * @default "Node.js powered server"
+   */
+  "description": "Node.js powered server",
+  /**
+   * Nykyinen kartta
+   * @type String
+   * @default "Luna"
+   */
+  "map": "Luna",
+  /**
+   * Maksimimäärä pelaajia. Suurin mahdollinen maksimimäärä on 64.
+   * @type Number
+   * @default 10
+   */
+  "maxPlayers": 10,
+  /**
+   * Bottien määrä. Jos tämä on nollaa pienempi, käytetään kartan asetuksissa määriteltyä arvoa.
+   * @type Number
+   * @default -1
+   */
+  "botCount": -1,
+  /**
+   * Bottien käytössä olevat aseet. Jos tämä on tyhjä, käytetään kartan asetuksissa olevia aseita.
+   * Jos niitäkään ei ole, on käytössä kaikki aseet. Tällä voi myös asettaa todennäköisyyksiä
+   * bottien eri asevaihtoehdoille antamalla saman arvon useampaan kertaan.
+   *  - 1 = Pistooli
+   *  - 2 = Konepistooli
+   *  - 3 = Sinko
+   *  - 4 = Haulikko
+   *  - 5 = Kranaatinlaukaisin
+   *  - 6 = Moottorisaha
+   * @type Array
+   * @default []
+   */
+  "botWeapons": [],
+  /**
+   * Pelimoodi: DM = 1, TDM = 2, Zombiemode = 3
+   * @type Byte
+   * @default 1
+   */
+  "gameMode": 1,
+  /**
+   * Kuinka pitkän ajan pelaajilla on suoja spawnauksen jälkeen. Aika millisekunteissa
+   * @type Number
+   * @default 3000
+   */
+  "spawnProtection": 3000,
+  /**
+   * Kuinka kauan kestää (millisekunteina) että pelaajat heräävät henkiin uudelleen
+   * @type Number
+   * @default 3000
+   */
+  "deathDelay": 3000,
+  /**
+   * Näytetäänkö palvelimen konsolissa tappoviestit
+   * @type Boolean
+   * @default false
+   */
+  "logKillMessages": false,
+  /**
+   * Ovatko tutkanuolet käytössä vai ei
+   * @type Boolean
+   * @default true
+   */
+  "radarArrows": true,
+  /**
+   * Palvelimen pelimoottorin päivitystahti, kuinka monta päivitystä per sekunti tehdään.
+   * @type Number
+   * @default 60
+   */
+  "updatesPerSec": 60,
+  /**
+   * Palvelimen salasana. Jos tätä ei aseteta, pelaaja voi saada admin-oikeudet vain palvelimen
+   * konsolikomennon op kautta.
+   * @type String
+   * @default ""
+   */
+  "password": "",
+  /**
+   * Onko palvelin kehitysversio
+   * @type Boolean
+   * @default false
+   */
+  "devBuild": false
+}
