@@ -1,5 +1,7 @@
 // ##################################################################################
 // ## Uudelleennimeä tämä tiedostoksi config.json niin se ladataan automaattisesti ##
+// ## tai kopioi se haluamaasi tiedostopolkuun ja aseta npm:n asetuksista uusi     ##
+// ## polku komennolla `npm set NetMatch:config /path/to/your/config.json`         ##
 // ##################################################################################
 
 {
@@ -84,6 +86,13 @@
    * @default 3000
    */
   "deathDelay": 3000,
+  /**
+   * Kuinka pitkän ajan jälkeen (millisekunteina) pelaaja poistetaan pelistä, kun hänestä ei ole
+   * kuulunut mitään
+   * @type Number
+   * @default 10000
+   */
+  "maxInactiveTime": 10000,
   /**
    * Näytetäänkö palvelimen konsolissa tappoviestit
    * @type Boolean

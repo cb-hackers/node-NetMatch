@@ -104,6 +104,13 @@ Config.defaults = {
    */
   deathDelay: 3000,
   /**
+   * Kuinka pitkän ajan jälkeen (millisekunteina) pelaaja poistetaan pelistä, kun hänestä ei ole
+   * kuulunut mitään
+   * @type Number
+   * @default 10000
+   */
+  maxInactiveTime: 10000,
+  /**
    * Näytetäänkö palvelimen konsolissa tappoviestit
    * @type Boolean
    * @default false

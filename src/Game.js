@@ -161,7 +161,30 @@ Game.prototype.updatePlayers = function () {
  * @private
  */
 Game.prototype.updateTimeouts = function () {
+  var server = this.server;
 
+  server.loopPlayers( function (player) {
+    if ((!player.active && !player.loggedIn) || player.zombie) {
+      // Pelaaja ei ole aktiivinen eikä sisäänkirjautunut taikka pelaaja on botti, joten
+      // ei tarkisteta tältä timeouttia.
+      return;
+    }
+    if (player.lastActivity + server.config.maxInactiveTime < Date.now()) {
+      // Timeout tuli, poistetaan pelaaja.
+      player.active = false;
+      player.loggedIn = false;
+      player.admin = false;
+      log.info('%0 timed out.', player.name.green);
+      
+      server.gameState.playerCount--;
+
+      // Päivitetään tiedot servulistaukseen
+      server.registration.update();
+      
+      // Kerrotaan siitä muillekin
+      server.messages.addToAll({ msgType: NET.LOGOUT, player: player });
+    }
+  });
 };
 
 /**
