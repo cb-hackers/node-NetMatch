@@ -379,7 +379,7 @@ BotAI.prototype.checkCollisions = function () {
     return true;
   }
   return false;
-}
+};
 
 /**
  * Debuggaa raycastia

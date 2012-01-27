@@ -35,8 +35,6 @@ function Item(server, map, itemId, itemType) {
 
   this.x = randomPlace.x;
   this.y = randomPlace.y;
-
-  server.items[itemId] = this;
 }
 
 /**

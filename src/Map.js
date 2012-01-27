@@ -154,32 +154,41 @@ Map.prototype.initItems = function () {
   if (this.server.gameState.gameMode === 3) {
     // Zombie-moodissa on 20 hp-pakettia ja 50 kpl haulikon ja konekiväärin ammuslootia
     for (i = 0; i < 20; i++) {
-      new Item(this.server, this, ++itemId, ITM.HEALTH);
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.HEALTH);
     }
     for (i = 0; i < 50; i++) {
-      new Item(this.server, this, ++itemId, ITM.AMMO);
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.AMMO);
     }
     for (i = 0; i < 50; i++) {
-      new Item(this.server, this, ++itemId, ITM.SHOTGUN);
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.SHOTGUN);
     }
   } else {
     for (i = 0; i < this.config.healthItems; i++) {
-      new Item(this.server, this, ++itemId, ITM.HEALTH);
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.HEALTH);
     }
     for (i = 0; i < this.config.mgunItems; i++) {
-      new Item(this.server, this, ++itemId, ITM.AMMO);
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.AMMO);
     }
     for (i = 0; i < this.config.bazookaItems; i++) {
-      new Item(this.server, this, ++itemId, ITM.ROCKET);
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.ROCKET);
     }
     for (i = 0; i < this.config.shotgunItems; i++) {
-      new Item(this.server, this, ++itemId, ITM.SHOTGUN);
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.SHOTGUN);
     }
     for (i = 0; i < this.config.launcherItems; i++) {
-      new Item(this.server, this, ++itemId, ITM.LAUNCHER);
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.LAUNCHER);
     }
     for (i = 0; i < this.config.chainsawItems; i++) {
-      new Item(this.server, this, ++itemId, ITM.FUEL);
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.FUEL);
     }
   }
 };
@@ -514,7 +523,7 @@ Map.prototype.checkCircleCollision = function (x, y, r, tileX, tileY) {
   */
 
   return false;
-}
+};
 
 /**
  * Piirtää boksin tilen paikalle.

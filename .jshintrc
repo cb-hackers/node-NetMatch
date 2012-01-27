@@ -21,6 +21,8 @@
         //"exampleVar",
         //"anotherCoolGlobal",
         //"iLoveDouglas"
+        "ArrayBuffer",
+        "Uint8Array"
     ],
 
 
