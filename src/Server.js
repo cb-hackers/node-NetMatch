@@ -367,16 +367,14 @@ Server.prototype.sendReply = function (client, player) {
         }
         reply.putShort(plr.kills);      // Tapot
         reply.putShort(plr.deaths);     // Kuolemat
-      } else if (server.gameState.radarArrows || server.gameState.playMode > 1) {
+      } else if (server.gameState.radarArrows || (server.gameState.playMode > 1 && player.team === plr.team)) {
         // Ei näy. Lähetetään tutkatieto. playMode > 1 tarkoittaa kaikkia muita kuin DM-moodeja
-        if (player.team === plr.team || server.gameState.radarArrows) {
-          // Lähetetään tutkatiedot jos joukkueet ovat samat tai asetuksista on laitettu että
-          // kaikkien joukkueiden pelaajien tutkatiedot lähetetään
-          reply.putByte(NET.RADAR); // Tutkatietoa tulossa
-          var angle = Math.atan2(y1 - y2, x1 - x2) + Math.PI; // Kulma radiaaneina välillä 0...2pi
-          reply.putByte((angle / (2 * Math.PI)) * 255); // Kulma muutettuna välille 0-255
-          reply.putByte(plr.team);  // Pelaajan joukkue
-        }
+        // Lähetetään tutkatiedot jos joukkueet ovat samat tai asetuksista on laitettu että
+        // kaikkien joukkueiden pelaajien tutkatiedot lähetetään
+        reply.putByte(NET.RADAR); // Tutkatietoa tulossa
+        var angle = Math.atan2(y1 - y2, x1 - x2) + Math.PI; // Kulma radiaaneina välillä 0...2pi
+        reply.putByte((angle / (2 * Math.PI)) * 255); // Kulma muutettuna välille 0-255
+        reply.putByte(plr.team);  // Pelaajan joukkue
       }
     }
   });
