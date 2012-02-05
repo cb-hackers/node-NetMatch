@@ -615,8 +615,8 @@ Server.prototype.kickPlayer = function (player, kicker, reason) {
   // Lähetään viesti kaikille
   this.messages.addToAll({
     msgType: NET.KICKED,
-    player: player,
-    player2: kicker,
+    player: kicker,   // Kuka viestin lähetti
+    player2: player,  // Kehen tapahtuma kohdistui
     msgText: reason
   });
 };
