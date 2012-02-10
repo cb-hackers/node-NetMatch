@@ -65,6 +65,59 @@ $(function() {
     }, Math.random() * 150);
     setTimeout(blink, Math.random() * 3000);
   }
+
+  // Smooth scrolling
+  function filterPath(string) {
+    return string.replace(/^\//,'').replace(/(index|default).[a-zA-Z]{3,4}$/,'').replace(/\/$/,'');
+  }
+  var locationPath = filterPath(location.pathname);
+  var scrollElem = scrollableElement('html', 'body');
+
+  $('a[href*=#]').each(function () {
+    if (locationPath == (filterPath(this.pathname) || locationPath) &&
+       (location.hostname == this.hostname || !this.hostname) &&
+        this.hash.replace(/#/,'')) {
+      var $target = $(this.hash), target = this.hash;
+      if (!target) { return; }
+
+      var targetOffset = $target.offset().top - $(window).height() / 2 + $target.outerHeight(true) / 2;
+      // Smoothly scroll to element on click
+      $(this).click(function (event) {
+        event.preventDefault();
+        var targetOffset = $(this).offset().top - $(window).height() / 2 + $(this).outerHeight(true) / 2;
+        $(scrollElem).animate({scrollTop: targetOffset}, 400, function() {
+          location.hash = target;
+          $(scrollElem).scrollTop(targetOffset);
+        });
+      });
+      // also if this is currently on the hash
+      if (target === location.hash) {
+        $(scrollElem).animate({scrollTop: targetOffset}, 1000, function() {
+          $(scrollElem).scrollTop(targetOffset);
+        });
+      }
+    }
+  });
+
+  // use the first element that is "scrollable"
+  function scrollableElement(els) {
+    for (var i = 0, argLength = arguments.length; i <argLength; i++) {
+      var el = arguments[i],
+          $scrollElement = $(el);
+      if ($scrollElement.scrollTop()> 0) {
+        return el;
+      } else {
+        $scrollElement.scrollTop(1);
+        var isScrollable = $scrollElement.scrollTop()> 0;
+        $scrollElement.scrollTop(0);
+        if (isScrollable) {
+          return el;
+        }
+      }
+    }
+    return [];
+  }
+
 });
 </script>
 </html>

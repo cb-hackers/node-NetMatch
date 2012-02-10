@@ -8,6 +8,11 @@ margin: 0.3em;
 }
 article {
 border-radius: 0.5em;
+transition: transform 1s ease;
+}
+article:target {
+transform: scale(1.05,1.05);
+margin: 0.7em 0;
 }
 article h1 {
 font-size: 1.7em;

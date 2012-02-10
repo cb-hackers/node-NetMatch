@@ -1,3 +1,4 @@
+"use strict";
 
   // Oma loggeri ja join-funktio
 var Logger = require('./Logger').Logger
@@ -311,7 +312,7 @@ gss.on('update', function onUpdate(req, res, uri) {
 |   ok                   = kaikki onnistui      /
 `**********************************************/
 gss.on('unreg', function onUnregister(req, res, uri) {
-  var self = this, info
+  var self = this, log
   , q = uri.query
   , addr   = q.addr || req.headers['x-forwarded-for']
   , port = parseInt(q.port, 10)

@@ -23,7 +23,7 @@ list-style: none;
 display: inline-block;
 border-radius: 0.3em;
 background-color: #154442;
-transition: box-shadow 0.5s ease;
+transition: box-shadow 0.2s ease;
 white-space: nowrap;
 }
 nav a:hover, nav a.this {
@@ -41,16 +41,19 @@ padding: 0.2em 0.4em;
 margin: 0.5em 0;
 position: relative;
 overflow: hidden;
-opacity: 0.6;
-transition: box-shadow 0.5s ease;
+opacity: 0.5;
+transition: box-shadow, opacity 0.3s ease-in;
 }
-article:hover, article:target {
+article:target {
 opacity: 1;
-box-shadow: 0 0 0.5em #7F8;
+box-shadow: 0 0 0.9em #7F8;
 }
 article h1 {
 margin: 0;
 color: #6E8;
+}
+article h1:hover, article:target h1 {
+color: #7F8;
 }
 article h2 {
 margin: 0.3em 0 0 0;
@@ -111,7 +114,7 @@ text-decoration: none;
 color: inherit;
 }
 footer {
-margin-top: 2em;
+margin: 2em 0;
 font-size: 0.7em;
 font-style: italic;
 text-align: center;
