@@ -19,8 +19,7 @@
     <!-- Pong -->
     {{#ping}}({{ping}}ms){{/ping}}</span><br />
     <!-- Players & map -->
-    <span class="plrs">{{#info.names}}{{{info.names}}} (<em>+{{info.bots}}</em> bots) playing map {{info.map}}.{{/info.names}}
-    {{^info.names}}No one's playing except {{info.bots}} bots! :({{/info.names}}</span>
+    <span class="plrs">{{#info.names}}{{{info.names}}} playing map {{info.map}}.{{/info.names}}</span>
     <!-- Version info -->
     <span class="ver">{{ver}}{{#dev}}-<strong title="You need a developer version to join dev-servers.">dev</strong>{{/dev}}</span>
   </article></a>

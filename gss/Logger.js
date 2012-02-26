@@ -20,7 +20,7 @@ Logger.prototype.gss = function (type, req, params) {
   this.buf = {
     name: type,
     time: Date.now(),
-    date: new Date().toUTCString(),
+    date: new Date().toLocaleString(),
     from: this.sid,
     details: [
       {name: 'Request', msg: JSON.stringify(req, null, '  ')},
