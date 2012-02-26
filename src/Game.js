@@ -29,6 +29,7 @@ function Game(server) {
  * @param {Number} updatesPerSecond  Kuinka monta kertaa sekunnissa palvelinta päivitetään
  */
 Game.prototype.start = function (updatesPerSecond) {
+  this.sessionStarted = Date.now();
   this.interval = setInterval(this.update, 1000 / updatesPerSecond, this);
 };
 
@@ -81,6 +82,11 @@ Game.prototype.updateBotsAI = function () {
     return;
   }
 
+  // Onko erä loppu
+  if (this.server.gameState.sessionComplete) {
+    return;
+  }
+
   // Pyyhitään jokaiselta pelaajalta debuggaukset, jos debugataan.
   if (this.server.debug) {
     this.server.loopPlayers (function (player) {
@@ -94,6 +100,7 @@ Game.prototype.updateBotsAI = function () {
     });
   }
 
+  // Päivitetään bottien tekoälyt
   this.server.loopPlayers (function (player) {
     if (player.zombie && player.active && !player.isDead) {
       player.botAI.update();
@@ -106,7 +113,50 @@ Game.prototype.updateBotsAI = function () {
  * @private
  */
 Game.prototype.updateRoundTime = function () {
+  var timeLeft, server = this.server;
 
+  // Jos asetuksissa on erän pituus pienempi tai yhtä suuri kuin 0, niin kello ei ole käytössä.
+  if (server.config.periodLength <= 0) {
+    return;
+  }
+
+  // Jos pelaajia ei ole palvelimella niin kello ei käy.
+  if (server.gameState.playerCount <= 0) {
+    this.sessionStarted = Date.now();
+    return;
+  }
+
+  // Lasketaan jäljellä oleva aika
+  timeLeft = this.sessionStarted + server.config.periodLength * 1000 - Date.now();
+
+  server.gameState.sessionComplete = false;
+  if (timeLeft <= 0) {
+    // Poistetaan kaikki ammukset
+    server.bullets = {};
+
+    // TODO: Karttojen kierrätys
+
+    server.gameState.sessionComplete = true;
+
+    // Tapetaan jokainen pelaaja
+    server.loopPlayers(function roundEndKill(player) {
+      player.health = -10;
+      player.timeToDeath = Date.now();
+    });
+  }
+
+  // Onko erä päättynyt 10 sekuntia sitten
+  if (timeLeft < -10000) {
+    this.sessionStarted = Date.now();
+    server.gameState.sessionComplete = false;
+    server.loopPlayers(function mapStartLoop(player) {
+      player.timeToDeath = Date.now() - server.config.deathDelay * 2;
+      player.kills = 0;
+      player.deaths = 0;
+
+      // TODO: Tarkistetaan onko pelaajalla jo ladattuna sama kartta kuin palvelimella
+    });
+  }
 };
 
 /**
@@ -175,12 +225,12 @@ Game.prototype.updateTimeouts = function () {
       player.loggedIn = false;
       player.admin = false;
       log.info('%0 timed out.', player.name.green);
-      
+
       server.gameState.playerCount--;
 
       // Päivitetään tiedot servulistaukseen
       server.registration.update();
-      
+
       // Kerrotaan siitä muillekin
       server.messages.addToAll({ msgType: NET.LOGOUT, player: player });
     }

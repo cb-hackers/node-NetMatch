@@ -194,6 +194,10 @@ Bullet.prototype.update = function () {
       }
     }
 
+    // Jos erä on päättynyt niin ammus on törmännyt
+    if (this.server.gameState.sessionComplete) {
+      hit = true;
+    }
   }
 
   if (hit) {
@@ -223,6 +227,11 @@ Bullet.prototype.checkExplosion = function (x, y) {
   , isProtected
   , dist
   , checkRange;
+
+  // Jos erä on loppunut niin palataan
+  if (this.server.gameState.sessionComplete) {
+    return false;
+  }
 
   // Poistutaan jos ammus ei ole räjähtävää mallia
   if (!damageRange) {

@@ -162,6 +162,7 @@ Server.prototype.initialize = function (port, address, config) {
   this.gameState.gameMode = this.config.gameMode;
   this.gameState.maxPlayers = this.config.maxPlayers;
   this.gameState.radarArrows = this.config.radarArrows;
+  this.gameState.sessionComplete = false;
 
   // Ladataan kartta
   this.gameState.map = new Map(this, this.config.map);
@@ -293,6 +294,11 @@ Server.prototype.handlePacket = function (client) {
     msgType = data.getByte();
   }
 
+  // Jos erä on päättynyt niin lähetetään kaikkien pelaajien kaikki tiedot
+  if (this.gameState.sessionComplete) {
+    player.sendNames = true;
+  }
+
   // Lähetetään dataa pelaajalle
   this.sendReply(client, player);
 
@@ -402,8 +408,11 @@ Server.prototype.sendReply = function (client, player) {
     }
   }
 
-  // UNIMPLEMENTED
   // Pelisession aikatiedot
+  reply.putByte(NET.SESSIONTIME);
+  reply.putInt(this.config.periodLength);                       // Erän pituus
+  reply.putInt((Date.now() - this.game.sessionStarted) / 1000); // Kuinka kauan on pelattu
+  reply.putByte(this.gameState.sessionComplete);                // Onko erä loppu
 
   // Tieto siitä että debug-viestejä voi laittaa uudelleen
   player.debugState = 0;
@@ -753,6 +762,11 @@ Server.prototype.getBotWeapon = function () {
  */
 Server.prototype.createBullet = function (player) {
   var bullet, bulletAmount;
+
+  // Ei tehdä ammusta jos erä on päättynyt
+  if (this.gameState.sessionComplete) {
+    return;
+  }
 
   if ('undefined' === typeof player) {
     log.error("Tried to create a bullet for an undefined player!");

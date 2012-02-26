@@ -92,6 +92,12 @@ Config.defaults = {
    */
   gameMode: 1,
   /**
+   * Kuinka pitkään yksi kierros kestää. Aika sekunneissa. 0 tarkoittaa ettei erä pääty koskaan.
+   * @type Number
+   * @default 300
+   */
+  periodLength: 300,
+  /**
    * Kuinka pitkän ajan pelaajilla on suoja spawnauksen jälkeen. Aika millisekunteissa
    * @type Number
    * @default 3000
