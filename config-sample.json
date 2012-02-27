@@ -37,11 +37,13 @@
    */
   "description": "Node.js powered server",
   /**
-   * Nykyinen kartta
-   * @type String
-   * @default "Luna"
+   * Pelattava kartta. Voi olla merkkijono, jolloin pelataan vain yhtä karttaa, tai taulukko,
+   * joka sisältää useamman kartan ja niitä kierrätetään erien välillä. Kaikkien karttojen tulee
+   * olla olemassa kun palvelin käynnistetään.
+   * @type String|Array
+   * @default ["Luna", "Warehouse", "Mictlan"]
    */
-  "map": "Luna",
+  "map": ["Luna", "Warehouse", "Mictlan"],
   /**
    * Maksimimäärä pelaajia. Suurin mahdollinen maksimimäärä on 64.
    * @type Number

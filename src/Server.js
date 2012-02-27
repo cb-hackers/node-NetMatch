@@ -163,21 +163,24 @@ Server.prototype.initialize = function (port, address, config) {
   this.gameState.maxPlayers = this.config.maxPlayers;
   this.gameState.radarArrows = this.config.radarArrows;
   this.gameState.sessionComplete = false;
+  this.gameState.mapNumber = 0; // Missä config.map listan kartassa mennään
 
   // Ladataan kartta
-  this.gameState.map = new Map(this, this.config.map);
+  this.gameState.map = new Map(this, this.config.map[0]);
   if (!this.gameState.map.loaded) {
     // Kartan lataus epäonnistui
-    log.fatal('Could not load map "%0"', this.config.map);
+    log.fatal('Could not load map "%0"', this.config.map[0]);
     return false;
   }
+
+  // Alustetaan tavarat paikoilleen
+  this.gameState.map.initItems();
 
   // Jos kartalla on botCount-asetus, asetetaan se botCountiksi, mikäli nykyinen on < 0
   if ('number' === typeof this.gameState.map.config.botCount && this.gameState.botCount < 0) {
     this.gameState.botCount = this.gameState.map.config.botCount;
   }
 
-  // UNIMPLEMENTED Mappien rotaatio
   this.maps[this.gameState.map.name] = this.gameState.map;
 
   // Alustetaan pelaajat
@@ -316,7 +319,8 @@ Server.prototype.sendReply = function (client, player) {
   var reply = new Packet()
     , playerIds = Object.keys(this.players)
     , plr
-    , server = this;
+    , server = this
+    , timeLeft;
 
   // Lähetetään kaikkien pelaajien tiedot
   this.loopPlayers(function (plr) {
@@ -385,8 +389,15 @@ Server.prototype.sendReply = function (client, player) {
     }
   });
 
-  // UNIMPLEMENTED
-  // Kartan vaihtaminen
+  // Kartan vaihtaminen, mikäli tarpeellista
+  if (this.gameState.sessionComplete && this.config.map.length > 1 && player.mapName !== this.gameState.map.name) {
+    timeLeft = this.gameState.sessionStarted + this.config.periodLength * 1000 - Date.now();
+    if (timeLeft < -5) {
+      reply.putByte(NET.MAPCHANGE);
+      reply.putString(this.gameState.map.name);
+      reply.putInt(this.gameState.map.crc32);
+    }
+  }
 
   // Lähetetään kaikki pelaajalle osoitetut viestit
   this.messages.fetch(player, reply);
@@ -411,7 +422,7 @@ Server.prototype.sendReply = function (client, player) {
   // Pelisession aikatiedot
   reply.putByte(NET.SESSIONTIME);
   reply.putInt(this.config.periodLength);                       // Erän pituus
-  reply.putInt((Date.now() - this.game.sessionStarted) / 1000); // Kuinka kauan on pelattu
+  reply.putInt((Date.now() - this.gameState.sessionStarted) / 1000); // Kuinka kauan on pelattu
   reply.putByte(this.gameState.sessionComplete);                // Onko erä loppu
 
   // Tieto siitä että debug-viestejä voi laittaa uudelleen
@@ -712,8 +723,11 @@ Server.prototype.initBots = function () {
     bot.loggedIn  = true;
     bot.isDead    = false;
     bot.health    = 100;
-    bot.kills     = 0;
-    bot.deaths    = 0;
+    if (!this.gameState.sessionComplete) {
+      // Nollataan bottien statsit vain jos ei olla erän lopetustilassa
+      bot.kills     = 0;
+      bot.deaths    = 0;
+    }
     bot.weapon    = this.getBotWeapon();
     randomPlace = map.findSpot();
     bot.x = randomPlace.x;
@@ -814,6 +828,65 @@ Server.prototype.createBullet = function (player) {
       log.debug('Failed to initialize a new bullet shot by %0', player.name.green);
     }
   }
+};
+
+/**
+ * Kartan vaihto. Jos parametrina annetaan merkkijono, niin vaihdetaan kyseiseen karttaan.
+ * Muulloin edetään karttalistassa määriteltyyn seuraavaan karttaan.
+ *
+ * @param {String} [mapName]  Kartta johon vaihdetaan
+ *
+ * @returns {Boolean}  Onnistuiko kartan vaihto
+ */
+Server.prototype.changeMap = function (mapName) {
+  var nextMapName, mapPath, nextMap;
+
+  if ('string' === typeof mapName) {
+    nextMapName = mapName;
+  } else {
+    // Ei annettu parametrina kartan nimeä, joten mennään listassa eteenpäin
+    this.gameState.mapNumber++;
+    if (this.gameState.mapNumber >= this.config.map.length) {
+      this.gameState.mapNumber = 0;
+    }
+
+    nextMapName = this.config.map[this.gameState.mapNumber];
+  }
+
+  log.info('Changing map to %0', nextMapName.green);
+
+  // Tarkistetaan onko kartta jo ladattu muistiin
+  if (this.maps[nextMapName]) {
+    // Oli ladattu, joten ei tarvitse alustaa uutta
+    nextMap = this.maps[nextMapName];
+  } else {
+    // Karttaa ei ollut vielä olemassa joten luodaan uusi
+    nextMap = new Map(this, nextMapName);
+    if (!nextMap.loaded) {
+      // Kartan lataus epäonnistui
+      log.error('Could not load map "%0"', nextMapName);
+      return false;
+    }
+
+    // Laitetaan kartta muistiin ettei sitä tarvitse ladata enää uudelleen
+    this.maps[nextMapName] = nextMap;
+  }
+
+  // Alustetaan tavarat paikoilleen
+  this.items = {};
+  nextMap.initItems();
+
+  // Asetetaan uusi kartta nykyisen kartan paikalle
+  this.gameState.map = nextMap;
+
+  // Alustetaan botit
+  this.initBots();
+
+  // Tapetaan kaikki pelaajat
+  this.loopPlayers(function mapChangeKill(player) {
+    player.health = -10;
+    player.timeToDeath = Date.now();
+  });
 };
 
 // Tapahtumien dokumentaatio

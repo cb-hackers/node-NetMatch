@@ -55,11 +55,13 @@ Config.defaults = {
    */
   description: "Node.js powered server",
   /**
-   * Nykyinen kartta
-   * @type String
-   * @default "Luna"
+   * Pelattava kartta. Voi olla merkkijono, jolloin pelataan vain yhtä karttaa, tai taulukko,
+   * joka sisältää useamman kartan ja niitä kierrätetään erien välillä. Kaikkien karttojen tulee
+   * olla olemassa kun palvelin käynnistetään.
+   * @type String|Array
+   * @default ["Luna", "Warehouse", "Mictlan"]
    */
-  map: "Luna",
+  map: ["Luna", "Warehouse", "Mictlan"],
   /**
    * Maksimimäärä pelaajia. Suurin mahdollinen maksimimäärä on 64.
    * @type Number
@@ -161,7 +163,8 @@ Config.prototype.load = function (config) {
     config += '.json';
   }
   var filePath = path.resolve(__dirname, '..', config)
-    , loadedConfig;
+    , loadedConfig
+    , i, mapPath;
 
   if (!path.existsSync(filePath)) {
     log.error('Config %0 doesn\'t exist', filePath.green);
@@ -179,6 +182,29 @@ Config.prototype.load = function (config) {
     log.fatal('maxPlayers set to %0 while the hardcoded maximum is %1!', this.maxPlayers, 64);
     return false;
   }
+
+  // Tarkistetaan onko kartta merkkijono. Jos se on merkkijono, niin muutetaan se listaksi jossa
+  // on vain yksi arvo.
+  if ('string' === typeof this.map) {
+    this.map = [this.map];
+  }
+
+  // Tarkistetaan että kartta todellakin on lista tässä vaiheessa
+  if (!Array.isArray(this.map)) {
+    log.fatal('Invalid value for "map" in config %0', filePath.green);
+    return false;
+  }
+
+  // Tarkistetaan onko määritellyt kartat olemassa
+  for (i = 0; i < this.map.length; i++) {
+    mapPath = path.resolve(__dirname, '..', 'maps', this.map[i] + '.json');
+
+    if (!path.existsSync(mapPath)) {
+      log.fatal('Map %0 doesn\'t exist in %1', this.map[i].green, mapPath.green);
+      return false;
+    }
+  }
+
 
   return true;
 };

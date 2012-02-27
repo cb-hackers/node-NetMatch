@@ -21,6 +21,7 @@ function Game(server) {
   this.server = server;
   this.lastUpdate = 0;
   this.frameTime = 0;
+  this.isNextMapLoaded = false;
 }
 
 /**
@@ -29,7 +30,7 @@ function Game(server) {
  * @param {Number} updatesPerSecond  Kuinka monta kertaa sekunnissa palvelinta päivitetään
  */
 Game.prototype.start = function (updatesPerSecond) {
-  this.sessionStarted = Date.now();
+  this.server.gameState.sessionStarted = Date.now();
   this.interval = setInterval(this.update, 1000 / updatesPerSecond, this);
 };
 
@@ -122,21 +123,25 @@ Game.prototype.updateRoundTime = function () {
 
   // Jos pelaajia ei ole palvelimella niin kello ei käy.
   if (server.gameState.playerCount <= 0) {
-    this.sessionStarted = Date.now();
+    server.gameState.sessionStarted = Date.now();
     return;
   }
 
   // Lasketaan jäljellä oleva aika
-  timeLeft = this.sessionStarted + server.config.periodLength * 1000 - Date.now();
+  timeLeft = server.gameState.sessionStarted + server.config.periodLength * 1000 - Date.now();
 
-  server.gameState.sessionComplete = false;
   if (timeLeft <= 0) {
+    server.gameState.sessionComplete = true;
+
     // Poistetaan kaikki ammukset
     server.bullets = {};
 
-    // TODO: Karttojen kierrätys
-
-    server.gameState.sessionComplete = true;
+    // Kierrätetään seuraava kartta peliin, jos karttoja on listassa yli yksi, eikä karttaa
+    // ole vielä vaihdettu.
+    if (!this.isNextMapLoaded && timeLeft < -5000 && server.config.map.length > 1) {
+      server.changeMap();
+      this.isNextMapLoaded = true;
+    }
 
     // Tapetaan jokainen pelaaja
     server.loopPlayers(function roundEndKill(player) {
@@ -147,14 +152,21 @@ Game.prototype.updateRoundTime = function () {
 
   // Onko erä päättynyt 10 sekuntia sitten
   if (timeLeft < -10000) {
-    this.sessionStarted = Date.now();
+    server.gameState.sessionStarted = Date.now();
     server.gameState.sessionComplete = false;
+    this.isNextMapLoaded = false;
     server.loopPlayers(function mapStartLoop(player) {
       player.timeToDeath = Date.now() - server.config.deathDelay * 2;
       player.kills = 0;
       player.deaths = 0;
 
-      // TODO: Tarkistetaan onko pelaajalla jo ladattuna sama kartta kuin palvelimella
+      // Tarkistetaan onko pelaajalla jo ladattuna sama kartta kuin palvelimella
+      if (player.active && !player.zombie && server.config.map.length > 1 && player.mapName !== server.gameState.map.name) {
+        // Kartta oli eri.
+        log.notice('Player %0 had a map %1 while the server was running map %2',
+          player.name.green, player.mapName.green, server.gameState.map.name.green);
+        server.logout(player);
+      }
     });
   }
 };

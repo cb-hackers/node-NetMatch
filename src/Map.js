@@ -76,9 +76,6 @@ function Map(server, name) {
   }
   this.data = uint8View;
 
-  // Alustetaan kartan tavarat
-  this.initItems();
-
   this.loaded = true;
 }
 
