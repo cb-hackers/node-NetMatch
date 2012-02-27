@@ -1,6 +1,6 @@
 {
   "name": "NetMatch",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Vesa Laakso <laakso.vesa@gmail.com> (http://vesq.net)",
   "description": "A node-server of a CoolBasic game NetMatch",
   "contributors": [
