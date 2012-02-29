@@ -586,7 +586,11 @@ Server.prototype.logout = function (player) {
   player.loggedIn = false;
   player.admin = false;
   log.info('%0 logged out.', player.name.green);
-  this.gameState.playerCount--;
+
+  // Vähennetään pelaajamäärää vain jos kyseessä ei ollut botti
+  if (!player.zombie) {
+    this.gameState.playerCount--;
+  }
 
   // Päivitetään tiedot servulistaukseen
   this.registration.update();
@@ -642,7 +646,7 @@ Server.prototype.getPlayer = function (name) {
  * @param {Function} callback  Funktio jota kutsutaan jokaisen pelaajan kohdalla
  */
 Server.prototype.loopPlayers = function (callback) {
-  var playerIds = Object.keys(this.players), plr;
+  var playerIds = Object.keys(this.players);
   for (var i = 0; i < playerIds.length; i++) {
     callback(this.players[playerIds[i]]);
   }
