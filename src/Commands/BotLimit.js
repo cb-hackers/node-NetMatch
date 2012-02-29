@@ -16,7 +16,18 @@ var botlimit = {
   help: 'Sets the count of bots.',
   remote: true,
   action: function commandsBotLimit() {
-    this.gameState.botCount = arguments[1];
+    var botCount = arguments[1]
+    if (botCount >= 0) {
+      this.gameState.botCount = botCount;
+    } else {
+      // Jos annettu arvo oli pienempi kuin nolla niin käytetään kartan asetuksissa määriteltyä
+      // arvoa, jos se on olemassa. Muulloin 0
+      if (this.gameState.map.config && this.gameState.map.config.botCount > 0) {
+        this.gameState.botCount = this.gameState.map.config.botCount;
+      } else {
+        this.gameState.botCount = 0;
+      }
+    }
   }
   /**#nocode-*/
 };
