@@ -6,6 +6,7 @@
 
 /**#nocode+*/
 var log = require('./Utils').log
+  , rand = require('./Utils').rand
   , Obj = require('./Object')
   , WPN = require('./Constants').WPN
   , NET = require('./Constants').NET
@@ -209,6 +210,46 @@ Player.prototype.bulletHit = function (bullet, x, y) {
   // Kuolema?
   if (this.health <= 0) {
     this.kill(bullet);
+  }
+};
+
+/** Asettaa pelaajan tasaisesti johonkin joukkueeseen. */
+Player.prototype.setTeamEvenly = function () {
+  var server = this.server
+    , reds = 0, greens = 0;
+
+  // Deathmatch-moodissa kaikki pelaajat ovat vihreillä
+  if (server.gameState.gameMode === 1) {
+    this.team = 1;
+    return;
+  }
+
+  if (server.gameState.gameMode === 3) {
+    // Zombie-moodi, kaikki botit ovat punaisilla ja ihmispelaajat vihreillä
+    if (this.zombie) {
+      this.team = 2;
+    } else {
+      this.team = 1;
+    }
+    return;
+  }
+
+  // Lasketaan pelaajien määrä molemmissa joukkueissa
+  server.loopPlayers(function playerSetTeamEvenly(plr) {
+    if (!plr.loggedIn) { return; }
+    if (plr.team === 1) {
+      greens++;
+    } else {
+      reds++;
+    }
+  });
+
+  if (greens < reds) {
+    this.team = 1;
+  } else if (reds < greens) {
+    this.team = 2;
+  } else {
+    this.team = rand(1, 2);
   }
 };
 

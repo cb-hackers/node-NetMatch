@@ -517,30 +517,6 @@ Server.prototype.login = function (client) {
     if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
       // Tyhjä paikka löytyi
       player.clientId = client.id;
-      if (this.gameState.gameMode === 3) {
-        // Zombie-moodi, kaikki botit ovat punaisilla ja ihmispelaajat vihreillä
-        player.team = 1;
-      } else if (this.gameState.gameMode > 1) {
-        // Tasainen jako joukkueihin TDM-pelimoodissa
-        this.loopPlayers(function (plr) {
-          if (!plr.loggedIn) { return; }
-          if (plr.team === 1) {
-            greens++;
-          } else {
-            reds++;
-          }
-        });
-        if (greens > reds) {
-          log.info(' -> Assigned to reds');
-          player.team = 2;
-        } else if (reds > greens) {
-          log.info(' -> Assigned to greens');
-          player.team = 1;
-        } else {
-          player.team = rand(1, 2);
-          log.info(' -> Assigned randomly to %0', (player.team === 1) ? 'greens' : 'reds');
-        }
-      }
       player.active = true;
       player.loggedIn = false;
       player.name = nickname;
@@ -560,6 +536,8 @@ Server.prototype.login = function (client) {
       player.admin = false;
       player.kicked = false;
       player.kickReason = "";
+      player.setTeamEvenly();
+
       this.gameState.playerCount++;
 
       // Lähetetään vastaus clientille
