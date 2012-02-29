@@ -670,9 +670,7 @@ Server.prototype.loopPlayers = function (callback) {
   }
 };
 
-/**
- * Sammuttaa palvelimen. Emittoi eventit {@link Server#closing} ja {@link Server#closed}
- */
+/** Sammuttaa palvelimen. Emittoi eventit {@link Server#closing} ja {@link Server#closed} */
 Server.prototype.close = function (now) {
   if (this.gameState.closing) {
     // Ollaan jo sulkemassa, ei aloiteta samaa prosessia uudelleen.
@@ -704,9 +702,7 @@ Server.prototype.close = function (now) {
   }, now ? 0 : 1000);
 };
 
-/**
- * Alustaa botit.
- */
+/** Alustaa botit. */
 Server.prototype.initBots = function () {
   var count = this.gameState.botCount
     , bot
@@ -753,9 +749,7 @@ Server.prototype.initBots = function () {
   }
 };
 
-/**
- * Arpoo aseen boteille sallittujen listalta.
- */
+/** Arpoo aseen boteille sallittujen listalta. */
 Server.prototype.getBotWeapon = function () {
   var weapons;
 
