@@ -225,7 +225,7 @@ Game.prototype.updatePlayers = function () {
 Game.prototype.updateTimeouts = function () {
   var server = this.server;
 
-  server.loopPlayers( function (player) {
+  server.loopPlayers(function (player) {
     if ((!player.active && !player.loggedIn) || player.zombie) {
       // Pelaaja ei ole aktiivinen eikä sisäänkirjautunut taikka pelaaja on botti, joten
       // ei tarkisteta tältä timeouttia.
@@ -254,7 +254,24 @@ Game.prototype.updateTimeouts = function () {
  * @private
  */
 Game.prototype.updateBotsAmount = function () {
+  var server = this.server
+    , botCount = server.gameState.botCount
+    , loopedBotsCount = 0;
 
+  server.loopPlayers(function (player) {
+    // Tarkistetaan vain aktiiviset botit
+    if (!player.zombie || !player.active) {
+      return;
+    }
+
+    // Tarkistetaan ollaanko ylitetty tämän botin kohdalla bottiraja
+    if (loopedBotsCount >= botCount) {
+      // Yli ollaan menty. Kirjataan botti ulos.
+      server.logout(player);
+    }
+
+    loopedBotsCount++;
+  });
 };
 
 /**
