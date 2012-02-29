@@ -75,6 +75,15 @@ Config.defaults = {
    */
   botCount: -1,
   /**
+   * Minkä pelaajamäärän jälkeen (pelaajat + botit) botteja lähtee itsestään pois. Jos tämä arvo on
+   * pienempi kuin botCount-arvo, niin tämä asetetaan samaksi botCountin kanssa. Jos tämä on 0, niin
+   * botit eivät poistu automaattisesti koskaan. Jos taas tämä on nollaa pienempi, käytetään kartan
+   * asetuksissa määriteltyä arvoa.
+   * @type Number
+   * @default -1
+   */
+  botDepartLimit: -1,
+  /**
    * Bottien käytössä olevat aseet. Jos tämä on tyhjä, käytetään kartan asetuksissa olevia aseita.
    * Jos niitäkään ei ole, on käytössä kaikki aseet.
    *  - 1 = Pistooli

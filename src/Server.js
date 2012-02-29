@@ -159,6 +159,7 @@ Server.prototype.initialize = function (port, address, config) {
   // Alustetaan pelitilanne
   this.gameState.playerCount = 0;
   this.gameState.botCount = this.config.botCount;
+  this.gameState.botDepartLimit = this.config.botDepartLimit;
   this.gameState.gameMode = this.config.gameMode;
   this.gameState.maxPlayers = this.config.maxPlayers;
   this.gameState.radarArrows = this.config.radarArrows;
@@ -179,6 +180,11 @@ Server.prototype.initialize = function (port, address, config) {
   // Jos kartalla on botCount-asetus, asetetaan se botCountiksi, mikäli nykyinen on < 0
   if ('number' === typeof this.gameState.map.config.botCount && this.gameState.botCount < 0) {
     this.gameState.botCount = this.gameState.map.config.botCount;
+  }
+
+  // Jos kartalla on botDepartLimit-asetus, asetetaan se nykyiseksi, mikäli nykyinen on < 0
+  if ('number' === typeof this.gameState.map.config.botDepartLimit && this.gameState.botDepartLimit < 0) {
+    this.gameState.botDepartLimit = this.gameState.map.config.botDepartLimit;
   }
 
   this.maps[this.gameState.map.name] = this.gameState.map;
@@ -927,6 +933,16 @@ Server.prototype.changeMap = function (mapName) {
 
     // Laitetaan kartta muistiin ettei sitä tarvitse ladata enää uudelleen
     this.maps[nextMapName] = nextMap;
+  }
+
+  // Jos kartalla on botCount-asetus, asetetaan se botCountiksi, mikäli configissa se on < 0
+  if ('number' === typeof nextMap.config.botCount && this.config.botCount < 0) {
+    this.gameState.botCount = nextMap.config.botCount;
+  }
+
+  // Jos kartalla on botDepartLimit-asetus, asetetaan se nykyiseksi, mikäli configissa se on < 0
+  if ('number' === typeof nextMap.config.botDepartLimit && this.config.botDepartLimit < 0) {
+    this.gameState.botDepartLimit = nextMap.config.botDepartLimit;
   }
 
   // Alustetaan tavarat paikoilleen
