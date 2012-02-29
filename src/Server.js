@@ -686,49 +686,57 @@ Server.prototype.close = function (now) {
 
 /** Alustaa botit. */
 Server.prototype.initBots = function () {
-  var count = this.gameState.botCount
-    , bot
+  var server = this
+    , botCount = this.gameState.botCount
+    , loopedBotsCount = 0
     , team = rand(1, 2)
-    , map = this.gameState.map
-    , randomPlace;
+    , map = this.gameState.map;
 
-  for (var i = 1; i <= count; i++) {
-    bot = this.players[i];
-    bot.clientId  = 'bot:' + i;
-    bot.name      = bot.botName;
-    bot.zombie    = true;
-    bot.active    = true;
-    bot.loggedIn  = true;
-    bot.isDead    = false;
-    bot.health    = 100;
-    if (!this.gameState.sessionComplete) {
-      // Nollataan bottien statsit vain jos ei olla erän lopetustilassa
-      bot.kills     = 0;
-      bot.deaths    = 0;
+  this.loopPlayers(function serverInitBots(plr) {
+    var randomPlace;
+
+    // Tarkistetaan, että pysytään bottimäärän sisällä eikä muokata ihmispelaajaa
+    if (loopedBotsCount >= botCount || (plr.active && !plr.zombie)) {
+      return;
     }
-    bot.weapon    = this.getBotWeapon();
+
+    plr.clientId  = 'bot:' + plr.id;
+    plr.name      = plr.botName;
+    plr.zombie    = true;
+    plr.active    = true;
+    plr.loggedIn  = true;
+    plr.isDead    = false;
+    plr.health    = 100;
+    if (!server.gameState.sessionComplete) {
+      // Nollataan bottien statsit vain jos ei olla erän lopetustilassa
+      plr.kills     = 0;
+      plr.deaths    = 0;
+    }
+    plr.weapon    = server.getBotWeapon();
     randomPlace = map.findSpot();
-    bot.x = randomPlace.x;
-    bot.y = randomPlace.y;
-    bot.lastValidX = bot.x;
-    bot.lastValidY = bot.y;
-    bot.angle = rand(0, 360);
-    if (this.gameState.gameMode === 3) {
+    plr.x = randomPlace.x;
+    plr.y = randomPlace.y;
+    plr.lastValidX = plr.x;
+    plr.lastValidY = plr.y;
+    plr.angle = rand(0, 360);
+    if (server.gameState.gameMode === 3) {
       // Zombie-modi, botit vastaan pelaajat ja boteilla on 10hp
-      bot.team = 2;
-      bot.health = 10;
-    } else if (this.gameState.gameMode > 1) {
-      bot.team = team;
+      plr.team = 2;
+      plr.health = 10;
+    } else if (server.gameState.gameMode > 1) {
+      plr.team = team;
       team++;
       if (team > 2) { team = 1; }
     } else {
-      bot.team = 1;
+      plr.team = 1;
     }
 
     // Luodaan botille tekoäly ja asetetaan sen taitotaso samaksi kuin pelaaja-ID
-    bot.botAI = new BotAI(this, bot);
-    bot.botAI.setSkill(i);
-  }
+    plr.botAI = new BotAI(server, plr);
+    plr.botAI.setSkill(plr.id);
+
+    loopedBotsCount++;
+  });
 };
 
 /** Arpoo aseen boteille sallittujen listalta. */
