@@ -272,6 +272,13 @@ Game.prototype.updateBotsAmount = function () {
 
     loopedBotsCount++;
   });
+
+  // Pidetään huolta ettei botteja ole liian vähän
+  if (loopedBotsCount < botCount) {
+    for (var i = loopedBotsCount; i < botCount; i++) {
+      server.addBot();
+    }
+  }
 };
 
 /**

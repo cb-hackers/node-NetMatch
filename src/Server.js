@@ -739,6 +739,79 @@ Server.prototype.initBots = function () {
   });
 };
 
+/**
+ * Lisää uuden botin, vaihtoehtoisesti jonkin epäaktiivisen pelaajan paikalle. Huom! Ei välitä
+ * Server.gameState.botCount arvosta, vaan botti lentää heti pihalle jos määrä ylittyy. Katso
+ * lisätietoja: {@link Game#updateBotsAmount}.
+ *
+ * @param {Player} [player]  Pelaaja, jonka paikalle bottia yritetään laittaa.
+ *
+ * @returns {Boolean}  Onnistuiko botin lisääminen
+ */
+Server.prototype.addBot = function (player) {
+  var bot, playerIds, plr, randomPlace;
+
+  if (player instanceof Player) {
+    // Tarkistetaan ettei paikalla ole jo aktiivista pelaajaa
+    if (player.active) {
+      return false;
+    }
+    bot = player
+  } else {
+    // Haetaan seuraava vapaa paikka botille
+    playerIds = Object.keys(this.players);
+    for (var i = 0; i < playerIds.length; i++) {
+      plr = this.players[playerIds[i]];
+      if (!plr.active) {
+        bot = plr;
+        break;
+      }
+    }
+  }
+
+  // Tarkistetaan onko meillä nyt sopiva objekti valmiina
+  if (!(bot instanceof Player)) {
+    // Ei ollut.
+    return false;
+  }
+
+  bot.clientId  = 'bot:' + bot.id;
+  bot.name      = bot.botName;
+  bot.zombie    = true;
+  bot.active    = true;
+  bot.loggedIn  = true;
+  bot.isDead    = false;
+  bot.health    = 100;
+  bot.kills     = 0;
+  bot.deaths    = 0;
+  bot.weapon = this.getBotWeapon();
+  randomPlace = this.gameState.map.findSpot();
+  bot.x = randomPlace.x;
+  bot.y = randomPlace.y;
+  bot.lastValidX = bot.x;
+  bot.lastValidY = bot.y;
+  bot.angle = rand(0, 360);
+  if (this.gameState.gameMode === 3) {
+    // Zombie-modi, botit vastaan pelaajat ja boteilla on 10hp
+    bot.health = 10;
+  }
+  // Arvotaan botille joukkue
+  bot.setTeamEvenly();
+
+  // Luodaan botille tekoäly ja asetetaan sen taitotaso samaksi kuin pelaaja-ID
+  bot.botAI = new BotAI(this, bot);
+  bot.botAI.setSkill(bot.id);
+
+  // Lisätään viestijonoon ilmoitus uudesta pelaajasta
+  this.messages.addToAll({
+    msgType: NET.LOGIN,
+    msgText: bot.name,
+    player: bot
+  });
+
+  log.info('%0 joined the forces of AI.', bot.name.green);
+};
+
 /** Arpoo aseen boteille sallittujen listalta. */
 Server.prototype.getBotWeapon = function () {
   var weapons;
