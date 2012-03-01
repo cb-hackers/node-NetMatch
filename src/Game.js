@@ -255,8 +255,33 @@ Game.prototype.updateTimeouts = function () {
  */
 Game.prototype.updateBotsAmount = function () {
   var server = this.server
-    , botCount = server.gameState.botCount
+    , gs = server.gameState
     , loopedBotsCount = 0;
+
+  // Pidetään huolta ettei botDepartCount eikä botCount ylitä maxPlayersin arvoa
+  if (gs.botCount > gs.maxPlayers) {
+    gs.botCount = gs.maxPlayers;
+  }
+  if (gs.botDepartLimit > gs.maxPlayers) {
+    gs.botDepartLimit = gs.maxPlayers;
+  }
+
+  // Pidetään huolta että botCount menee myös botDepartLimitin mukaan
+  if (gs.botDepartLimit < gs.botCount + gs.playerCount) {
+    gs.botCount = gs.botDepartLimit - gs.playerCount;
+  } else if (gs.botDepartLimit > gs.botCount + gs.playerCount) {
+    // Tarkistetaan että onko botDepartLimitin takia joskus poistettu botteja mutta ei lisätty
+    // takaisin sallittua määrää
+    if (server.config.botCount < 0 && gs.map.config && gs.map.config.botCount > gs.botCount) {
+      // Mennään kartan configin arvojen mukaan
+      gs.botCount = gs.map.config.botCount;
+    } else {
+      // Muulloin mennään normaalin configin arvojen mukaan
+      if (server.config.botCount > gs.botCount) {
+        gs.botCount = server.config.botCount;
+      }
+    }
+  }
 
   server.loopPlayers(function (player) {
     // Tarkistetaan vain aktiiviset botit
@@ -265,7 +290,7 @@ Game.prototype.updateBotsAmount = function () {
     }
 
     // Tarkistetaan ollaanko ylitetty tämän botin kohdalla bottiraja
-    if (loopedBotsCount >= botCount) {
+    if (loopedBotsCount >= gs.botCount) {
       // Yli ollaan menty. Kirjataan botti ulos.
       server.logout(player);
     }
@@ -274,8 +299,8 @@ Game.prototype.updateBotsAmount = function () {
   });
 
   // Pidetään huolta ettei botteja ole liian vähän
-  if (loopedBotsCount < botCount) {
-    for (var i = loopedBotsCount; i < botCount; i++) {
+  if (loopedBotsCount < gs.botCount) {
+    for (var i = loopedBotsCount; i < gs.botCount; i++) {
       server.addBot();
     }
   }
