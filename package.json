@@ -1,6 +1,6 @@
 {
   "name": "NetMatch",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": "Vesa Laakso <laakso.vesa@gmail.com> (http://vesq.net)",
   "description": "A node-server of a CoolBasic game NetMatch",
   "contributors": [
@@ -14,6 +14,9 @@
     "debug2": "node ./src/NetMatch.js --debug 2",
     "debug3": "node ./src/NetMatch.js --debug 3"
   },
+	"bin": {
+		"netmatch": "bin/netmatch.js"
+	},
   "config": {
     "config": "config"
   },
