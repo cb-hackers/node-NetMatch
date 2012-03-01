@@ -11,21 +11,32 @@
 var botlimit = {
   /**#nocode+*/
   params: [
-    {name: 'count',  type: 'integer', optional: false, help: 'Amount of bots'}
+    {name: 'count',  type: 'integer', optional: true, help: 'When this amount of players is reached, bots start to leave'}
   ],
-  help: 'Sets the count of bots.',
+  help: 'Sets the bot depart limit',
   remote: true,
   action: function commandsBotLimit() {
-    var botCount = arguments[1]
-    if (botCount >= 0) {
-      this.gameState.botCount = botCount;
+    var msg, value;
+    // Jos ei annettu parametreja, niin tulostetaan nykyinen bottilimitti. arguments[0] on kutsuja
+    if (arguments.length < 2) {
+      msg = 'Current bot depart limit is ' + this.gameState.botDepartLimit + ' and current bot count is ' + this.gameState.botCount;
+      if (arguments[0]) {
+        this.serverMessage(msg, arguments[0]);
+      } else {
+        console.log(msg);
+      }
+      return;
+    }
+    value = arguments[1]
+    if (value >= 0) {
+      this.gameState.botDepartLimit = value;
     } else {
       // Jos annettu arvo oli pienempi kuin nolla niin käytetään kartan asetuksissa määriteltyä
       // arvoa, jos se on olemassa. Muulloin 0
-      if (this.gameState.map.config && this.gameState.map.config.botCount > 0) {
-        this.gameState.botCount = this.gameState.map.config.botCount;
+      if (this.gameState.map.config && this.gameState.map.config.botDepartLimit > 0) {
+        this.gameState.botDepartLimit = this.gameState.map.config.botDepartLimit;
       } else {
-        this.gameState.botCount = 0;
+        this.gameState.botDepartLimit = 0;
       }
     }
   }
