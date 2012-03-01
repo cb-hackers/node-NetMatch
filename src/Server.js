@@ -497,6 +497,18 @@ Server.prototype.login = function (client) {
   nickname = data.getString().trim();
   log.info('Player %0 is trying to login...', nickname.green);
 
+  // Tarkistetaan onko palvelin täynnä
+  if (this.gameState.playerCount + this.gameState.botCount >= this.gameState.maxPlayers) {
+    // Vapaita paikkoja ei ollut
+    log.info(' -> Server is full!');
+    replyData = new Packet(3);
+    replyData.putByte(NET.LOGIN);
+    replyData.putByte(NET.LOGINFAILED);
+    replyData.putByte(NET.TOOMANYPLAYERS);
+    client.reply(replyData);
+    return;
+  }
+
   // Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa
   playerIds = Object.keys(this.players);
   for (var i = 0; i < playerIds.length; i++) {
@@ -520,7 +532,7 @@ Server.prototype.login = function (client) {
   // Etsitään inaktiivinen pelaaja
   for (i = 0; i < playerIds.length; i++) {
     player = this.players[playerIds[i]];
-    if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
+    if (!player.active) {
       // Tyhjä paikka löytyi
       player.clientId = client.id;
       player.active = true;
@@ -572,15 +584,6 @@ Server.prototype.login = function (client) {
       return;
     }
   }
-
-  // Vapaita paikkoja ei ollut
-  log.info(' -> Server is full!');
-  replyData = new Packet(3);
-  replyData.putByte(NET.LOGIN);
-  replyData.putByte(NET.LOGINFAILED);
-  replyData.putByte(NET.TOOMANYPLAYERS);
-  client.reply(replyData);
-  return;
 };
 
 /**
