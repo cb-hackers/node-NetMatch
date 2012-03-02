@@ -30,7 +30,7 @@ var Utils = {
    * log.error('VIRHE! Tulostuu punaisen ja lihavoidun ERROR-tagin kanssa.');
    * log.fatal('KRIITTINEN VIRHE! Tulostuu punaisen ja lihavoidun FATAL-tagin kanssa.');
    */
-  log: new Logger('[NetMatch %t] '.grey, argv.d && argv.d - 1),
+  log: new Logger('[NetMatch %t] '.grey, argv.d && (argv.d > 1 ? argv.d - 1 : 1)),
 
   /**
    * Palauttaa satunnaisen luvun väliltä minVal...maxVal, mahdollisesti liukulukuna
