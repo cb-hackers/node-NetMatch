@@ -136,6 +136,12 @@ Server.prototype.initialize = function (port, address, config) {
   if (port) { this.config.port = port; }
   if (address) { this.config.address = address; }
 
+  // Portti on pakollinen.
+  if (!this.config.port || 'number' !== typeof this.config.port) {
+    log.fatal('You need to specify a port for NetMatch! Try `%0`', 'netmatch --help'.yellow);
+    return false;
+  }
+
   /**
    * cbNetwork-node UDP-palvelin
    * @type cbNetwork.Server
