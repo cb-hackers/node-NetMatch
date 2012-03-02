@@ -33,9 +33,9 @@ Config.defaults = {
   /**
    * GSS-palvelimen osoite
    * @type String
-   * @default "http://netmatch.vesq.org"
+   * @default "http://tuhoojabotti.com/nm"
    */
-  regHost: "http://netmatch.vesq.org",
+  regHost: "http://tuhoojabotti.com/nm",
   /**
    * GSS-palvelimella oleva polku gss.php tiedostoon
    * @type String
@@ -45,9 +45,9 @@ Config.defaults = {
   /**
    * Rekisteröidäänkö palvelin
    * @type Boolean
-   * @default false
+   * @default true
    */
-  register: false,
+  register: true,
   /**
    * Palvelimen kuvaus, näkyy listauksessa
    * @type String

@@ -1,9 +1,8 @@
-// ##################################################################################
-// ## Uudelleennimeä tämä tiedostoksi config.json niin se ladataan automaattisesti ##
-// ## tai kopioi se haluamaasi tiedostopolkuun ja aseta npm:n asetuksista uusi     ##
-// ## polku komennolla `npm set NetMatch:config /path/to/your/config.json`         ##
-// ##################################################################################
-
+// Voit asettaa tämän asetustiedoston polun node-NetMatchin tietoon seuraavasti:
+//         `npm set NetMatch:config /path/to/your/config.json`
+// Tiedostopäätteen tulee olla .json, sillä jos se puuttuu niin se lisätään automaattisesti.
+// Tiedostopääte on myös vapaaehtoinen, eli jos annat vain polun /path/to/config, etsii ohjelma
+// tiedostoa polusta /path/to/config.json
 {
   /**
    * Nämä kaksi alla olevaa määrittävät palvelimen portin ja osoitteen.
@@ -15,9 +14,9 @@
   /**
    * GSS-palvelimen osoite
    * @type String
-   * @default "http://netmatch.vesq.org"
+   * @default "http://tuhoojabotti.com/nm"
    */
-  "regHost": "http://netmatch.vesq.org",
+  "regHost": "http://tuhoojabotti.com/nm",
   /**
    * GSS-palvelimella oleva polku gss.php tiedostoon
    * @type String
@@ -27,9 +26,9 @@
   /**
    * Rekisteröidäänkö palvelin
    * @type Boolean
-   * @default false
+   * @default true
    */
-  "register": false,
+  "register": true,
   /**
    * Palvelimen kuvaus, näkyy listauksessa
    * @type String
