@@ -370,11 +370,14 @@ gss.on('list', function (req, res, uri) {
 
     // Onko palvelin aktiivinen?
     if (Date.now() - serv.last > 90000) { serv.active = false; }
-    // Jos ei niin poistetaan listauksesta.
+    // Jos ei niin tarkistetaan onko viimeisestä viestistä kulunut 10min
     if (!serv.active) {
-      serv.log.info('timeout', 'Deleted server after inactivity.');
-      serv.log.end('deleted');
-      self.servers.splice(i, 1);
+      if (Date.now() - serv.last > 600000) {
+        // Viimeisestä viestistä on kulunut 10min, poistetaan palvelin.
+        serv.log.info('timeout', 'Deleted server after inactivity.');
+        serv.log.end('deleted');
+        self.servers.splice(i, 1);
+      }
       return;
     }
 
