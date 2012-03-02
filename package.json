@@ -14,9 +14,9 @@
     "debug2": "node ./src/NetMatch.js --debug 2",
     "debug3": "node ./src/NetMatch.js --debug 3"
   },
-	"bin": {
-		"netmatch": "bin/netmatch.js"
-	},
+  "bin": {
+    "netmatch": "bin/netmatch.js"
+  },
   "config": {
     "config": "config"
   },
