@@ -383,8 +383,8 @@ Server.prototype.sendReply = function (client, player) {
         }
         reply.putShort(plr.kills);      // Tapot
         reply.putShort(plr.deaths);     // Kuolemat
-      } else if (server.gameState.radarArrows || (server.gameState.playMode > 1 && player.team === plr.team)) {
-        // Ei näy. Lähetetään tutkatieto. playMode > 1 tarkoittaa kaikkia muita kuin DM-moodeja
+      } else if (server.gameState.radarArrows || (server.gameState.gameMode > 1 && player.team === plr.team)) {
+        // Ei näy. Lähetetään tutkatieto. gameMode > 1 tarkoittaa kaikkia muita kuin DM-moodeja
         // Lähetetään tutkatiedot jos joukkueet ovat samat tai asetuksista on laitettu että
         // kaikkien joukkueiden pelaajien tutkatiedot lähetetään
         reply.putByte(NET.RADAR); // Tutkatietoa tulossa
