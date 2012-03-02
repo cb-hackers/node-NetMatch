@@ -765,7 +765,7 @@ Server.prototype.addBot = function (player) {
     if (player.active) {
       return false;
     }
-    bot = player
+    bot = player;
   } else {
     // Haetaan seuraava vapaa paikka botille
     playerIds = Object.keys(this.players);

@@ -27,7 +27,7 @@ var botlimit = {
       }
       return;
     }
-    value = arguments[1]
+    value = arguments[1];
     if (value >= 0) {
       this.gameState.botDepartLimit = value;
     } else {
