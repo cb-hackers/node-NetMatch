@@ -99,10 +99,13 @@ GSS.prototype.getServer = function (sid, cb) {
 };
 
 GSS.prototype.getUpdatePing = function (srv) {
+  // Tätä ei olla vielä tehty valmiiksi palvelimen puolella, joten ei pingata koskaan.
+  /*
   if (srv && parseFloat(srv.ver.slice(1)) >= 2.5) {
     srv.pingT = Date.now();
     this.sock.send(this.pingPacket, 0, 8, srv.port, srv.addr);
   }
+  */
 };
 
 GSS.prototype.endRequest = function (res, log, msg) {
