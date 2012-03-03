@@ -49,6 +49,12 @@ Config.defaults = {
    */
   register: true,
   /**
+   * Osoite, josta pelaaja voi ladata puuttuvan kartan
+   * @type String
+   * @default "http://netmatch.vesq.org/maps/"
+   */
+  mapDownloadUrl: "http://netmatch.vesq.org/maps/",
+  /**
    * Palvelimen kuvaus, näkyy listauksessa
    * @type String
    * @default "Node.js powered server"
@@ -214,6 +220,9 @@ Config.prototype.load = function (config) {
     }
   }
 
+  if (this.mapDownloadUrl[this.mapDownloadUrl.length - 1] !== '/') {
+    this.mapDownloadUrl = this.mapDownloadUrl + '/';
+  }
 
   return true;
 };

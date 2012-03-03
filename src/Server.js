@@ -573,8 +573,7 @@ Server.prototype.login = function (client) {
       replyData.putByte(this.gameState.gameMode === 3 ? 2 : this.gameState.gameMode);
       replyData.putString(this.gameState.map.name);
       replyData.putInt(this.gameState.map.crc32);
-      // UNIMPLEMENTED
-      replyData.putString(" "); // Kartan URL josta sen voi ladata, mikäli se puuttuu
+      replyData.putString(this.config.mapDownloadUrl); // Kartan URL josta sen voi ladata, mikäli se puuttuu
       client.reply(replyData);
       log.info(' -> login successful, assigned ID (%0)', String(player.id).magenta);
 
