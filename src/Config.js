@@ -221,7 +221,7 @@ Config.prototype.load = function (config) {
   }
 
   if (this.mapDownloadUrl[this.mapDownloadUrl.length - 1] !== '/') {
-	this.mapDownloadUrl = this.mapDownloadUrl + '/';
+    this.mapDownloadUrl = this.mapDownloadUrl + '/';
   }
 
   return true;
