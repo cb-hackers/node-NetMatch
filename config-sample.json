@@ -31,6 +31,12 @@
    */
   "register": false,
   /**
+   * Osoite, josta pelaaja voi ladata puuttuvan kartan
+   * @type String
+   * @default "http://netmatch.vesq.org/maps/"
+   */
+  "mapDownloadUrl": "http://netmatch.vesq.org/maps/",
+  /**
    * Palvelimen kuvaus, näkyy listauksessa
    * @type String
    * @default "Node.js powered server"
