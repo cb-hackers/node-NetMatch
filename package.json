@@ -1,11 +1,12 @@
 {
   "name": "NetMatch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Vesa Laakso <laakso.vesa@gmail.com> (http://vesq.net)",
   "description": "A node-server of a CoolBasic game NetMatch",
   "contributors": [
     "Vesa Laakso <laakso.vesa@gmail.com> (http://vesq.net)",
-    "Ville Lahdenvuo <tuhoojabotti@gmail.com> (http://tuhoojabotti.com)"
+    "Ville Lahdenvuo <tuhoojabotti@gmail.com> (http://tuhoojabotti.com)",
+    "Vili Hietala <viltzu2@gmail.com> (http://viltzu.in)"
   ],
   "scripts": {
     "start": "node ./src/NetMatch.js",
