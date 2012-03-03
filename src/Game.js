@@ -124,6 +124,8 @@ Game.prototype.updateRoundTime = function () {
   // Jos pelaajia ei ole palvelimella niin kello ei käy.
   if (server.gameState.playerCount <= 0) {
     server.gameState.sessionStarted = Date.now();
+    server.gameState.sessionComplete = false;
+    this.isNextMapLoaded = false;
     return;
   }
 
