@@ -34,10 +34,7 @@ var log       = require('./Utils').log
  * @property {Number}   sideStep      Botin sivuaskeleet
  * @property {Number}   nextAction    Ajankohta jolloin botille arvotaan uusi suunta
  * @property {Boolean}  tooClose      Botti on liian lähellä seinää tai toista pelaajaa
- * @property {Number}   fightRotate   Kääntymisnopeus kun ollaan havaittu vastustaja
- * @property {Number}   shootingAngle Ammutaan kun uhri on tämän kulman sisällä botin edessä
- * @property {Object}   config        Botin tekoälyä ohjaavat asetukset: {@link BotAI#initConfig}
-*/
+ */
 function BotAI(server, player) {
   this.server = server;
   this.player = player;
