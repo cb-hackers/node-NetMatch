@@ -183,7 +183,7 @@ Config.prototype.load = function (config) {
 
   if (!path.existsSync(filePath)) {
     log.error('Config %0 doesn\'t exist', filePath.green);
-    log.error('Use `%0` to load your own config', 'npm set NetMatch:config /path/to/your/config.json'.yellow);
+    log.error('Use `%0` to load your own config', 'netmatch -c /path/to/your/config.json'.yellow);
     return true;
   }
 
@@ -194,7 +194,7 @@ Config.prototype.load = function (config) {
 
   // Tarkistetaan onko maksimimäärä liian suuri ja kaadetaan palvelin mikäli on
   if (this.maxPlayers > 64) {
-    log.fatal('maxPlayers set to %0 while the hardcoded maximum is %1!', this.maxPlayers, 64);
+    log.fatal('maxPlayers set to %0 while the hardcoded maximum is %1!', String(this.maxPlayers).magenta, 64);
     return false;
   }
 

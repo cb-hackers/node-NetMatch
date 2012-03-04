@@ -6,14 +6,14 @@
 
 /**#nocode+*/
 var argv = require('optimist')
-    .default({d: false, c: process.env.npm_package_config_config || 'config'})
+    .default({d: false, c: 'config'})
     .alias({'p' : 'port', 'a' : 'address', 'd' : 'debug', 'c': 'config', 'h': 'help'})
     .describe({
       'h': 'Shows this help and exits.',
-      'c': 'Load config from this file default is `config`, do not use file extension.',
+      'c': 'Load config from this file, default is `config`.',
       'p': 'Port to listen to. Clients must connect to this port (overrides config).',
-      'a': 'Address to bind to defaults to all addresses (overrides config).',
-      'd': 'Spam a lot.'})
+      'a': 'Address to bind to. Defaults to all addresses (overrides config).',
+      'd': 'Spam a lot. There\'s also different levels of debug, ranging from 1 to 3'})
     .usage('Run NetMatch server: $0')
     .check(function (a) {return !a.h;}) // Näytetään helppi, jos -h tai --help
     .argv // Palautetaan parametrit opjektina, jotta niitä
