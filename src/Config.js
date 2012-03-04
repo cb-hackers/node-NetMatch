@@ -224,6 +224,12 @@ Config.prototype.load = function (config) {
     this.mapDownloadUrl = this.mapDownloadUrl + '/';
   }
 
+  // Tarkistetaan että portti on numero
+  if (this.port && 'number' !== typeof this.port) {
+    log.fatal('You must set %0 to be a number in %1!', 'port'.yellow, filePath.green);
+    return false;
+  }
+
   return true;
 };
 
