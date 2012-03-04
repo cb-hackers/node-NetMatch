@@ -2,6 +2,8 @@
  * @fileOverview Serverikomentoihin liittyvät toiminnot
  */
 
+"use strict";
+
 /**#nocode+*/
 var log  = require('./Utils').log
   , join = require('./Utils').join
@@ -145,7 +147,15 @@ Commands.kick = {
   action: function commandsKick() {
     var player
       , plrName = arguments[1]
-      , reason  = arguments[2] || '';
+      , reason  = '';
+
+    if (arguments.length > 2) {
+      // Annettiin selitys, yhdistetään kaikki loput parametrit välilyönnein
+      for (var i = 2; i < arguments.length; i++) {
+        reason += arguments[i] + " ";
+      }
+      reason = reason.trim();
+    }
 
     // Jos annettiinkin ID, niin vaihdetaan se nimeksi
     if (this.players[plrName]) {
@@ -156,9 +166,8 @@ Commands.kick = {
     if (!player || !player.active || player.zombie) {
       log.notice('Sorry, player couldn\'t be found or you tried to kick a bot.');
     } else {
-      // Vaihdetaan toinen parametri nollaksi, jos kutsut tulee palvelimelta, kun klientti on pätsätty, muuten MAV.
-      this.kickPlayer(player, // Kicker id joko komennon kutsujan ID tai serveri.
-        arguments[0], reason);
+      // arguments[0] on komennon kutsuja, mikäli se ei ole palvelin.
+      this.kickPlayer(player, arguments[0], reason);
     }
 
   }

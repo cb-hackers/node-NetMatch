@@ -89,7 +89,7 @@
 			Documentation generator: <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0<br />
 			Template: <a href="http://www.thebrightlines.com/2010/05/06/new-template-for-jsdoctoolkit-codeview/" target="_blank">Codeview</a> 1.2<br />
 			Generated on:
-			<time datetime='2012-0-15' pubdate>2012-0-15 1:40</time>
+			<time datetime='2012-2-4' pubdate>2012-2-4 16:11</time>
 		</footer>
 	</div>
 </div>
@@ -204,7 +204,7 @@
 													<div class="fixedFont">
 													<b><a href="../symbols/Map.html#data">data</a></b>
 													</div>
-													<div class="description">Törmäyskerroksen data kaksiulotteisessa xy-taulukossa</div>
+													<div class="description">Törmäyskerroksen data yksiulotteisessa taulukossa</div>
 												</td>
 											</tr>
 										
@@ -293,6 +293,39 @@
 											<tr
 												 class='item0'
 											>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Map.html#checkCircleCollision">checkCircleCollision</a></b>(x, y, r, tileX, tileY)
+													</div>
+													<div class="description"></div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item1'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Map.html#circleCollision">circleCollision</a></b>(x, y, r)
+													</div>
+													<div class="description">Ympyrä-tilekartta törmäys.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item2'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Map.html#debugBox">debugBox</a></b>(tileX, tileY, fill)
+													</div>
+													<div class="description">Piirtää boksin tilen paikalle.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item3'
+											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont"><b><a href="../symbols/Map.html#findSpot">findSpot</a></b>()
@@ -303,19 +336,31 @@ koordinaatit objektissa, jolla on kentät x ja y.</div>
 											</tr>
 										
 											<tr
-												 class='item1'
+												 class='item4'
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont"><b><a href="../symbols/Map.html#findWall">findWall</a></b>(x, y, angle, dist)
 													</div>
-													<div class="description">Etsii annettujen koordinaattien ja kulman muodostavalta suoralta lähimmän seinän koordinaatit
-ja palauttaa ne objektin kenttinä x ja y.</div>
+													<div class="description">Etsii annettujen koordinaattien ja kulman muodostavalta suoralta annetulta maksimietäisyydeltä
+seinän koordinaatit ja palauttaa ne objektin kenttinä x ja y.</div>
 												</td>
 											</tr>
 										
 											<tr
-												 class='item2'
+												 class='item5'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/Map.html#findWall2">findWall2</a></b>(x1, y1, x2, y2)
+													</div>
+													<div class="description">Tarkistaa onko annettujen koordinaattien välillä seinää ja jos väliltä löytyy seinä,
+palauttaa funktio ne objektin kenttinä x ja y.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item6'
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
@@ -326,7 +371,7 @@ ja palauttaa ne objektin kenttinä x ja y.</div>
 											</tr>
 										
 											<tr
-												 class='item3'
+												 class='item7'
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
@@ -337,13 +382,14 @@ ja palauttaa ne objektin kenttinä x ja y.</div>
 											</tr>
 										
 											<tr
-												 class='item4'
+												 class='item8'
 											>
-												<td class="attributes">&nbsp;</td>
+												<td class="attributes">&lt;private&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont"><b><a href="../symbols/Map.html#rayCast">rayCast</a></b>(origP1, origP2)
 													</div>
-													<div class="description">Raycast</div>
+													<div class="description">Tekee raycastin kahden pisteen välillä ja palauttaa kohdan, jossa pisteiden välillä kulkeva
+suora osuu ensimmäisen kerran seinään.</div>
 												</td>
 											</tr>
 										
@@ -496,7 +542,7 @@ ja palauttaa ne objektin kenttinä x ja y.</div>
 								</div>
 								
 								<div class="description">
-									Törmäyskerroksen data kaksiulotteisessa xy-taulukossa
+									Törmäyskerroksen data yksiulotteisessa taulukossa
 									
 									
 									
@@ -638,6 +684,201 @@ ja palauttaa ne objektin kenttinä x ja y.</div>
 									<li 
 										 class='item0'
 									>
+										<div class="fixedFont heading" id="checkCircleCollision">
+											<span class='lighter'>
+											&lt;private&gt; 
+											</span>
+											
+											
+											
+											<b>checkCircleCollision</b>(x, y, r, tileX, tileY)
+										</div>
+										
+										<div class="description">
+											
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<b>x</b>
+														
+													</dt>
+													<dd></dd>
+												
+													<dt>
+														<b>y</b>
+														
+													</dt>
+													<dd></dd>
+												
+													<dt>
+														<b>r</b>
+														
+													</dt>
+													<dd></dd>
+												
+													<dt>
+														<b>tileX</b>
+														
+													</dt>
+													<dd></dd>
+												
+													<dt>
+														<b>tileY</b>
+														
+													</dt>
+													<dd></dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item1'
+									>
+										<div class="fixedFont heading" id="circleCollision">
+											<span class='lighter'>
+											
+											</span>
+											
+											<span class="light">{Object}</span>
+											
+											<b>circleCollision</b>(x, y, r)
+										</div>
+										
+										<div class="description">
+											Ympyrä-tilekartta törmäys.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>x</b>
+														
+													</dt>
+													<dd>Ympyrän keskipisteen x-koordinaatti maailmankoordinaateissa</dd>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>y</b>
+														
+													</dt>
+													<dd>Ympyrän keskipisteen y-koordinaatti maailmankoordinaateissa</dd>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>r</b>
+														
+													</dt>
+													<dd>Ympyrän säteen pituus</dd>
+												
+											</dl>
+										
+										
+										
+											<dl class="detailList nomargin">
+											
+												
+												
+												
+												
+												
+												
+												
+													<dt class="heading">Returns:</dt>
+													
+														<dd><span class="light fixedFont">{Object}</span> Objektilla on kentät "left", "right", "up" ja/tai "down". Jos kentän arvo on
+                  tosi, niin siitä suunnasta löytyy törmäys.</dd>
+													
+												
+												
+												
+												
+												
+													<dt class="heading">See:</dt>
+													
+														<dd>http://stackoverflow.com/a/402010/1152564</dd>
+													
+												
+											
+											</dl>
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item2'
+									>
+										<div class="fixedFont heading" id="debugBox">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>debugBox</b>(tileX, tileY, fill)
+										</div>
+										
+										<div class="description">
+											Piirtää boksin tilen paikalle.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Integer}</span> <b>tileX</b>
+														
+													</dt>
+													<dd></dd>
+												
+													<dt>
+														<span class="light fixedFont">{Integer}</span> <b>tileY</b>
+														
+													</dt>
+													<dd></dd>
+												
+													<dt>
+														<span class="light fixedFont">{Boolean}</span> <b>fill</b>
+														<i>Optional, Default: false</i>
+													</dt>
+													<dd>Piirretäänkö täytetty boksi</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item3'
+									>
 										<div class="fixedFont heading" id="findSpot">
 											<span class='lighter'>
 											
@@ -687,7 +928,7 @@ koordinaatit objektissa, jolla on kentät x ja y.
 									</li>
 								
 									<li 
-										 class='item1'
+										 class='item4'
 									>
 										<div class="fixedFont heading" id="findWall">
 											<span class='lighter'>
@@ -700,8 +941,9 @@ koordinaatit objektissa, jolla on kentät x ja y.
 										</div>
 										
 										<div class="description">
-											Etsii annettujen koordinaattien ja kulman muodostavalta suoralta lähimmän seinän koordinaatit
-ja palauttaa ne objektin kenttinä x ja y.
+											Etsii annettujen koordinaattien ja kulman muodostavalta suoralta annetulta maksimietäisyydeltä
+seinän koordinaatit ja palauttaa ne objektin kenttinä x ja y. Jos seinää ei löytynyt ennen
+maksimietäisyyden saavuttamista, ei funktio palauta mitään arvoa.
 											
 											
 											
@@ -718,13 +960,13 @@ ja palauttaa ne objektin kenttinä x ja y.
 														<span class="light fixedFont">{Number}</span> <b>x</b>
 														
 													</dt>
-													<dd>Aloituspisteen x-koordinaatti</dd>
+													<dd>Aloituspisteen x-koordinaatti maailmankoordinaateissa</dd>
 												
 													<dt>
 														<span class="light fixedFont">{Number}</span> <b>y</b>
 														
 													</dt>
-													<dd>Aloituspisteen y-koordinaatti</dd>
+													<dd>Aloituspisteen y-koordinaatti maailmankoordinaateissa</dd>
 												
 													<dt>
 														<span class="light fixedFont">{Number}</span> <b>angle</b>
@@ -733,10 +975,93 @@ ja palauttaa ne objektin kenttinä x ja y.
 													<dd>Mihin suuntaan suora muodostuu (asteina)</dd>
 												
 													<dt>
-														<b>dist</b>
+														<span class="light fixedFont">{Number}</span> <b>dist</b>
+														<i>Optional</i>
+													</dt>
+													<dd>Kuinka pitkältä katsotaan. Jos tätä ei anneta, niin etäisyyttä ei
+                        rajoiteta.</dd>
+												
+											</dl>
+										
+										
+										
+											<dl class="detailList nomargin">
+											
+												
+												
+												
+												
+												
+												
+												
+													<dt class="heading">Returns:</dt>
+													
+														<dd><span class="light fixedFont">{Object}</span> Palauttaa objektin jolla on kentät x ja y jotka sisältävät maksimietäisyyden
+                   sisältä löytyneen seinän törmäyskoordinaatit. Tätä ei palauteta, jos ei
+                   löytynyt seinää.</dd>
+													
+												
+												
+												
+												
+												
+											
+											</dl>
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item5'
+									>
+										<div class="fixedFont heading" id="findWall2">
+											<span class='lighter'>
+											
+											</span>
+											
+											<span class="light">{Object}</span>
+											
+											<b>findWall2</b>(x1, y1, x2, y2)
+										</div>
+										
+										<div class="description">
+											Tarkistaa onko annettujen koordinaattien välillä seinää ja jos väliltä löytyy seinä,
+palauttaa funktio ne objektin kenttinä x ja y.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>x1</b>
 														
 													</dt>
-													<dd></dd>
+													<dd>Alkupisteen x-koordinaatti</dd>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>y1</b>
+														
+													</dt>
+													<dd>Alkupisteen y-koordinaatti</dd>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>x2</b>
+														
+													</dt>
+													<dd>Loppupisteen x-koordinaatti</dd>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>y2</b>
+														
+													</dt>
+													<dd>Loppupisteen y-koordinaatti</dd>
 												
 											</dl>
 										
@@ -768,7 +1093,7 @@ ja palauttaa ne objektin kenttinä x ja y.
 									</li>
 								
 									<li 
-										 class='item2'
+										 class='item6'
 									>
 										<div class="fixedFont heading" id="initItems">
 											<span class='lighter'>
@@ -797,7 +1122,7 @@ ja palauttaa ne objektin kenttinä x ja y.
 									</li>
 								
 									<li 
-										 class='item3'
+										 class='item7'
 									>
 										<div class="fixedFont heading" id="isColliding">
 											<span class='lighter'>
@@ -843,20 +1168,21 @@ ja palauttaa ne objektin kenttinä x ja y.
 									</li>
 								
 									<li 
-										 class='item4'
+										 class='item8'
 									>
 										<div class="fixedFont heading" id="rayCast">
 											<span class='lighter'>
-											
+											&lt;private&gt; 
 											</span>
 											
-											
+											<span class="light">{Object}</span>
 											
 											<b>rayCast</b>(origP1, origP2)
 										</div>
 										
 										<div class="description">
-											Raycast
+											Tekee raycastin kahden pisteen välillä ja palauttaa kohdan, jossa pisteiden välillä kulkeva
+suora osuu ensimmäisen kerran seinään.
 											
 											
 											
@@ -870,20 +1196,42 @@ ja palauttaa ne objektin kenttinä x ja y.
 												<dt class="heading">Parameters:</dt>
 												
 													<dt>
-														<b>origP1</b>
+														<span class="light fixedFont">{Object}</span> <b>origP1</b>
 														
 													</dt>
-													<dd></dd>
+													<dd>Alkupiste, jolla on kentissä x ja y koordinaatit</dd>
 												
 													<dt>
-														<b>origP2</b>
+														<span class="light fixedFont">{Object}</span> <b>origP2</b>
 														
 													</dt>
-													<dd></dd>
+													<dd>Loppupiste, jolla on kentissä x ja y koordinaatit</dd>
 												
 											</dl>
 										
 										
+										
+											<dl class="detailList nomargin">
+											
+												
+												
+												
+												
+												
+												
+												
+													<dt class="heading">Returns:</dt>
+													
+														<dd><span class="light fixedFont">{Object}</span> Ensimmäinen vastaan tullut seinä ja tarkka osumakohta. Jos pisteiden välillä
+                   ei ollut seinää, ei funktio palauta mitään.</dd>
+													
+												
+												
+												
+												
+												
+											
+											</dl>
 										
 										
 									</li>

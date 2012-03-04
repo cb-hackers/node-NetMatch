@@ -2,6 +2,8 @@
  * @fileOverview Toteutus komennolle asplayer: {@link Commands.asplayer}
  */
 
+"use strict";
+
 var log = require('../Utils').log;
 
 /**

@@ -1,2 +1,5 @@
 # Let people config the way they like.
 config.json
+
+# Don't allow node_modules. At least not yet
+node_modules

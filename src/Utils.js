@@ -1,10 +1,16 @@
 /**
  * @fileOverview Sisältää hyödyllisiä funktioita, eli {@link Utils}-nimiavaruuden toteutuksen.
  */
+
+
+"use strict";
+
+/**#nocode+*/
 var argv = require('optimist')
   .default({d: false}).alias({'d' : 'debug'}).argv
   , colors = require('colors')
   , Logger = require('cbNetwork').Logger;
+/**#nocode-*/
 
 /**
  * @namespace Sisältää hyödyllisiä funktioita.
@@ -24,7 +30,7 @@ var Utils = {
    * log.error('VIRHE! Tulostuu punaisen ja lihavoidun ERROR-tagin kanssa.');
    * log.fatal('KRIITTINEN VIRHE! Tulostuu punaisen ja lihavoidun FATAL-tagin kanssa.');
    */
-  log: new Logger('[NetMatch %t] '.grey, argv.d),
+  log: new Logger('[NetMatch %t] '.grey, argv.d && (argv.d > 1 ? argv.d - 1 : 1)),
 
   /**
    * Palauttaa satunnaisen luvun väliltä minVal...maxVal, mahdollisesti liukulukuna
@@ -63,7 +69,7 @@ var Utils = {
   },
 
   /**
-   * Palauttaa kahden pisteen välisen kulman asteina
+   * Palauttaa kahden pisteen välisen kulman asteina väliltä -180...180º
    * @param {Number} x1  Ensimmäisen pisteen x-koordinaatti
    * @param {Number} y1  Ensimmäisen pisteen y-koordinaatti
    * @param {Number} x2  Toisen pisteen x-koordinaatti
@@ -71,7 +77,7 @@ var Utils = {
    * @returns {Number}   Pisteiden välinen kulma asteina välillä 0...360º
    */
   getAngle: function (x1, y1, x2, y2) {
-    var radAngle = Math.atan2(y1 - y2, x1 - x2) + Math.PI; // Kulma radiaaneina välillä 0...2pi
+    var radAngle = Math.atan2(y1 - y2, x1 - x2); // Kulma radiaaneina välillä -pi...pi
     return (radAngle / Math.PI) * 180;
   },
 
@@ -80,8 +86,8 @@ var Utils = {
    * @param {Number} num  Numero, jonka perästä desimaalit poistetaan
    */
   truncateNumber: function (num) {
-    if (num<0) return Math.ceil(num);
-    else return Math.floor(num);
+    if (num<0) { return Math.ceil(num); }
+    return Math.floor(num);
   },
 
   /**

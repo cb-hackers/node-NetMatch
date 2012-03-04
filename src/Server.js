@@ -2,6 +2,8 @@
  * @fileOverview Pitää sisällään {@link Server} nimiavaruuden.
  */
 
+"use strict";
+
 /**#nocode+*/
 var cbNetwork = require('cbNetwork')
   , Packet = cbNetwork.Packet
@@ -109,9 +111,17 @@ function Server(args, version) {
   this.registration = new Registration(this);
 
   // Alustetaan palvelin (esim. kartta, pelaajat, tavarat)
-  this.initialize(args.p, args.a, args.c);
-
-  log.info('Server initialized successfully.');
+  if (this.initialize(args.p, args.a, args.c)) {
+    log.info('Server initialized successfully.');
+  } else {
+    log.fatal('Server initialization failed!');
+    if ('undefined' === typeof this.server) {
+      // cbNetworkkia ei keretty alustaa
+      this.close(true);
+    } else {
+      this.close();
+    }
+  }
 }
 
 util.inherits(Server, events.EventEmitter);
@@ -121,10 +131,16 @@ Server.prototype.initialize = function (port, address, config) {
   var self = this;
 
   // Ladataan konffit
-  this.config.load(config);
+  if (!this.config.load(config)) { return false; }
   // Komentoriviparametrit voittaa.
   if (port) { this.config.port = port; }
   if (address) { this.config.address = address; }
+
+  // Portti on pakollinen.
+  if (!this.config.port || 'number' !== typeof this.config.port) {
+    log.fatal('You need to specify a port for NetMatch! Try `%0`', 'netmatch --help'.yellow);
+    return false;
+  }
 
   /**
    * cbNetwork-node UDP-palvelin
@@ -148,29 +164,39 @@ Server.prototype.initialize = function (port, address, config) {
 
   // Alustetaan pelitilanne
   this.gameState.playerCount = 0;
-  this.gameState.botCount = 5;
+  this.gameState.botCount = this.config.botCount;
+  this.gameState.botDepartLimit = this.config.botDepartLimit;
   this.gameState.gameMode = this.config.gameMode;
   this.gameState.maxPlayers = this.config.maxPlayers;
   this.gameState.radarArrows = this.config.radarArrows;
+  this.gameState.sessionComplete = false;
+  this.gameState.mapNumber = 0; // Missä config.map listan kartassa mennään
 
   // Ladataan kartta
-  this.gameState.map = new Map(this, this.config.map);
+  this.gameState.map = new Map(this, this.config.map[0]);
   if (!this.gameState.map.loaded) {
-    log.fatal('Could not load map "%0"', this.config.map);
-    this.close();
-    return;
+    // Kartan lataus epäonnistui
+    log.fatal('Could not load map "%0"', this.config.map[0]);
+    return false;
   }
 
-  // Jos kartalla on botCount-asetus, overridaa se configin
-  if ('number' === typeof this.gameState.map.config.botCount) {
+  // Alustetaan tavarat paikoilleen
+  this.gameState.map.initItems();
+
+  // Jos kartalla on botCount-asetus, asetetaan se botCountiksi, mikäli nykyinen on < 0
+  if ('number' === typeof this.gameState.map.config.botCount && this.gameState.botCount < 0) {
     this.gameState.botCount = this.gameState.map.config.botCount;
   }
 
-  // UNIMPLEMENTED Mappien rotaatio
+  // Jos kartalla on botDepartLimit-asetus, asetetaan se nykyiseksi, mikäli nykyinen on < 0
+  if ('number' === typeof this.gameState.map.config.botDepartLimit && this.gameState.botDepartLimit < 0) {
+    this.gameState.botDepartLimit = this.gameState.map.config.botDepartLimit;
+  }
+
   this.maps[this.gameState.map.name] = this.gameState.map;
 
   // Alustetaan pelaajat
-  for (var i = 1; i <= this.gameState.maxPlayers; ++i) {
+  for (var i = 1; i <= 64; ++i) {
     this.players[i] = new Player(this, i);
   }
 
@@ -185,8 +211,10 @@ Server.prototype.initialize = function (port, address, config) {
     });
   }
 
-  // Käynnistetään pelimekaniikka, joka päivittyy 60 kertaa sekunnissa
-  this.game.start(30);
+  // Käynnistetään pelimekaniikka, joka päivittyy configeissa määriteltyyn tahtiin.
+  this.game.start(this.config.updatesPerSec);
+
+  return true;
 };
 
 /**
@@ -281,6 +309,11 @@ Server.prototype.handlePacket = function (client) {
     msgType = data.getByte();
   }
 
+  // Jos erä on päättynyt niin lähetetään kaikkien pelaajien kaikki tiedot
+  if (this.gameState.sessionComplete) {
+    player.sendNames = true;
+  }
+
   // Lähetetään dataa pelaajalle
   this.sendReply(client, player);
 
@@ -298,7 +331,8 @@ Server.prototype.sendReply = function (client, player) {
   var reply = new Packet()
     , playerIds = Object.keys(this.players)
     , plr
-    , server = this;
+    , server = this
+    , timeLeft;
 
   // Lähetetään kaikkien pelaajien tiedot
   this.loopPlayers(function (plr) {
@@ -355,22 +389,27 @@ Server.prototype.sendReply = function (client, player) {
         }
         reply.putShort(plr.kills);      // Tapot
         reply.putShort(plr.deaths);     // Kuolemat
-      } else if (server.gameState.radarArrows || server.gameState.playMode === 2) {
-        // Ei näy. Lähetetään tutkatieto. playMode === 2 tarkoittaa TDM-pelimuotoa
-        if (player.team === plr.team || server.gameState.radarArrows) {
-          // Lähetetään tutkatiedot jos joukkueet ovat samat tai asetuksista on laitettu että
-          // kaikkien joukkueiden pelaajien tutkatiedot lähetetään
-          reply.putByte(NET.RADAR); // Tutkatietoa tulossa
-          var angle = Math.atan2(y1 - y2, x1 - x2) + Math.PI; // Kulma radiaaneina välillä 0...2pi
-          reply.putByte((angle / (2 * Math.PI)) * 255); // Kulma muutettuna välille 0-255
-          reply.putByte(plr.team);  // Pelaajan joukkue
-        }
+      } else if (server.gameState.radarArrows || (server.gameState.gameMode > 1 && player.team === plr.team)) {
+        // Ei näy. Lähetetään tutkatieto. gameMode > 1 tarkoittaa kaikkia muita kuin DM-moodeja
+        // Lähetetään tutkatiedot jos joukkueet ovat samat tai asetuksista on laitettu että
+        // kaikkien joukkueiden pelaajien tutkatiedot lähetetään
+        reply.putByte(NET.RADAR); // Tutkatietoa tulossa
+        var angle = Math.atan2(y1 - y2, x1 - x2) + Math.PI; // Kulma radiaaneina välillä 0...2pi
+        reply.putByte((angle / (2 * Math.PI)) * 255); // Kulma muutettuna välille 0-255
+        reply.putByte(plr.team);  // Pelaajan joukkue
       }
     }
   });
 
-  // UNIMPLEMENTED
-  // Kartan vaihtaminen
+  // Kartan vaihtaminen, mikäli tarpeellista
+  if (this.gameState.sessionComplete && this.config.map.length > 1 && player.mapName !== this.gameState.map.name) {
+    timeLeft = this.gameState.sessionStarted + this.config.periodLength * 1000 - Date.now();
+    if (timeLeft < -5) {
+      reply.putByte(NET.MAPCHANGE);
+      reply.putString(this.gameState.map.name);
+      reply.putInt(this.gameState.map.crc32);
+    }
+  }
 
   // Lähetetään kaikki pelaajalle osoitetut viestit
   this.messages.fetch(player, reply);
@@ -380,7 +419,7 @@ Server.prototype.sendReply = function (client, player) {
   if (player.sendNames) {
     player.sendNames = false;
     var itemIds = Object.keys(this.items);
-    for (i = itemIds.length; i--;) {
+    for (var i = itemIds.length; i--;) {
       var item = this.items[itemIds[i]];
       this.messages.add(player.id, {
         msgType: NET.ITEM,
@@ -392,8 +431,13 @@ Server.prototype.sendReply = function (client, player) {
     }
   }
 
-  // UNIMPLEMENTED
   // Pelisession aikatiedot
+  reply.putByte(NET.SESSIONTIME);
+  reply.putInt(this.config.periodLength);                       // Erän pituus
+  reply.putInt((Date.now() - this.gameState.sessionStarted) / 1000); // Kuinka kauan on pelattu
+  reply.putByte(this.gameState.sessionComplete);                // Onko erä loppu
+
+  // Tieto siitä että debug-viestejä voi laittaa uudelleen
   player.debugState = 0;
 
   reply.putByte(NET.END);
@@ -440,7 +484,8 @@ Server.prototype.login = function (client) {
     , nickname
     , playerIds
     , randomPlace
-    , player;
+    , player
+    , teamCheckLoop, reds = 0, greens = 0;
 
   // Täsmääkö clientin ja serverin versiot
   if (version !== this.VERSION) {
@@ -458,9 +503,21 @@ Server.prototype.login = function (client) {
   nickname = data.getString().trim();
   log.info('Player %0 is trying to login...', nickname.green);
 
+  // Tarkistetaan onko palvelin täynnä
+  if (this.gameState.playerCount + this.gameState.botCount >= this.gameState.maxPlayers) {
+    // Vapaita paikkoja ei ollut
+    log.info(' -> Server is full!');
+    replyData = new Packet(3);
+    replyData.putByte(NET.LOGIN);
+    replyData.putByte(NET.LOGINFAILED);
+    replyData.putByte(NET.TOOMANYPLAYERS);
+    client.reply(replyData);
+    return;
+  }
+
   // Käydään kaikki nimet läpi ettei samaa nimeä vain ole jo suinkin olemassa
   playerIds = Object.keys(this.players);
-  for (var i = playerIds.length; i--;) {
+  for (var i = 0; i < playerIds.length; i++) {
     player = this.players[playerIds[i]];
     if (player.name.toLowerCase() === nickname.toLowerCase()) {
       if (player.kicked || !player.active) {
@@ -479,9 +536,9 @@ Server.prototype.login = function (client) {
   }
 
   // Etsitään inaktiivinen pelaaja
-  for (i = playerIds.length; i--;) {
+  for (i = 0; i < playerIds.length; i++) {
     player = this.players[playerIds[i]];
-    if (this.gameState.playerCount < this.config.maxPlayers && !player.active) {
+    if (!player.active) {
       // Tyhjä paikka löytyi
       player.clientId = client.id;
       player.active = true;
@@ -503,11 +560,8 @@ Server.prototype.login = function (client) {
       player.admin = false;
       player.kicked = false;
       player.kickReason = "";
-      if (this.gameState.gameMode === 2) {
-        // UNIMPLEMENTED
-        // Tasainen jako joukkueihin TDM-pelimoodissa
-        player.team = Math.floor(Math.random() * 2 + 1) + 1; // Rand(1,2)
-      }
+      player.setTeamEvenly();
+
       this.gameState.playerCount++;
 
       // Lähetetään vastaus clientille
@@ -515,11 +569,11 @@ Server.prototype.login = function (client) {
       replyData.putByte(NET.LOGIN);
       replyData.putByte(NET.LOGINOK);
       replyData.putByte(player.id);
-      replyData.putByte(this.gameState.gameMode);
+      // Zombiemoodi on täysin palvelinpuolen moodi joka näytetään klienteille TDM:nä
+      replyData.putByte(this.gameState.gameMode === 3 ? 2 : this.gameState.gameMode);
       replyData.putString(this.gameState.map.name);
       replyData.putInt(this.gameState.map.crc32);
-      // UNIMPLEMENTED
-      replyData.putString(" "); // Kartan URL josta sen voi ladata, mikäli se puuttuu
+      replyData.putString(this.config.mapDownloadUrl); // Kartan URL josta sen voi ladata, mikäli se puuttuu
       client.reply(replyData);
       log.info(' -> login successful, assigned ID (%0)', String(player.id).magenta);
 
@@ -535,15 +589,6 @@ Server.prototype.login = function (client) {
       return;
     }
   }
-
-  // Vapaita paikkoja ei ollut
-  log.info(' -> Server is full!');
-  replyData = new Packet(3);
-  replyData.putByte(NET.LOGIN);
-  replyData.putByte(NET.LOGINFAILED);
-  replyData.putByte(NET.TOOMANYPLAYERS);
-  client.reply(replyData);
-  return;
 };
 
 /**
@@ -555,7 +600,11 @@ Server.prototype.logout = function (player) {
   player.loggedIn = false;
   player.admin = false;
   log.info('%0 logged out.', player.name.green);
-  this.gameState.playerCount--;
+
+  // Vähennetään pelaajamäärää vain jos kyseessä ei ollut botti
+  if (!player.zombie) {
+    this.gameState.playerCount--;
+  }
 
   // Päivitetään tiedot servulistaukseen
   this.registration.update();
@@ -582,8 +631,8 @@ Server.prototype.kickPlayer = function (player, kicker, reason) {
   // Lähetään viesti kaikille
   this.messages.addToAll({
     msgType: NET.KICKED,
-    player: player,
-    player2: kicker,
+    player: kicker,   // Kuka viestin lähetti
+    player2: player,  // Kehen tapahtuma kohdistui
     msgText: reason
   });
 };
@@ -611,15 +660,13 @@ Server.prototype.getPlayer = function (name) {
  * @param {Function} callback  Funktio jota kutsutaan jokaisen pelaajan kohdalla
  */
 Server.prototype.loopPlayers = function (callback) {
-  var playerIds = Object.keys(this.players), plr;
-  for (var i = playerIds.length; i--;) {
+  var playerIds = Object.keys(this.players);
+  for (var i = 0; i < playerIds.length; i++) {
     callback(this.players[playerIds[i]]);
   }
 };
 
-/**
- * Sammuttaa palvelimen. Emittoi eventit {@link Server#closing} ja {@link Server#closed}
- */
+/** Sammuttaa palvelimen. Emittoi eventit {@link Server#closing} ja {@link Server#closed} */
 Server.prototype.close = function (now) {
   if (this.gameState.closing) {
     // Ollaan jo sulkemassa, ei aloiteta samaa prosessia uudelleen.
@@ -643,56 +690,153 @@ Server.prototype.close = function (now) {
 
   var self = this;
   setTimeout(function closeServer() {
-    self.server.close();
+    if (self.server) {
+      self.server.close();
+    }
     self.emit('closed');
     process.exit();
   }, now ? 0 : 1000);
 };
 
-/**
- * Alustaa botit.
- */
+/** Alustaa botit. */
 Server.prototype.initBots = function () {
-  var count = this.gameState.botCount
-    , bot
-    , map = this.gameState.map
-    , randomPlace;
+  var server = this
+    , botCount = this.gameState.botCount
+    , loopedBotsCount = 0
+    , team = rand(1, 2)
+    , map = this.gameState.map;
 
-  for (var i = 1; i <= count; i++) {
-    bot = this.players[i];
-    bot.clientId  = 'bot:' + i;
-    bot.name      = bot.botName;
-    bot.zombie    = true;
-    bot.active    = true;
-    bot.loggedIn  = true;
-    bot.isDead    = false;
-    bot.health    = 100;
-    bot.kills     = 0;
-    bot.deaths    = 0;
-    bot.weapon    = this.getBotWeapon();
+  this.loopPlayers(function serverInitBots(plr) {
+    var randomPlace;
+
+    // Tarkistetaan, että pysytään bottimäärän sisällä eikä muokata ihmispelaajaa
+    if (loopedBotsCount >= botCount || (plr.active && !plr.zombie)) {
+      return;
+    }
+
+    plr.clientId  = 'bot:' + plr.id;
+    plr.name      = plr.botName;
+    plr.zombie    = true;
+    plr.active    = true;
+    plr.loggedIn  = true;
+    plr.isDead    = false;
+    plr.health    = 100;
+    if (!server.gameState.sessionComplete) {
+      // Nollataan bottien statsit vain jos ei olla erän lopetustilassa
+      plr.kills     = 0;
+      plr.deaths    = 0;
+    }
+    plr.weapon    = server.getBotWeapon();
     randomPlace = map.findSpot();
-    bot.x = randomPlace.x;
-    bot.y = randomPlace.y;
-    bot.angle = rand(0, 360);
-    // UNIMPLEMENTED: boteille tiimit tasaisesti
-    bot.team = 1;
+    plr.x = randomPlace.x;
+    plr.y = randomPlace.y;
+    plr.lastValidX = plr.x;
+    plr.lastValidY = plr.y;
+    plr.angle = rand(0, 360);
+    if (server.gameState.gameMode === 3) {
+      // Zombie-modi, botit vastaan pelaajat ja boteilla on 10hp
+      plr.team = 2;
+      plr.health = 10;
+    } else if (server.gameState.gameMode > 1) {
+      plr.team = team;
+      team++;
+      if (team > 2) { team = 1; }
+    } else {
+      plr.team = 1;
+    }
 
-    bot.botAI = new BotAI(this, bot);
-  }
+    // Luodaan botille tekoäly ja asetetaan sen taitotaso samaksi kuin pelaaja-ID
+    plr.botAI = new BotAI(server, plr);
+    plr.botAI.setSkill(plr.id);
+
+    loopedBotsCount++;
+  });
 };
 
 /**
- * Arpoo aseen boteille sallittujen listalta.
+ * Lisää uuden botin, vaihtoehtoisesti jonkin epäaktiivisen pelaajan paikalle. Huom! Ei välitä
+ * Server.gameState.botCount arvosta, vaan botti lentää heti pihalle jos määrä ylittyy. Katso
+ * lisätietoja: {@link Game#updateBotsAmount}.
+ *
+ * @param {Player} [player]  Pelaaja, jonka paikalle bottia yritetään laittaa.
+ *
+ * @returns {Boolean}  Onnistuiko botin lisääminen
  */
+Server.prototype.addBot = function (player) {
+  var bot, playerIds, plr, randomPlace;
+
+  if (player instanceof Player) {
+    // Tarkistetaan ettei paikalla ole jo aktiivista pelaajaa
+    if (player.active) {
+      return false;
+    }
+    bot = player;
+  } else {
+    // Haetaan seuraava vapaa paikka botille
+    playerIds = Object.keys(this.players);
+    for (var i = 0; i < playerIds.length; i++) {
+      plr = this.players[playerIds[i]];
+      if (!plr.active) {
+        bot = plr;
+        break;
+      }
+    }
+  }
+
+  // Tarkistetaan onko meillä nyt sopiva objekti valmiina
+  if (!(bot instanceof Player)) {
+    // Ei ollut.
+    return false;
+  }
+
+  bot.clientId  = 'bot:' + bot.id;
+  bot.name      = bot.botName;
+  bot.zombie    = true;
+  bot.active    = true;
+  bot.loggedIn  = true;
+  bot.isDead    = false;
+  bot.health    = 100;
+  bot.kills     = 0;
+  bot.deaths    = 0;
+  bot.weapon = this.getBotWeapon();
+  randomPlace = this.gameState.map.findSpot();
+  bot.x = randomPlace.x;
+  bot.y = randomPlace.y;
+  bot.lastValidX = bot.x;
+  bot.lastValidY = bot.y;
+  bot.angle = rand(0, 360);
+  if (this.gameState.gameMode === 3) {
+    // Zombie-modi, botit vastaan pelaajat ja boteilla on 10hp
+    bot.health = 10;
+  }
+  // Arvotaan botille joukkue
+  bot.setTeamEvenly();
+
+  // Luodaan botille tekoäly ja asetetaan sen taitotaso samaksi kuin pelaaja-ID
+  bot.botAI = new BotAI(this, bot);
+  bot.botAI.setSkill(bot.id);
+
+  // Lisätään viestijonoon ilmoitus uudesta pelaajasta
+  this.messages.addToAll({
+    msgType: NET.LOGIN,
+    msgText: bot.name,
+    player: bot
+  });
+
+  log.info('%0 joined the forces of AI.', bot.name.green);
+};
+
+/** Arpoo aseen boteille sallittujen listalta. */
 Server.prototype.getBotWeapon = function () {
   var weapons;
 
-  if ('undefined' === this.gameState.map.config.botWeapons) {
+  if (this.config.botWeapons && this.config.botWeapons.length > 0) {
+    weapons = this.config.botWeapons;
+  } else if ('undefined' === this.gameState.map.config.botWeapons) {
     weapons = [1, 2, 3, 4, 5, 6];
   } else {
     weapons = this.gameState.map.config.botWeapons;
   }
-
   return weapons[rand(0, weapons.length - 1)];
 };
 
@@ -703,6 +847,16 @@ Server.prototype.getBotWeapon = function () {
  */
 Server.prototype.createBullet = function (player) {
   var bullet, bulletAmount;
+
+  // Ei tehdä ammusta jos erä on päättynyt
+  if (this.gameState.sessionComplete) {
+    return;
+  }
+
+  if ('undefined' === typeof player) {
+    log.error("Tried to create a bullet for an undefined player!");
+    return;
+  }
 
   switch (player.weapon) {
     case WPN.LAUNCHER:
@@ -725,7 +879,7 @@ Server.prototype.createBullet = function (player) {
     } else {
       bullet = new Bullet(this, player, ++this.lastBulletId);
     }
-    if (bullet.initialize()) {
+    if (!bullet.failed && bullet.initialize()) {
       // Jos ammuksen alustus onnistui (esim. ei ammuttu seinän sisällä), lisätään se listaan.
       this.bullets[bullet.id] = bullet;
       // Lisätään ammusviesti lähetettäväksi jokaiselle pelaajalle
@@ -745,7 +899,76 @@ Server.prototype.createBullet = function (player) {
       log.debug('Failed to initialize a new bullet shot by %0', player.name.green);
     }
   }
-}
+};
+
+/**
+ * Kartan vaihto. Jos parametrina annetaan merkkijono, niin vaihdetaan kyseiseen karttaan.
+ * Muulloin edetään karttalistassa määriteltyyn seuraavaan karttaan.
+ *
+ * @param {String} [mapName]  Kartta johon vaihdetaan
+ *
+ * @returns {Boolean}  Onnistuiko kartan vaihto
+ */
+Server.prototype.changeMap = function (mapName) {
+  var nextMapName, mapPath, nextMap;
+
+  if ('string' === typeof mapName) {
+    nextMapName = mapName;
+  } else {
+    // Ei annettu parametrina kartan nimeä, joten mennään listassa eteenpäin
+    this.gameState.mapNumber++;
+    if (this.gameState.mapNumber >= this.config.map.length) {
+      this.gameState.mapNumber = 0;
+    }
+
+    nextMapName = this.config.map[this.gameState.mapNumber];
+  }
+
+  log.info('Changing map to %0', nextMapName.green);
+
+  // Tarkistetaan onko kartta jo ladattu muistiin
+  if (this.maps[nextMapName]) {
+    // Oli ladattu, joten ei tarvitse alustaa uutta
+    nextMap = this.maps[nextMapName];
+  } else {
+    // Karttaa ei ollut vielä olemassa joten luodaan uusi
+    nextMap = new Map(this, nextMapName);
+    if (!nextMap.loaded) {
+      // Kartan lataus epäonnistui
+      log.error('Could not load map "%0"', nextMapName);
+      return false;
+    }
+
+    // Laitetaan kartta muistiin ettei sitä tarvitse ladata enää uudelleen
+    this.maps[nextMapName] = nextMap;
+  }
+
+  // Jos kartalla on botCount-asetus, asetetaan se botCountiksi, mikäli configissa se on < 0
+  if ('number' === typeof nextMap.config.botCount && this.config.botCount < 0) {
+    this.gameState.botCount = nextMap.config.botCount;
+  }
+
+  // Jos kartalla on botDepartLimit-asetus, asetetaan se nykyiseksi, mikäli configissa se on < 0
+  if ('number' === typeof nextMap.config.botDepartLimit && this.config.botDepartLimit < 0) {
+    this.gameState.botDepartLimit = nextMap.config.botDepartLimit;
+  }
+
+  // Alustetaan tavarat paikoilleen
+  this.items = {};
+  nextMap.initItems();
+
+  // Asetetaan uusi kartta nykyisen kartan paikalle
+  this.gameState.map = nextMap;
+
+  // Alustetaan botit
+  this.initBots();
+
+  // Tapetaan kaikki pelaajat
+  this.loopPlayers(function mapChangeKill(player) {
+    player.health = -10;
+    player.timeToDeath = Date.now();
+  });
+};
 
 // Tapahtumien dokumentaatio
 /**

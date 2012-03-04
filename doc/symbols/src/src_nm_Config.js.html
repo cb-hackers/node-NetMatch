@@ -10,130 +10,235 @@
 <span class='line'>  3</span>  * Kts. {@link Config} ja {@link Config.defaults}
 <span class='line'>  4</span>  */</span><span class="WHIT">
 <span class='line'>  5</span> 
-<span class='line'>  6</span> </span><span class="COMM">/**#nocode+*/</span><span class="WHIT">
-<span class='line'>  7</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">log</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Utils'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">log</span><span class="WHIT">
-<span class='line'>  8</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cjson</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'cjson'</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>  9</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">path</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'path'</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'> 10</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">colors</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'colors'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 11</span> </span><span class="COMM">/**#nocode-*/</span><span class="WHIT">
-<span class='line'> 12</span> 
-<span class='line'> 13</span> </span><span class="COMM">/**
-<span class='line'> 14</span>  * Alustaa luokan käyttöä varten, lataa {@link Config.defaults} kentät tämän instanssin kentiksi
-<span class='line'> 15</span>  * @class Asetukset
-<span class='line'> 16</span>  *
-<span class='line'> 17</span>  * @param {Server} server  NetMatch-palvelin, joka kutsuu tätä konstruktoria
-<span class='line'> 18</span>  */</span><span class="WHIT">
-<span class='line'> 19</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">Config</span><span class="PUNC">(</span><span class="NAME">server</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 20</span> </span><span class="WHIT">  </span><span class="NAME">this.server</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">server</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 21</span> 
-<span class='line'> 22</span> </span><span class="WHIT">  </span><span class="COMM">// Laajennetaan tämän Configin ominaisuuksia oletusconfigeilla</span><span class="WHIT">
-<span class='line'> 23</span> </span><span class="WHIT">  </span><span class="NAME">cjson.extend</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">Config.defaults</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 24</span> </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 25</span> 
-<span class='line'> 26</span> </span><span class="COMM">/**
-<span class='line'> 27</span>  * @namespace Sisältää NetMatch-palvelimen oletusasetukset. Näitä voi muuttaa antamalla
-<span class='line'> 28</span>  * {@link Server}-konstruktorille parametrina objektin, jonka avaimet sopivat tämän muotoon.
-<span class='line'> 29</span>  */</span><span class="WHIT">
-<span class='line'> 30</span> </span><span class="NAME">Config.defaults</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 31</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 32</span>    * GSS-palvelimen osoite
-<span class='line'> 33</span>    * @type String
-<span class='line'> 34</span>    * @default "http://netmatch.vesq.org"
-<span class='line'> 35</span>    */</span><span class="WHIT">
-<span class='line'> 36</span> </span><span class="WHIT">  </span><span class="NAME">regHost</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"http://netmatch.vesq.org"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 37</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 38</span>    * GSS-palvelimella oleva polku gss.php tiedostoon
-<span class='line'> 39</span>    * @type String
-<span class='line'> 40</span>    * @default "/reg/gss.php"
-<span class='line'> 41</span>    */</span><span class="WHIT">
-<span class='line'> 42</span> </span><span class="WHIT">  </span><span class="NAME">regPath</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"/reg/gss.php"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 43</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 44</span>    * Rekisteröidäänkö palvelin
-<span class='line'> 45</span>    * @type Boolean
-<span class='line'> 46</span>    * @default false
-<span class='line'> 47</span>    */</span><span class="WHIT">
-<span class='line'> 48</span> </span><span class="WHIT">  </span><span class="NAME">register</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 49</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 50</span>    * Palvelimen kuvaus, näkyy listauksessa
-<span class='line'> 51</span>    * @type String
-<span class='line'> 52</span>    * @default "Node.js powered server"
-<span class='line'> 53</span>    */</span><span class="WHIT">
-<span class='line'> 54</span> </span><span class="WHIT">  </span><span class="NAME">description</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"Node.js powered server"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 55</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 56</span>    * Nykyinen kartta
-<span class='line'> 57</span>    * @type String
-<span class='line'> 58</span>    * @default "Luna"
-<span class='line'> 59</span>    */</span><span class="WHIT">
-<span class='line'> 60</span> </span><span class="WHIT">  </span><span class="NAME">map</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"Luna"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 61</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 62</span>    * Maksimimäärä pelaajia
-<span class='line'> 63</span>    * @type Number
-<span class='line'> 64</span>    * @default 10
-<span class='line'> 65</span>    */</span><span class="WHIT">
-<span class='line'> 66</span> </span><span class="WHIT">  </span><span class="NAME">maxPlayers</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 67</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 68</span>    * Pelimoodi, DM = 1 ja TDM = 2
-<span class='line'> 69</span>    * @type Byte
-<span class='line'> 70</span>    * @default 1
-<span class='line'> 71</span>    */</span><span class="WHIT">
-<span class='line'> 72</span> </span><span class="WHIT">  </span><span class="NAME">gameMode</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 73</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 74</span>    * Kuinka pitkän ajan pelaajilla on suoja spawnauksen jälkeen. Aika millisekunteissa
-<span class='line'> 75</span>    * @type Number
-<span class='line'> 76</span>    * @default 3000
-<span class='line'> 77</span>    */</span><span class="WHIT">
-<span class='line'> 78</span> </span><span class="WHIT">  </span><span class="NAME">spawnProtection</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">3000</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 79</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 80</span>    * Kuinka kauan kestää (millisekunteina) että pelaajat heräävät henkiin uudelleen
-<span class='line'> 81</span>    * @type Number
-<span class='line'> 82</span>    * @default 3000
-<span class='line'> 83</span>    */</span><span class="WHIT">
-<span class='line'> 84</span> </span><span class="WHIT">  </span><span class="NAME">deathDelay</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">3000</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 85</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 86</span>    * Ovatko tutkanuolet käytössä vai ei
-<span class='line'> 87</span>    * @type Boolean
-<span class='line'> 88</span>    * @default true
-<span class='line'> 89</span>    */</span><span class="WHIT">
-<span class='line'> 90</span> </span><span class="WHIT">  </span><span class="NAME">radarArrows</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 91</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 92</span>    * Palvelimen pelimoottorin päivitystahti, kuinka monta päivitystä per sekunti tehdään.
-<span class='line'> 93</span>    * @type Number
-<span class='line'> 94</span>    * @default 60
-<span class='line'> 95</span>    */</span><span class="WHIT">
-<span class='line'> 96</span> </span><span class="WHIT">  </span><span class="NAME">updatesPerSec</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">60</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 97</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'> 98</span>    * Palvelimen salasana
-<span class='line'> 99</span>    * @type String
-<span class='line'>100</span>    * @default password
-<span class='line'>101</span>    */</span><span class="WHIT">
-<span class='line'>102</span> </span><span class="WHIT">  </span><span class="NAME">password</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"password"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>103</span> </span><span class="WHIT">  </span><span class="COMM">/**
-<span class='line'>104</span>    * Onko palvelin kehitysversio
-<span class='line'>105</span>    * @type Boolean
-<span class='line'>106</span>    * @default false
-<span class='line'>107</span>    */</span><span class="WHIT">
-<span class='line'>108</span> </span><span class="WHIT">  </span><span class="NAME">devBuild</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT">
-<span class='line'>109</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>110</span> 
-<span class='line'>111</span> </span><span class="COMM">/**
-<span class='line'>112</span>  * Lataa asetukset annetusta tiedostosta. Tämä metodi hakee tiedostoa node-NetMatchin juuresta.
-<span class='line'>113</span>  *
-<span class='line'>114</span>  * @param {String} [config="config"]  Asetustiedoston nimi, ilman .json päätettä.
-<span class='line'>115</span>  */</span><span class="WHIT">
-<span class='line'>116</span> </span><span class="NAME">Config.prototype.load</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>117</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">filePath</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">path.resolve</span><span class="PUNC">(</span><span class="NAME">__dirname</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'..'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">config</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'.json'</span><span class="PUNC">)</span><span class="WHIT">
-<span class='line'>118</span> </span><span class="WHIT">    </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">loadedConfig</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>119</span> 
-<span class='line'>120</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">path.existsSync</span><span class="PUNC">(</span><span class="NAME">filePath</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>121</span> </span><span class="WHIT">    </span><span class="NAME">log.error</span><span class="PUNC">(</span><span class="STRN">'Config %0 doesn\'t exist'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filePath.green</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>122</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>123</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>124</span> 
-<span class='line'>125</span> </span><span class="WHIT">  </span><span class="NAME">log.info</span><span class="PUNC">(</span><span class="STRN">'Loading config from %0'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filePath.green</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>126</span> </span><span class="WHIT">  </span><span class="NAME">loadedConfig</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cjson.load</span><span class="PUNC">(</span><span class="NAME">filePath</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>127</span> </span><span class="WHIT">  </span><span class="COMM">// Laajennetaan tämän Configin ominaisuuksia ladatulla json-tiedostolla</span><span class="WHIT">
-<span class='line'>128</span> </span><span class="WHIT">  </span><span class="NAME">cjson.extend</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">loadedConfig</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>129</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>130</span> 
-<span class='line'>131</span> </span><span class="NAME">module.exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Config</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>132</span> </span></pre></body></html>
+<span class='line'>  6</span> </span><span class="STRN">"use strict"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  7</span> 
+<span class='line'>  8</span> </span><span class="COMM">/**#nocode+*/</span><span class="WHIT">
+<span class='line'>  9</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">log</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'./Utils'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">log</span><span class="WHIT">
+<span class='line'> 10</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cjson</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'cjson'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 11</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">path</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'path'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="WHIT">  </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">colors</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">require</span><span class="PUNC">(</span><span class="STRN">'colors'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 13</span> </span><span class="COMM">/**#nocode-*/</span><span class="WHIT">
+<span class='line'> 14</span> 
+<span class='line'> 15</span> </span><span class="COMM">/**
+<span class='line'> 16</span>  * Alustaa luokan käyttöä varten, lataa {@link Config.defaults} kentät tämän instanssin kentiksi
+<span class='line'> 17</span>  * @class Asetukset
+<span class='line'> 18</span>  *
+<span class='line'> 19</span>  * @param {Server} server  NetMatch-palvelin, joka kutsuu tätä konstruktoria
+<span class='line'> 20</span>  */</span><span class="WHIT">
+<span class='line'> 21</span> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">Config</span><span class="PUNC">(</span><span class="NAME">server</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 22</span> </span><span class="WHIT">  </span><span class="NAME">this.server</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">server</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 23</span> 
+<span class='line'> 24</span> </span><span class="WHIT">  </span><span class="COMM">// Laajennetaan tämän Configin ominaisuuksia oletusconfigeilla</span><span class="WHIT">
+<span class='line'> 25</span> </span><span class="WHIT">  </span><span class="NAME">cjson.extend</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">Config.defaults</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 26</span> </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 27</span> 
+<span class='line'> 28</span> </span><span class="COMM">/**
+<span class='line'> 29</span>  * @namespace Sisältää NetMatch-palvelimen oletusasetukset. Näitä voi muuttaa antamalla
+<span class='line'> 30</span>  * {@link Server}-konstruktorille parametrina objektin, jonka avaimet sopivat tämän muotoon.
+<span class='line'> 31</span>  */</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="NAME">Config.defaults</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 34</span>    * GSS-palvelimen osoite
+<span class='line'> 35</span>    * @type String
+<span class='line'> 36</span>    * @default "http://tuhoojabotti.com/nm"
+<span class='line'> 37</span>    */</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">  </span><span class="NAME">regHost</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"http://tuhoojabotti.com/nm"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 40</span>    * GSS-palvelimella oleva polku gss.php tiedostoon
+<span class='line'> 41</span>    * @type String
+<span class='line'> 42</span>    * @default "/reg/gss.php"
+<span class='line'> 43</span>    */</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">  </span><span class="NAME">regPath</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"/reg/gss.php"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 46</span>    * Rekisteröidäänkö palvelin
+<span class='line'> 47</span>    * @type Boolean
+<span class='line'> 48</span>    * @default true
+<span class='line'> 49</span>    */</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">  </span><span class="NAME">register</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 52</span>    * Osoite, josta pelaaja voi ladata puuttuvan kartan
+<span class='line'> 53</span>    * @type String
+<span class='line'> 54</span>    * @default "http://netmatch.vesq.org/maps/"
+<span class='line'> 55</span>    */</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">  </span><span class="NAME">mapDownloadUrl</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"http://netmatch.vesq.org/maps/"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 58</span>    * Palvelimen kuvaus, näkyy listauksessa
+<span class='line'> 59</span>    * @type String
+<span class='line'> 60</span>    * @default "Node.js powered server"
+<span class='line'> 61</span>    */</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">  </span><span class="NAME">description</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"Node.js powered server"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 64</span>    * Pelattava kartta. Voi olla merkkijono, jolloin pelataan vain yhtä karttaa, tai taulukko,
+<span class='line'> 65</span>    * joka sisältää useamman kartan ja niitä kierrätetään erien välillä. Kaikkien karttojen tulee
+<span class='line'> 66</span>    * olla olemassa kun palvelin käynnistetään.
+<span class='line'> 67</span>    * @type String|Array
+<span class='line'> 68</span>    * @default ["Luna", "Warehouse", "Mictlan"]
+<span class='line'> 69</span>    */</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">  </span><span class="NAME">map</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="STRN">"Luna"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"Warehouse"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"Mictlan"</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 72</span>    * Maksimimäärä pelaajia. Suurin mahdollinen maksimimäärä on 64.
+<span class='line'> 73</span>    * @type Number
+<span class='line'> 74</span>    * @default 10
+<span class='line'> 75</span>    */</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">  </span><span class="NAME">maxPlayers</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 78</span>    * Bottien määrä. Jos tämä on nollaa pienempi, käytetään kartan asetuksissa määriteltyä arvoa.
+<span class='line'> 79</span>    * @type Number
+<span class='line'> 80</span>    * @default -1
+<span class='line'> 81</span>    */</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">  </span><span class="NAME">botCount</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 84</span>    * Minkä pelaajamäärän jälkeen (pelaajat + botit) botteja lähtee itsestään pois. Jos tämä arvo on
+<span class='line'> 85</span>    * pienempi kuin botCount-arvo, niin tämä asetetaan samaksi botCountin kanssa. Jos tämä on 0, niin
+<span class='line'> 86</span>    * botit eivät poistu automaattisesti koskaan. Jos taas tämä on nollaa pienempi, käytetään kartan
+<span class='line'> 87</span>    * asetuksissa määriteltyä arvoa.
+<span class='line'> 88</span>    * @type Number
+<span class='line'> 89</span>    * @default -1
+<span class='line'> 90</span>    */</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">  </span><span class="NAME">botDepartLimit</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'> 93</span>    * Bottien käytössä olevat aseet. Jos tämä on tyhjä, käytetään kartan asetuksissa olevia aseita.
+<span class='line'> 94</span>    * Jos niitäkään ei ole, on käytössä kaikki aseet.
+<span class='line'> 95</span>    *  - 1 = Pistooli
+<span class='line'> 96</span>    *  - 2 = Konepistooli
+<span class='line'> 97</span>    *  - 3 = Sinko
+<span class='line'> 98</span>    *  - 4 = Haulikko
+<span class='line'> 99</span>    *  - 5 = Kranaatinlaukaisin
+<span class='line'>100</span>    *  - 6 = Moottorisaha
+<span class='line'>101</span>    * @type Array
+<span class='line'>102</span>    * @default []
+<span class='line'>103</span>    */</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">  </span><span class="NAME">botWeapons</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>106</span>    * Pelimoodi: DM = 1, TDM = 2, Zombiemode = 3
+<span class='line'>107</span>    * @type Byte
+<span class='line'>108</span>    * @default 1
+<span class='line'>109</span>    */</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">  </span><span class="NAME">gameMode</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>112</span>    * Kuinka pitkään yksi kierros kestää. Aika sekunneissa. 0 tarkoittaa ettei erä pääty koskaan.
+<span class='line'>113</span>    * @type Number
+<span class='line'>114</span>    * @default 300
+<span class='line'>115</span>    */</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">  </span><span class="NAME">periodLength</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">300</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>118</span>    * Kuinka pitkän ajan pelaajilla on suoja spawnauksen jälkeen. Aika millisekunteissa
+<span class='line'>119</span>    * @type Number
+<span class='line'>120</span>    * @default 3000
+<span class='line'>121</span>    */</span><span class="WHIT">
+<span class='line'>122</span> </span><span class="WHIT">  </span><span class="NAME">spawnProtection</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">3000</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>123</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>124</span>    * Kuinka kauan kestää (millisekunteina) että pelaajat heräävät henkiin uudelleen
+<span class='line'>125</span>    * @type Number
+<span class='line'>126</span>    * @default 3000
+<span class='line'>127</span>    */</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">  </span><span class="NAME">deathDelay</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">3000</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>130</span>    * Kuinka pitkän ajan jälkeen (millisekunteina) pelaaja poistetaan pelistä, kun hänestä ei ole
+<span class='line'>131</span>    * kuulunut mitään
+<span class='line'>132</span>    * @type Number
+<span class='line'>133</span>    * @default 10000
+<span class='line'>134</span>    */</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">  </span><span class="NAME">maxInactiveTime</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">10000</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>137</span>    * Näytetäänkö palvelimen konsolissa tappoviestit
+<span class='line'>138</span>    * @type Boolean
+<span class='line'>139</span>    * @default false
+<span class='line'>140</span>    */</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">  </span><span class="NAME">logKillMessages</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>143</span>    * Ovatko tutkanuolet käytössä vai ei
+<span class='line'>144</span>    * @type Boolean
+<span class='line'>145</span>    * @default true
+<span class='line'>146</span>    */</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">  </span><span class="NAME">radarArrows</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>149</span>    * Palvelimen pelimoottorin päivitystahti, kuinka monta päivitystä per sekunti tehdään.
+<span class='line'>150</span>    * @type Number
+<span class='line'>151</span>    * @default 60
+<span class='line'>152</span>    */</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="WHIT">  </span><span class="NAME">updatesPerSec</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">60</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>155</span>    * Palvelimen salasana. Jos tätä ei aseteta, pelaaja voi saada admin-oikeudet vain palvelimen
+<span class='line'>156</span>    * konsolikomennon op kautta.
+<span class='line'>157</span>    * @type String
+<span class='line'>158</span>    * @default ""
+<span class='line'>159</span>    */</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="WHIT">  </span><span class="NAME">password</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">""</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>161</span> </span><span class="WHIT">  </span><span class="COMM">/**
+<span class='line'>162</span>    * Onko palvelin kehitysversio
+<span class='line'>163</span>    * @type Boolean
+<span class='line'>164</span>    * @default false
+<span class='line'>165</span>    */</span><span class="WHIT">
+<span class='line'>166</span> </span><span class="WHIT">  </span><span class="NAME">devBuild</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>168</span> 
+<span class='line'>169</span> </span><span class="COMM">/**
+<span class='line'>170</span>  * Lataa asetukset annetusta tiedostosta. Tämä metodi hakee tiedostoa node-NetMatchin juuresta.
+<span class='line'>171</span>  *
+<span class='line'>172</span>  * @param {String} [config="config"]  Asetustiedoston nimi, ilman .json päätettä.
+<span class='line'>173</span>  *
+<span class='line'>174</span>  * @returns {Boolean}  Pystytäänkö peliä jatkamaan nykyisillä asetuksilla
+<span class='line'>175</span>  */</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="NAME">Config.prototype.load</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">config.substr</span><span class="PUNC">(</span><span class="PUNC">-</span><span class="NUMB">5</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="STRN">'.json'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="WHIT">    </span><span class="NAME">config</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'.json'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">  </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">filePath</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">path.resolve</span><span class="PUNC">(</span><span class="NAME">__dirname</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'..'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">config</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">    </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">loadedConfig</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">    </span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">mapPath</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>183</span> 
+<span class='line'>184</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">path.existsSync</span><span class="PUNC">(</span><span class="NAME">filePath</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>185</span> </span><span class="WHIT">    </span><span class="NAME">log.error</span><span class="PUNC">(</span><span class="STRN">'Config %0 doesn\'t exist'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filePath.green</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="WHIT">    </span><span class="NAME">log.error</span><span class="PUNC">(</span><span class="STRN">'Use `%0` to load your own config'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'netmatch -c /path/to/your/config.json'</span><span class="PUNC">.</span><span class="NAME">yellow</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>189</span> 
+<span class='line'>190</span> </span><span class="WHIT">  </span><span class="NAME">log.info</span><span class="PUNC">(</span><span class="STRN">'Loading config from %0'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filePath.green</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>191</span> </span><span class="WHIT">  </span><span class="NAME">loadedConfig</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cjson.load</span><span class="PUNC">(</span><span class="NAME">filePath</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>192</span> </span><span class="WHIT">  </span><span class="COMM">// Laajennetaan tämän Configin ominaisuuksia ladatulla json-tiedostolla</span><span class="WHIT">
+<span class='line'>193</span> </span><span class="WHIT">  </span><span class="NAME">cjson.extend</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">loadedConfig</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>194</span> 
+<span class='line'>195</span> </span><span class="WHIT">  </span><span class="COMM">// Tarkistetaan onko maksimimäärä liian suuri ja kaadetaan palvelin mikäli on</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.maxPlayers</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">64</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="WHIT">    </span><span class="NAME">log.fatal</span><span class="PUNC">(</span><span class="STRN">'maxPlayers set to %0 while the hardcoded maximum is %1!'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">String</span><span class="PUNC">(</span><span class="NAME">this.maxPlayers</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">magenta</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">64</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>198</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>199</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>200</span> 
+<span class='line'>201</span> </span><span class="WHIT">  </span><span class="COMM">// Tarkistetaan onko kartta merkkijono. Jos se on merkkijono, niin muutetaan se listaksi jossa</span><span class="WHIT">
+<span class='line'>202</span> </span><span class="WHIT">  </span><span class="COMM">// on vain yksi arvo.</span><span class="WHIT">
+<span class='line'>203</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'string'</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">this.map</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="WHIT">    </span><span class="NAME">this.map</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="NAME">this.map</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>205</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>206</span> 
+<span class='line'>207</span> </span><span class="WHIT">  </span><span class="COMM">// Tarkistetaan että kartta todellakin on lista tässä vaiheessa</span><span class="WHIT">
+<span class='line'>208</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">Array.isArray</span><span class="PUNC">(</span><span class="NAME">this.map</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>209</span> </span><span class="WHIT">    </span><span class="NAME">log.fatal</span><span class="PUNC">(</span><span class="STRN">'Invalid value for "map" in config %0'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filePath.green</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>211</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>212</span> 
+<span class='line'>213</span> </span><span class="WHIT">  </span><span class="COMM">// Tarkistetaan onko määritellyt kartat olemassa</span><span class="WHIT">
+<span class='line'>214</span> </span><span class="WHIT">  </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.map.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>215</span> </span><span class="WHIT">    </span><span class="NAME">mapPath</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">path.resolve</span><span class="PUNC">(</span><span class="NAME">__dirname</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'..'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'maps'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.map</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'.json'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>216</span> 
+<span class='line'>217</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">path.existsSync</span><span class="PUNC">(</span><span class="NAME">mapPath</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="WHIT">      </span><span class="NAME">log.fatal</span><span class="PUNC">(</span><span class="STRN">'Map %0 doesn\'t exist in %1'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.map</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">green</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">mapPath.green</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="WHIT">      </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>220</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>221</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>222</span> 
+<span class='line'>223</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.mapDownloadUrl</span><span class="PUNC">[</span><span class="NAME">this.mapDownloadUrl.length</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="STRN">'/'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>224</span> </span><span class="WHIT">    </span><span class="NAME">this.mapDownloadUrl</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.mapDownloadUrl</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'/'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>225</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>226</span> 
+<span class='line'>227</span> </span><span class="WHIT">  </span><span class="COMM">// Tarkistetaan että portti on numero</span><span class="WHIT">
+<span class='line'>228</span> </span><span class="WHIT">  </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.port</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="STRN">'number'</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">this.port</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>229</span> </span><span class="WHIT">    </span><span class="NAME">log.fatal</span><span class="PUNC">(</span><span class="STRN">'You must set %0 to be a number in %1!'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'port'</span><span class="PUNC">.</span><span class="NAME">yellow</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">filePath.green</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>230</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>231</span> </span><span class="WHIT">  </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>232</span> 
+<span class='line'>233</span> </span><span class="WHIT">  </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>234</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>235</span> 
+<span class='line'>236</span> </span><span class="NAME">module.exports</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Config</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>237</span> </span></pre></body></html>

@@ -2,6 +2,8 @@
  * @fileOverview Sisältää {@link Map}-luokan toteutuksen.
  */
 
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , rand = require('./Utils').rand
@@ -11,7 +13,10 @@ var log = require('./Utils').log
   , cjson = require('cjson')
   , colors = require('colors')
   , Item = require('./Item')
-  , ITM = require('./Constants').ITM;
+  , ITM = require('./Constants').ITM
+  , PLR = require('./Constants').PLR
+  , NET = require('./Constants').NET
+  , DRAW = require('./Constants').DRAW;
 /**#nocode-*/
 
 /**
@@ -41,11 +46,11 @@ var log = require('./Utils').log
  * @property {Integer} tileSize               Yhden tilen leveys/korkeus pikseleissä
  * @property {Integer} width                  Kartan leveys
  * @property {Integer} height                 Kartan korkeus
- * @property {Array}   data                   Törmäyskerroksen data kaksiulotteisessa xy-taulukossa
+ * @property {Array}   data                   Törmäyskerroksen data yksiulotteisessa taulukossa
 */
 function Map(server, name) {
   var filePath = path.resolve(__dirname, '..', 'maps', name + '.json')
-    , data;
+    , data, buffer, uint8View;
 
   this.server = server;
   this.loaded = false;
@@ -60,8 +65,16 @@ function Map(server, name) {
   // Laajennetaan tämän kartan ominaisuuksia ladatulla json-tiedostolla
   cjson.extend(this, data);
 
-  // Alustetaan kartan tavarat
-  this.initItems();
+  // Muunnetaan törmäyskerroksen data 8-bittiseksi, yksiulotteiseksi taulukoksi
+  buffer = new ArrayBuffer(this.width * this.height);
+  uint8View = new Uint8Array(buffer);
+  for (var y = 0; y < this.height; ++y) {
+    for (var x = 0; x < this.width; ++x) {
+      var index = y * this.width + x;
+      uint8View[index] = this.data[y][x];
+    }
+  }
+  this.data = uint8View;
 
   this.loaded = true;
 }
@@ -74,23 +87,25 @@ function Map(server, name) {
  */
 Map.prototype.isColliding = function (x, y) {
   var tileX = Math.ceil((x + this.width * this.tileSize / 2) / this.tileSize) - 1
-    , tileY = Math.ceil((-y + this.height * this.tileSize / 2) / this.tileSize) - 1;
+    , tileY = Math.ceil((-y + this.height * this.tileSize / 2) / this.tileSize) - 1
+    , index;
 
   if (tileX < 0 || tileX >= this.width || tileY < 0 || tileY >= this.height) {
     // Ollaan kartan ulkopuolella, eli törmätään.
     return true;
   }
 
+  // Lasketaan tilen paikka yksiulotteisessa taulukossa
+  index = tileY * this.width + tileX;
+
   if (this.server.debug) {
-    if ('undefined' === typeof this.data ||
-        'undefined' === typeof this.data[tileY] ||
-        'undefined' === typeof this.data[tileY][tileX] ) {
-      log.error('Map.data[%0][%1] is undefined', tileY, tileX);
+    if ('undefined' === typeof this.data || 'undefined' === typeof this.data[index]) {
+      log.error('Map.data[%0] (%1, %2) is undefined', index, tileY, tileX);
     }
   }
 
   // Nyt tarkistetaan että ollaanko seinän sisällä
-  if (this.data[tileY][tileX]) {
+  if (this.data[index]) {
     return true;
   }
 
@@ -105,12 +120,15 @@ Map.prototype.isColliding = function (x, y) {
  * @returns {Object}  Objekti, jolla on kentät x ja y, jotka ovat löydetyn paikan koordinaatit
  */
 Map.prototype.findSpot = function () {
-  var randTileX, randTileY, returnObj = {};
+  var randTileX, randTileY, index, returnObj = {};
   // Etsitään vapaata paikkaa kartalta "vain" 10 000 kertaa
   for (var i = 9999; --i;) {
     randTileX = rand(0, this.width - 1);
     randTileY = rand(0, this.height - 1);
-    if (!this.data[randTileY][randTileX]) {
+    // Lasketaan tilen paikka yksiulotteisessa taulukossa
+    index = randTileY * this.width + randTileX;
+
+    if (!this.data[index]) {
       // Ei ollut seinän sisällä
       returnObj.x = (randTileX * this.tileSize)
                   - (this.width * this.tileSize) / 2
@@ -128,41 +146,72 @@ Map.prototype.findSpot = function () {
  * Alustaa kartalla olevat tavarat.
  */
 Map.prototype.initItems = function () {
-  var itemId = 0;
+  var i, itemId = 0;
 
-  for (var i = this.config.healthItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.HEALTH);
-  }
-  for (i = this.config.mgunItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.AMMO);
-  }
-  for (i = this.config.bazookaItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.ROCKET);
-  }
-  for (i = this.config.shotgunItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.SHOTGUN);
-  }
-  for (i = this.config.launcherItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.LAUNCHER);
-  }
-  for (i = this.config.chainsawItems - 1; i--;) {
-    new Item(this.server, this, ++itemId, ITM.FUEL);
+  if (this.server.gameState.gameMode === 3) {
+    // Zombie-moodissa on 20 hp-pakettia ja 50 kpl haulikon ja konekiväärin ammuslootia
+    for (i = 0; i < 20; i++) {
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.HEALTH);
+    }
+    for (i = 0; i < 50; i++) {
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.AMMO);
+    }
+    for (i = 0; i < 50; i++) {
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.SHOTGUN);
+    }
+  } else {
+    for (i = 0; i < this.config.healthItems; i++) {
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.HEALTH);
+    }
+    for (i = 0; i < this.config.mgunItems; i++) {
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.AMMO);
+    }
+    for (i = 0; i < this.config.bazookaItems; i++) {
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.ROCKET);
+    }
+    for (i = 0; i < this.config.shotgunItems; i++) {
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.SHOTGUN);
+    }
+    for (i = 0; i < this.config.launcherItems; i++) {
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.LAUNCHER);
+    }
+    for (i = 0; i < this.config.chainsawItems; i++) {
+      itemId++;
+      this.server.items[itemId] = new Item(this.server, this, itemId, ITM.FUEL);
+    }
   }
 };
 
 /**
- * Etsii annettujen koordinaattien ja kulman muodostavalta suoralta lähimmän seinän koordinaatit
- * ja palauttaa ne objektin kenttinä x ja y.
+ * Etsii annettujen koordinaattien ja kulman muodostavalta suoralta annetulta maksimietäisyydeltä
+ * seinän koordinaatit ja palauttaa ne objektin kenttinä x ja y. Jos seinää ei löytynyt ennen
+ * maksimietäisyyden saavuttamista, ei funktio palauta mitään arvoa.
  *
- * @param {Number} x      Aloituspisteen x-koordinaatti
- * @param {Number} y      Aloituspisteen y-koordinaatti
- * @param {Number} angle  Mihin suuntaan suora muodostuu (asteina)
+ * @param {Number} x       Aloituspisteen x-koordinaatti maailmankoordinaateissa
+ * @param {Number} y       Aloituspisteen y-koordinaatti maailmankoordinaateissa
+ * @param {Number} angle   Mihin suuntaan suora muodostuu (asteina)
+ * @param {Number} [dist]  Kuinka pitkältä katsotaan. Jos tätä ei anneta, niin etäisyyttä ei
+ *                         rajoiteta.
  *
- * @returns {Object}  Palauttaa objektin jolla on kentät x ja y jotka sisältävät lähimmän seinän
- *                    koordinaatit.
+ * @returns {Object}  Palauttaa objektin jolla on kentät x ja y jotka sisältävät maksimietäisyyden
+ *                    sisältä löytyneen seinän törmäyskoordinaatit. Tätä ei palauteta, jos ei
+ *                    löytynyt seinää.
  */
 Map.prototype.findWall = function (x, y, angle, dist) {
   var startP = {}, endP = {}, returnP;
+
+  // Tarkistetaan etäisyys
+  if ('number' !== typeof dist) {
+    dist = (this.width + this.height) * this.tileSize;
+  }
 
   // Muunnetaan x ja y maailmankoordinaateista "näyttökoordinaateiksi"
   startP.x = x + this.width * this.tileSize / 2;
@@ -187,9 +236,57 @@ Map.prototype.findWall = function (x, y, angle, dist) {
 
   // Palautetaan piste
   return returnP;
-}
+};
 
-/** Raycast */
+/**
+ * Tarkistaa onko annettujen koordinaattien välillä seinää ja jos väliltä löytyy seinä,
+ * palauttaa funktio ne objektin kenttinä x ja y.
+ *
+ * @param {Number} x1  Alkupisteen x-koordinaatti
+ * @param {Number} y1  Alkupisteen y-koordinaatti
+ * @param {Number} x2  Loppupisteen x-koordinaatti
+ * @param {Number} y2  Loppupisteen y-koordinaatti
+ *
+ * @returns {Object}  Palauttaa objektin jolla on kentät x ja y jotka sisältävät lähimmän seinän
+ *                    koordinaatit.
+ */
+Map.prototype.findWall2 = function (x1, y1, x2, y2) {
+  var startP = {}, endP = {}, returnP;
+
+  // Muunnetaan x ja y maailmankoordinaateista "näyttökoordinaateiksi"
+  startP.x = x1 + this.width * this.tileSize / 2;
+  startP.y = -y1 + this.height * this.tileSize / 2;
+  endP.x = x2 + this.width * this.tileSize / 2;
+  endP.y = -y2 + this.height * this.tileSize / 2;
+
+  // Suoritetaan raycast
+  returnP = this.rayCast(startP, endP);
+
+  if (!returnP) {
+    // Välissä ei ollut seinää, ei palauteta mitään.
+    //console.log("No hits with raycast");
+    return;
+  }
+
+  // Muunnetaan "näyttökoordinaatit" maailmankoordinaateiksi
+  returnP.x = returnP.x - (this.width * this.tileSize / 2);
+  returnP.y = (this.height * this.tileSize / 2) - returnP.y;
+
+  // Palautetaan piste
+  return returnP;
+};
+
+/**
+ * Tekee raycastin kahden pisteen välillä ja palauttaa kohdan, jossa pisteiden välillä kulkeva
+ * suora osuu ensimmäisen kerran seinään.
+ * @private
+ *
+ * @param {Object} origP1  Alkupiste, jolla on kentissä x ja y koordinaatit
+ * @param {Object} origP2  Loppupiste, jolla on kentissä x ja y koordinaatit
+ *
+ * @returns {Object}  Ensimmäinen vastaan tullut seinä ja tarkka osumakohta. Jos pisteiden välillä
+ *                    ei ollut seinää, ei funktio palauta mitään.
+ */
 Map.prototype.rayCast = function (origP1, origP2) {
   // Pisteiden normalisaatio
   var p1 = {x: origP1.x / this.tileSize, y: origP1.y / this.tileSize}
@@ -203,7 +300,8 @@ Map.prototype.rayCast = function (origP1, origP2) {
     , maxX, maxY
     , endTile
     , hit
-    , colP;
+    , colP
+    , index;
 
   // Ylitetäänkö minkään laatan rajoja
   if (truncateNumber(p1.x) === truncateNumber(p2.x) && truncateNumber(p1.y) === truncateNumber(p2.y)) {
@@ -262,8 +360,10 @@ Map.prototype.rayCast = function (origP1, origP2) {
         // Ollaan kartan ulkopuolella, eli törmätään.
         hit = 1;
       } else {
+        // Lasketaan tilen paikka yksiulotteisessa taulukossa
+        index = testTile.y * this.width + testTile.x;
         // Tarkistetaan onko tilekerroksessa hit-dataa
-        hit = this.data[testTile.y][testTile.x];
+        hit = this.data[index];
       }
       if (hit) {
         // Raycast löysi törmäyksen
@@ -283,8 +383,10 @@ Map.prototype.rayCast = function (origP1, origP2) {
         // Ollaan kartan ulkopuolella, eli törmätään.
         hit = 0;
       } else {
+        // Lasketaan tilen paikka yksiulotteisessa taulukossa
+        index = testTile.y * this.width + testTile.x;
         // Tarkistetaan onko tilekerroksessa hit-dataa
-        hit = this.data[testTile.y][testTile.x];
+        hit = this.data[index];
       }
       if (hit) {
         // Raycast löysi törmäyksen
@@ -300,6 +402,156 @@ Map.prototype.rayCast = function (origP1, origP2) {
   }
 
   // Jos tänne asti ollaan päästy, niin törmäystä ei ole löydetty. Ei siis palauteta mitään.
-}
+};
+
+
+/**
+ * Ympyrä-tilekartta törmäys.
+ *
+ * @see http://stackoverflow.com/a/402010/1152564
+ *
+ * @param {Number} x  Ympyrän keskipisteen x-koordinaatti maailmankoordinaateissa
+ * @param {Number} y  Ympyrän keskipisteen y-koordinaatti maailmankoordinaateissa
+ * @param {Number} r  Ympyrän säteen pituus
+ *
+ * @return {Object}  Objektilla on kentät "left", "right", "up" ja/tai "down". Jos kentän arvo on
+ *                   tosi, niin siitä suunnasta löytyy törmäys.
+ */
+Map.prototype.circleCollision = function (x, y, r) {
+  var tileX, tileY, leftTileX, rightTileX, upTileY, downTileY
+    , circleDistance
+    , ret = {left: false, right: false, up: false, down: false};
+
+
+  // Muunnetaan x ja y maailmankoordinaateista "näyttökoordinaateiksi"
+  x = x + this.width * this.tileSize / 2;
+  y = -y + this.height * this.tileSize / 2;
+
+  // Otetaan ylös tilekoordinaatit nykyisestä tilestä sekä viereisistä
+  tileX = Math.floor(x / this.tileSize);
+  tileY = Math.floor(y / this.tileSize);
+  leftTileX = tileX - 1;
+  rightTileX = tileX + 1;
+  upTileY = tileY - 1;
+  downTileY = tileY + 1;
+
+  // Tarkistetaan törmäykset kaikkiin nykyistä tileä ympäröiviin kahdeksaan tileen.
+  // Aloitetaan vasemmalta ylhäältä ja mennään vasemmalta oikealla, ylhäältä alas.
+  if (this.checkCircleCollision(x, y, r, leftTileX, upTileY)) {
+    ret.left = true;
+    ret.up = true;
+  }
+  if (this.checkCircleCollision(x, y, r, tileX, upTileY)) {
+    ret.up = true;
+  }
+  if (this.checkCircleCollision(x, y, r, rightTileX, upTileY)) {
+    ret.right = true;
+    ret.up = true;
+  }
+  if (this.checkCircleCollision(x, y, r, leftTileX, tileY)) {
+    ret.left = true;
+  }
+  if (this.checkCircleCollision(x, y, r, rightTileX, tileY)) {
+    ret.right = true;
+  }
+  if (this.checkCircleCollision(x, y, r, leftTileX, downTileY)) {
+    ret.left = true;
+    ret.down = true;
+  }
+  if (this.checkCircleCollision(x, y, r, tileX, downTileY)) {
+    ret.down = true;
+  }
+  if (this.checkCircleCollision(x, y, r, rightTileX, downTileY)) {
+    ret.right = true;
+    ret.down = true;
+  }
+
+  // Suoritetaan tarkastus vielä nykyiseen tileen
+  if (this.checkCircleCollision(x, y, r, tileX, tileY)) {
+    ret.right = true;
+    ret.left = true;
+    ret.up = true;
+    ret.down = true;
+  }
+  return ret;
+};
+
+/**
+ * @private
+ */
+Map.prototype.checkCircleCollision = function (x, y, r, tileX, tileY) {
+  var hit, index, halfTile, circleDist, cornedDist_sq;
+
+  if (tileX < 0 || tileY < 0 || tileX >= this.width || tileY >= this.height) {
+    // Jos tilekoordinaatti on kartan rajojen ulkopuolella, lasketaan törmäys siihen.
+    hit = 1;
+  } else {
+    // Muulloin tarkastetaan törmäysdata tiledatasta.
+    index = tileY * this.width + tileX;
+    hit = this.data[index];
+  }
+
+  // Jos tilessä ei ole törmäystä asetettuna, voidaan tarkastus jättää jo tässä vaiheessa sikseen.
+  if (!hit) {
+    return false;
+  }
+
+  // Alustetaan joitakin muuttujia
+  circleDist = {};
+  halfTile = this.tileSize / 2;
+
+  // Tästä lähtee http://stackoverflow.com/a/402010/1152564
+  circleDist.x = Math.abs(x - (tileX * this.tileSize) - halfTile);
+  circleDist.y = Math.abs(y - (tileY * this.tileSize) - halfTile);
+
+  if (circleDist.x > (halfTile + r)) { return false; }
+  if (circleDist.y > (halfTile + r)) { return false; }
+
+  if (circleDist.x <= halfTile) { this.debugBox(tileX, tileY); return true; }
+  if (circleDist.y <= halfTile) { this.debugBox(tileX, tileY); return true; }
+
+  /*
+  cornedDist_sq = Math.pow(circleDist.x - halfTile, 2) + Math.pow(circleDist.y - halfTile, 2);
+
+  if (cornedDist_sq <= Math.pow(r, 2)) {
+    this.debugBox(tileX, tileY);
+    return true;
+  }
+  */
+
+  return false;
+};
+
+/**
+ * Piirtää boksin tilen paikalle.
+ * @param {Integer} tileX
+ * @param {Integer} tileY
+ * @param {Boolean} [fill=false]  Piirretäänkö täytetty boksi
+ */
+Map.prototype.debugBox = function (tileX, tileY, fill) {
+  var boxX, boxY, self = this;
+  if (!this.server.debug) { return; }
+  if ('boolean' !== typeof fill) { fill = false; }
+
+  boxX = tileX * this.tileSize - (this.width * this.tileSize / 2);
+  boxY = (this.height * this.tileSize / 2) - tileY * this.tileSize;
+
+  this.server.loopPlayers(function (player) {
+    if (player.debugState && player.debugState < 20) {
+      player.debugState += 1;
+      self.server.messages.add(player.id, {
+        msgType: NET.DEBUGDRAWING,
+        drawType: DRAW.BOX,
+        drawVars: [
+          boxX,
+          boxY,
+          self.tileSize,
+          self.tileSize,
+          fill
+        ]
+      });
+    }
+  });
+};
 
 module.exports = Map;

@@ -1,6 +1,9 @@
 /**
  * @fileOverview Sisältää {@link Item}-luokan toteutuksen.
  */
+
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , NET = require('./Constants').NET;
@@ -32,8 +35,6 @@ function Item(server, map, itemId, itemType) {
 
   this.x = randomPlace.x;
   this.y = randomPlace.y;
-
-  server.items[itemId] = this;
 }
 
 /**

@@ -89,7 +89,7 @@
 			Documentation generator: <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0<br />
 			Template: <a href="http://www.thebrightlines.com/2010/05/06/new-template-for-jsdoctoolkit-codeview/" target="_blank">Codeview</a> 1.2<br />
 			Generated on:
-			<time datetime='2012-0-15' pubdate>2012-0-15 1:40</time>
+			<time datetime='2012-2-4' pubdate>2012-2-4 16:11</time>
 		</footer>
 	</div>
 </div>
@@ -174,7 +174,39 @@
 													<div class="fixedFont">
 													<b><a href="../symbols/BotAI.html#config">config</a></b>
 													</div>
-													<div class="description">Botin tekoälyä ohjaavat asetukset: <a href="../symbols/BotAI.html#initConfig">BotAI#initConfig</a></div>
+													<div class="description">Botin tekoälyä ohjaavat asetukset: BotAI#initConfig</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													<b><a href="../symbols/BotAI.html#dodgeRotation">dodgeRotation</a></b>
+													</div>
+													<div class="description">Kun botti on lähellä estettä niin tällä määrätään kuinka jyrkällä käännöksellä yritetään
+väistää.</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													<b><a href="../symbols/BotAI.html#exploreAngle">exploreAngle</a></b>
+													</div>
+													<div class="description">Kun pitää päätellä uusi suunta niin se tehdään katselemalla näin monta astetta molempiin
+suuntiin.</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													<b><a href="../symbols/BotAI.html#fightDist">fightDist</a></b>
+													</div>
+													<div class="description">Kuinka kaukaa voidaan reagoida viholliseen (pikseleissä)</div>
 												</td>
 											</tr>
 										
@@ -192,9 +224,59 @@
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
+													<b><a href="../symbols/BotAI.html#fov">fov</a></b>
+													</div>
+													<div class="description">Botin field of vision, kuinka leveästä kulmasta voidaan poimia pelaaja (0-180 astetta)</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
 													<b><a href="../symbols/BotAI.html#lastAngle">lastAngle</a></b>
 													</div>
 													<div class="description">Kuinka paljon botin ja kohdekulman ero oli edellisellä kierroksella</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													<b><a href="../symbols/BotAI.html#maxNextAction">maxNextAction</a></b>
+													</div>
+													<div class="description">Koska viimeistään arvotaan botille uusi suunta</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													<b><a href="../symbols/BotAI.html#maxSpeed">maxSpeed</a></b>
+													</div>
+													<div class="description">Botin nopeus kun tie on vapaa</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													<b><a href="../symbols/BotAI.html#minNextAction">minNextAction</a></b>
+													</div>
+													<div class="description">Koska aikaisintaan arvotaan botille uusi suunta</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													<b><a href="../symbols/BotAI.html#minSpeed">minSpeed</a></b>
+													</div>
+													<div class="description">Botin nopeus kun se on havainnut esteen</div>
 												</td>
 											</tr>
 										
@@ -225,6 +307,16 @@
 													<b><a href="../symbols/BotAI.html#player">player</a></b>
 													</div>
 													<div class="description">Player-luokan instanssi johon tämä tekoäly kuuluu.</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													<b><a href="../symbols/BotAI.html#randRotation">randRotation</a></b>
+													</div>
+													<div class="description">Kun botille arvotaan uusi kääntyminen niin tämä on maksimi.</div>
 												</td>
 											</tr>
 										
@@ -268,6 +360,16 @@
 												</td>
 											</tr>
 										
+											<tr>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													<b><a href="../symbols/BotAI.html#wakeupDist">wakeupDist</a></b>
+													</div>
+													<div class="description">Jos matkaa esteeseen on vähemmän kuin tämä niin aletaan etsiä uutta suuntaa</div>
+												</td>
+											</tr>
+										
 									</tbody>
 								</table>
 							</div>
@@ -305,9 +407,9 @@
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/BotAI.html#debugRayCast">debugRayCast</a></b>(collision, picker)
+													<div class="fixedFont"><b><a href="../symbols/BotAI.html#checkCollisions">checkCollisions</a></b>()
 													</div>
-													<div class="description">Debuggaa raycastia</div>
+													<div class="description">Törmäystarkistus, estää botin menemisen seinien sisään.</div>
 												</td>
 											</tr>
 										
@@ -316,14 +418,47 @@
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
-													<div class="fixedFont"><b><a href="../symbols/BotAI.html#initConfig">initConfig</a></b>()
+													<div class="fixedFont"><b><a href="../symbols/BotAI.html#debugLine">debugLine</a></b>(x1, y1, x2, y2)
+													</div>
+													<div class="description">Piirtää debug-viivan yhdestä pisteestä toiseen</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item2'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/BotAI.html#debugRayCast">debugRayCast</a></b>(collision, picker, drawLineToCollision)
+													</div>
+													<div class="description">Debuggaa raycastia</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item3'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/BotAI.html#initBotAI">initBotAI</a></b>()
 													</div>
 													<div class="description">Alustaa botin tekoälyä ohjaavat asetukset.</div>
 												</td>
 											</tr>
 										
 											<tr
-												 class='item2'
+												 class='item4'
+											>
+												<td class="attributes">&nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont"><b><a href="../symbols/BotAI.html#setSkill">setSkill</a></b>(param)
+													</div>
+													<div class="description">Muuttaa botin asetuksia riippuen annetusta parametrista.</div>
+												</td>
+											</tr>
+										
+											<tr
+												 class='item5'
 											>
 												<td class="attributes">&nbsp;</td>
 												<td class="nameDescription">
@@ -416,7 +551,75 @@
 								</div>
 								
 								<div class="description">
-									Botin tekoälyä ohjaavat asetukset: <a href="../symbols/BotAI.html#initConfig">BotAI#initConfig</a>
+									Botin tekoälyä ohjaavat asetukset: BotAI#initConfig
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="dodgeRotation">
+									<span class='lighter'>
+									
+									</span>
+									
+									
+									
+									<b>dodgeRotation</b>							
+								</div>
+								
+								<div class="description">
+									Kun botti on lähellä estettä niin tällä määrätään kuinka jyrkällä käännöksellä yritetään
+väistää. Pienempi arvo on jyrkempi käännös.
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="exploreAngle">
+									<span class='lighter'>
+									
+									</span>
+									
+									
+									
+									<b>exploreAngle</b>							
+								</div>
+								
+								<div class="description">
+									Kun pitää päätellä uusi suunta niin se tehdään katselemalla näin monta astetta molempiin
+suuntiin.
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="fightDist">
+									<span class='lighter'>
+									
+									</span>
+									
+									
+									
+									<b>fightDist</b>							
+								</div>
+								
+								<div class="description">
+									Kuinka kaukaa voidaan reagoida viholliseen (pikseleissä)
 									
 									
 									
@@ -449,6 +652,28 @@
 								
 								<div class="hr"></div>
 							
+								<div class="fixedFont heading" id="fov">
+									<span class='lighter'>
+									
+									</span>
+									
+									
+									
+									<b>fov</b>							
+								</div>
+								
+								<div class="description">
+									Botin field of vision, kuinka leveästä kulmasta voidaan poimia pelaaja (0-180 astetta)
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
 								<div class="fixedFont heading" id="lastAngle">
 									<span class='lighter'>
 									
@@ -461,6 +686,94 @@
 								
 								<div class="description">
 									Kuinka paljon botin ja kohdekulman ero oli edellisellä kierroksella
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="maxNextAction">
+									<span class='lighter'>
+									
+									</span>
+									
+									
+									
+									<b>maxNextAction</b>							
+								</div>
+								
+								<div class="description">
+									Koska viimeistään arvotaan botille uusi suunta
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="maxSpeed">
+									<span class='lighter'>
+									
+									</span>
+									
+									
+									
+									<b>maxSpeed</b>							
+								</div>
+								
+								<div class="description">
+									Botin nopeus kun tie on vapaa
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="minNextAction">
+									<span class='lighter'>
+									
+									</span>
+									
+									
+									
+									<b>minNextAction</b>							
+								</div>
+								
+								<div class="description">
+									Koska aikaisintaan arvotaan botille uusi suunta
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="minSpeed">
+									<span class='lighter'>
+									
+									</span>
+									
+									
+									
+									<b>minSpeed</b>							
+								</div>
+								
+								<div class="description">
+									Botin nopeus kun se on havainnut esteen
 									
 									
 									
@@ -527,6 +840,28 @@
 								
 								<div class="description">
 									Player-luokan instanssi johon tämä tekoäly kuuluu.
+									
+									
+									
+								</div>
+								
+								
+									
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="randRotation">
+									<span class='lighter'>
+									
+									</span>
+									
+									
+									
+									<b>randRotation</b>							
+								</div>
+								
+								<div class="description">
+									Kun botille arvotaan uusi kääntyminen niin tämä on maksimi.
 									
 									
 									
@@ -623,6 +958,28 @@
 								
 									
 								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id="wakeupDist">
+									<span class='lighter'>
+									
+									</span>
+									
+									
+									
+									<b>wakeupDist</b>							
+								</div>
+								
+								<div class="description">
+									Jos matkaa esteeseen on vähemmän kuin tämä niin aletaan etsiä uutta suuntaa
+									
+									
+									
+								</div>
+								
+								
+									
+								
 								
 							
 						</div>
@@ -646,6 +1003,93 @@
 									<li 
 										 class='item0'
 									>
+										<div class="fixedFont heading" id="checkCollisions">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>checkCollisions</b>()
+										</div>
+										
+										<div class="description">
+											Törmäystarkistus, estää botin menemisen seinien sisään.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item1'
+									>
+										<div class="fixedFont heading" id="debugLine">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>debugLine</b>(x1, y1, x2, y2)
+										</div>
+										
+										<div class="description">
+											Piirtää debug-viivan yhdestä pisteestä toiseen
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<b>x1</b>
+														
+													</dt>
+													<dd></dd>
+												
+													<dt>
+														<b>y1</b>
+														
+													</dt>
+													<dd></dd>
+												
+													<dt>
+														<b>x2</b>
+														
+													</dt>
+													<dd></dd>
+												
+													<dt>
+														<b>y2</b>
+														
+													</dt>
+													<dd></dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item2'
+									>
 										<div class="fixedFont heading" id="debugRayCast">
 											<span class='lighter'>
 											
@@ -653,7 +1097,7 @@
 											
 											
 											
-											<b>debugRayCast</b>(collision, picker)
+											<b>debugRayCast</b>(collision, picker, drawLineToCollision)
 										</div>
 										
 										<div class="description">
@@ -682,6 +1126,12 @@
 													</dt>
 													<dd></dd>
 												
+													<dt>
+														<b>drawLineToCollision</b>
+														
+													</dt>
+													<dd></dd>
+												
 											</dl>
 										
 										
@@ -690,16 +1140,16 @@
 									</li>
 								
 									<li 
-										 class='item1'
+										 class='item3'
 									>
-										<div class="fixedFont heading" id="initConfig">
+										<div class="fixedFont heading" id="initBotAI">
 											<span class='lighter'>
 											
 											</span>
 											
 											
 											
-											<b>initConfig</b>()
+											<b>initBotAI</b>()
 										</div>
 										
 										<div class="description">
@@ -719,7 +1169,47 @@
 									</li>
 								
 									<li 
-										 class='item2'
+										 class='item4'
+									>
+										<div class="fixedFont heading" id="setSkill">
+											<span class='lighter'>
+											
+											</span>
+											
+											
+											
+											<b>setSkill</b>(param)
+										</div>
+										
+										<div class="description">
+											Muuttaa botin asetuksia riippuen annetusta parametrista.
+											
+											
+											
+											
+										</div>
+										
+										
+										
+										
+											<dl class="detailList params">
+												<dt class="heading">Parameters:</dt>
+												
+													<dt>
+														<span class="light fixedFont">{Number}</span> <b>param</b>
+														
+													</dt>
+													<dd>Arvo väliltä 1...64, jonka perusteella botin taitoja rukataan.</dd>
+												
+											</dl>
+										
+										
+										
+										<div class="hr"></div>
+									</li>
+								
+									<li 
+										 class='item5'
 									>
 										<div class="fixedFont heading" id="update">
 											<span class='lighter'>

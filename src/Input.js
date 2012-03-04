@@ -2,6 +2,8 @@
  * @fileOverview Konsoliin kirjoittamiseen liittyvät komennot
  */
 
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , NET = require('./Constants').NET
@@ -28,13 +30,15 @@ function Input(server) {
   process.stdin.resume();
   process.stdin.setEncoding('utf8');
 
-  process.on('SIGINT', function processSIGINT() {
-    log.notice('Received ' + 'SIGINT'.red);
-    // Lakataan kuuntelemasta stdin-syötettä.
-    // Node sulkeutuu jahka kaikki eventit on kutsuttu, eikä uusia ole lisätty event-luuppiin.
-    process.stdin.destroy();
-    server.close();
-  });
+  if (process.platform !== "win32") {
+    process.on('SIGINT', function processSIGINT() {
+      log.notice('Received ' + 'SIGINT'.red);
+      // Lakataan kuuntelemasta stdin-syötettä.
+      // Node sulkeutuu jahka kaikki eventit on kutsuttu, eikä uusia ole lisätty event-luuppiin.
+      process.stdin.destroy();
+      server.close();
+    });
+  }
 
   rli.on('close', function rliClose() {
     process.stdin.destroy();

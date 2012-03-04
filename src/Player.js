@@ -2,8 +2,11 @@
  * @fileOverview Sisältää {@link Player}-luokan toteutuksen.
  */
 
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
+  , rand = require('./Utils').rand
   , Obj = require('./Object')
   , WPN = require('./Constants').WPN
   , NET = require('./Constants').NET
@@ -65,23 +68,23 @@ var log = require('./Utils').log
  */
 function Player(server, playerId) {
   Obj.call(this, 0, 0, 0);
+  var botNames = server.gameState.map.config.botNames;
+
   this.server = server;
 
   // Alustetaan pelaaja
   this.id = playerId;
   this.team = 1;
-  this.botName = server.gameState.map.config.botNames[playerId-1];
-  if ('undefined' === typeof this.botName) {
+  if (botNames.length < playerId) {
     // Bottien nimiä ei ollut kaikkia määritelty kartan tiedoissa
     this.botName = "Bot_" + playerId;
+  } else {
+    this.botName = botNames[playerId-1];
   }
   this.clientId = "";
   this.name = "";
-  var skill = 21 - playerId; // Botteja hieman eritasoisiksi vissiinkin?
-  this.fightRotate = 1.5 + (skill / 1.5);
-  this.shootingAngle = 4.0 + (playerId * 1.5);
-  this.fov = 100 + (skill * 3.5);
   this.kickReason = "";
+  this.spawnTime = 0;
 
   // Lisätään tämä palvelimen players-kokoelmaan ja poistetaan vanha, jos sellainen oli olemassa.
   if (server.players.hasOwnProperty(playerId)) {
@@ -99,12 +102,14 @@ Player.prototype.constructor = Player;
 Player.prototype.kill = function (bullet) {
   var killer, weapon;
 
-  // Logataan kuka tappoi kenet.
-  if (bullet && this.server.players[bullet.player.id].name !== this.name) {
-    log.info('%0 was killed by player %1', this.name.green,
-      this.server.players[bullet.player.id].name.green, String(bullet.id).magenta);
-  } else {
-    log.info('%0 committed suicide.', this.name.green);
+  if (this.server.config.logKillMessages) {
+    // Logataan kuka tappoi kenet.
+    if (bullet && this.server.players[bullet.player.id].name !== this.name) {
+      log.info('%0 was killed by player %1', this.name.green,
+        this.server.players[bullet.player.id].name.green, String(bullet.id).magenta);
+    } else {
+      log.info('%0 committed suicide.', this.name.green);
+    }
   }
 
   this.isDead = true;
@@ -122,7 +127,7 @@ Player.prototype.kill = function (bullet) {
 
   // Onko tappaja vielä pelissä
   if (killer.active) {
-    if (killer.id === this.id || (killer.team === this.team && this.server.gameState.playMode > 1)) {
+    if (killer.id === this.id || (killer.team === this.team && this.server.gameState.gameMode > 1)) {
       // Teamkilleri tai itsemurha, vähennetään tappo.
       killer.kills--;
     } else {
@@ -152,8 +157,10 @@ Player.prototype.applyExplosion = function (bullet, dist) {
   }
   var damageRange = Weapons[bullet.weapon].damageRange;
 
-  log.debug('Applying explosion from %0 (%1) to %2',
-    String(bullet.id).magenta, Weapons[bullet.weapon].name.yellow, this.name.green);
+  if (this.server.debug > 1) {
+    log.debug('Applying explosion from %0 (%1) to %2',
+      String(bullet.id).magenta, Weapons[bullet.weapon].name.yellow, this.name.green);
+  }
 
   // Uhrille tieto ampujasta
   this.shootedBy = bullet.player;
@@ -203,6 +210,46 @@ Player.prototype.bulletHit = function (bullet, x, y) {
   // Kuolema?
   if (this.health <= 0) {
     this.kill(bullet);
+  }
+};
+
+/** Asettaa pelaajan tasaisesti johonkin joukkueeseen. */
+Player.prototype.setTeamEvenly = function () {
+  var server = this.server
+    , reds = 0, greens = 0;
+
+  // Deathmatch-moodissa kaikki pelaajat ovat vihreillä
+  if (server.gameState.gameMode === 1) {
+    this.team = 1;
+    return;
+  }
+
+  if (server.gameState.gameMode === 3) {
+    // Zombie-moodi, kaikki botit ovat punaisilla ja ihmispelaajat vihreillä
+    if (this.zombie) {
+      this.team = 2;
+    } else {
+      this.team = 1;
+    }
+    return;
+  }
+
+  // Lasketaan pelaajien määrä molemmissa joukkueissa
+  server.loopPlayers(function playerSetTeamEvenly(plr) {
+    if (!plr.loggedIn) { return; }
+    if (plr.team === 1) {
+      greens++;
+    } else {
+      reds++;
+    }
+  });
+
+  if (greens < reds) {
+    this.team = 1;
+  } else if (reds < greens) {
+    this.team = 2;
+  } else {
+    this.team = rand(1, 2);
   }
 };
 

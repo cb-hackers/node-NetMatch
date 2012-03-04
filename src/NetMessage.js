@@ -2,6 +2,8 @@
  * @fileOverview Viestien säilytykseen liittyvät toiminnot
  */
 
+"use strict";
+
 /**#nocode+*/
 var NET = require('./Constants').NET
   , WPN = require('./Constants').WPN
@@ -246,6 +248,11 @@ NetMessages.prototype.fetch = function (toPlayer, data) {
         data.putByte(d.drawType);
         if (d.drawVars) {
           for (var i=0; i < d.drawVars.length; i++) {
+            if (i === 4) {
+              // Viides parametri on pakko olla byte
+              data.putByte(d.drawVars[i]);
+              break;
+            }
             data.putShort(d.drawVars[i]);
           }
         }

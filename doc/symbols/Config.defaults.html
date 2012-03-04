@@ -89,7 +89,7 @@
 			Documentation generator: <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0<br />
 			Template: <a href="http://www.thebrightlines.com/2010/05/06/new-template-for-jsdoctoolkit-codeview/" target="_blank">Codeview</a> 1.2<br />
 			Generated on:
-			<time datetime='2012-0-15' pubdate>2012-0-15 1:40</time>
+			<time datetime='2012-2-4' pubdate>2012-2-4 16:11</time>
 		</footer>
 	</div>
 </div>
@@ -148,6 +148,36 @@
 												<td class="attributes">&lt;static&gt; &nbsp;</td>
 												<td class="nameDescription">
 													<div class="fixedFont">
+													Config.defaults.<b><a href="../symbols/Config.defaults.html#.botCount">botCount</a></b>
+													</div>
+													<div class="description">Bottien määrä.</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													Config.defaults.<b><a href="../symbols/Config.defaults.html#.botDepartLimit">botDepartLimit</a></b>
+													</div>
+													<div class="description">Minkä pelaajamäärän jälkeen (pelaajat + botit) botteja lähtee itsestään pois.</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													Config.defaults.<b><a href="../symbols/Config.defaults.html#.botWeapons">botWeapons</a></b>
+													</div>
+													<div class="description">Bottien käytössä olevat aseet.</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
 													Config.defaults.<b><a href="../symbols/Config.defaults.html#.deathDelay">deathDelay</a></b>
 													</div>
 													<div class="description">Kuinka kauan kestää (millisekunteina) että pelaajat heräävät henkiin uudelleen</div>
@@ -180,7 +210,17 @@
 													<div class="fixedFont">
 													Config.defaults.<b><a href="../symbols/Config.defaults.html#.gameMode">gameMode</a></b>
 													</div>
-													<div class="description">Pelimoodi, DM = 1 ja TDM = 2</div>
+													<div class="description">Pelimoodi: DM = 1, TDM = 2, Zombiemode = 3</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													Config.defaults.<b><a href="../symbols/Config.defaults.html#.logKillMessages">logKillMessages</a></b>
+													</div>
+													<div class="description">Näytetäänkö palvelimen konsolissa tappoviestit</div>
 												</td>
 											</tr>
 										
@@ -190,7 +230,28 @@
 													<div class="fixedFont">
 													Config.defaults.<b><a href="../symbols/Config.defaults.html#.map">map</a></b>
 													</div>
-													<div class="description">Nykyinen kartta</div>
+													<div class="description">Pelattava kartta.</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													Config.defaults.<b><a href="../symbols/Config.defaults.html#.mapDownloadUrl">mapDownloadUrl</a></b>
+													</div>
+													<div class="description">Osoite, josta pelaaja voi ladata puuttuvan kartan</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													Config.defaults.<b><a href="../symbols/Config.defaults.html#.maxInactiveTime">maxInactiveTime</a></b>
+													</div>
+													<div class="description">Kuinka pitkän ajan jälkeen (millisekunteina) pelaaja poistetaan pelistä, kun hänestä ei ole
+kuulunut mitään</div>
 												</td>
 											</tr>
 										
@@ -200,7 +261,7 @@
 													<div class="fixedFont">
 													Config.defaults.<b><a href="../symbols/Config.defaults.html#.maxPlayers">maxPlayers</a></b>
 													</div>
-													<div class="description">Maksimimäärä pelaajia</div>
+													<div class="description">Maksimimäärä pelaajia.</div>
 												</td>
 											</tr>
 										
@@ -210,7 +271,17 @@
 													<div class="fixedFont">
 													Config.defaults.<b><a href="../symbols/Config.defaults.html#.password">password</a></b>
 													</div>
-													<div class="description">Palvelimen salasana</div>
+													<div class="description">Palvelimen salasana.</div>
+												</td>
+											</tr>
+										
+											<tr>
+												<td class="attributes">&lt;static&gt; &nbsp;</td>
+												<td class="nameDescription">
+													<div class="fixedFont">
+													Config.defaults.<b><a href="../symbols/Config.defaults.html#.periodLength">periodLength</a></b>
+													</div>
+													<div class="description">Kuinka pitkään yksi kierros kestää.</div>
 												</td>
 											</tr>
 										
@@ -307,6 +378,121 @@
 								Field Detail
 							</h2>
 							
+							
+								<div class="fixedFont heading" id=".botCount">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									<span class="light">{Number}</span>
+									
+									<span class="light">Config.defaults.</span><b>botCount</b>							
+								</div>
+								
+								<div class="description">
+									Bottien määrä. Jos tämä on nollaa pienempi, käytetään kartan asetuksissa määriteltyä arvoa.
+									
+									
+									
+								</div>
+								
+								
+									
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+											<dt class="heading">Default Value:</dt>
+											<dd>
+												-1
+											</dd>
+										
+									</dl>
+								
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".botDepartLimit">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									<span class="light">{Number}</span>
+									
+									<span class="light">Config.defaults.</span><b>botDepartLimit</b>							
+								</div>
+								
+								<div class="description">
+									Minkä pelaajamäärän jälkeen (pelaajat + botit) botteja lähtee itsestään pois. Jos tämä arvo on
+pienempi kuin botCount-arvo, niin tämä asetetaan samaksi botCountin kanssa. Jos tämä on 0, niin
+botit eivät poistu automaattisesti koskaan. Jos taas tämä on nollaa pienempi, käytetään kartan
+asetuksissa määriteltyä arvoa.
+									
+									
+									
+								</div>
+								
+								
+									
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+											<dt class="heading">Default Value:</dt>
+											<dd>
+												-1
+											</dd>
+										
+									</dl>
+								
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".botWeapons">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									<span class="light">{Array}</span>
+									
+									<span class="light">Config.defaults.</span><b>botWeapons</b>							
+								</div>
+								
+								<div class="description">
+									Bottien käytössä olevat aseet. Jos tämä on tyhjä, käytetään kartan asetuksissa olevia aseita.
+Jos niitäkään ei ole, on käytössä kaikki aseet.
+ - 1 = Pistooli
+ - 2 = Konepistooli
+ - 3 = Sinko
+ - 4 = Haulikko
+ - 5 = Kranaatinlaukaisin
+ - 6 = Moottorisaha
+									
+									
+									
+								</div>
+								
+								
+									
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+											<dt class="heading">Default Value:</dt>
+											<dd>
+												[]
+											</dd>
+										
+									</dl>
+								
+								
+								<div class="hr"></div>
 							
 								<div class="fixedFont heading" id=".deathDelay">
 									<span class='lighter'>
@@ -424,7 +610,7 @@
 								</div>
 								
 								<div class="description">
-									Pelimoodi, DM = 1 ja TDM = 2
+									Pelimoodi: DM = 1, TDM = 2, Zombiemode = 3
 									
 									
 									
@@ -448,18 +634,18 @@
 								
 								<div class="hr"></div>
 							
-								<div class="fixedFont heading" id=".map">
+								<div class="fixedFont heading" id=".logKillMessages">
 									<span class='lighter'>
 									&lt;static&gt; 
 									</span>
 									
-									<span class="light">{String}</span>
+									<span class="light">{Boolean}</span>
 									
-									<span class="light">Config.defaults.</span><b>map</b>							
+									<span class="light">Config.defaults.</span><b>logKillMessages</b>							
 								</div>
 								
 								<div class="description">
-									Nykyinen kartta
+									Näytetäänkö palvelimen konsolissa tappoviestit
 									
 									
 									
@@ -475,7 +661,115 @@
 										
 											<dt class="heading">Default Value:</dt>
 											<dd>
-												"Luna"
+												false
+											</dd>
+										
+									</dl>
+								
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".map">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									<span class="light">{String|Array}</span>
+									
+									<span class="light">Config.defaults.</span><b>map</b>							
+								</div>
+								
+								<div class="description">
+									Pelattava kartta. Voi olla merkkijono, jolloin pelataan vain yhtä karttaa, tai taulukko,
+joka sisältää useamman kartan ja niitä kierrätetään erien välillä. Kaikkien karttojen tulee
+olla olemassa kun palvelin käynnistetään.
+									
+									
+									
+								</div>
+								
+								
+									
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+											<dt class="heading">Default Value:</dt>
+											<dd>
+												["Luna", "Warehouse", "Mictlan"]
+											</dd>
+										
+									</dl>
+								
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".mapDownloadUrl">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									<span class="light">{String}</span>
+									
+									<span class="light">Config.defaults.</span><b>mapDownloadUrl</b>							
+								</div>
+								
+								<div class="description">
+									Osoite, josta pelaaja voi ladata puuttuvan kartan
+									
+									
+									
+								</div>
+								
+								
+									
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+											<dt class="heading">Default Value:</dt>
+											<dd>
+												"http://netmatch.vesq.org/maps/"
+											</dd>
+										
+									</dl>
+								
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".maxInactiveTime">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									<span class="light">{Number}</span>
+									
+									<span class="light">Config.defaults.</span><b>maxInactiveTime</b>							
+								</div>
+								
+								<div class="description">
+									Kuinka pitkän ajan jälkeen (millisekunteina) pelaaja poistetaan pelistä, kun hänestä ei ole
+kuulunut mitään
+									
+									
+									
+								</div>
+								
+								
+									
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+											<dt class="heading">Default Value:</dt>
+											<dd>
+												10000
 											</dd>
 										
 									</dl>
@@ -494,7 +788,7 @@
 								</div>
 								
 								<div class="description">
-									Maksimimäärä pelaajia
+									Maksimimäärä pelaajia. Suurin mahdollinen maksimimäärä on 64.
 									
 									
 									
@@ -529,7 +823,8 @@
 								</div>
 								
 								<div class="description">
-									Palvelimen salasana
+									Palvelimen salasana. Jos tätä ei aseteta, pelaaja voi saada admin-oikeudet vain palvelimen
+konsolikomennon op kautta.
 									
 									
 									
@@ -545,7 +840,42 @@
 										
 											<dt class="heading">Default Value:</dt>
 											<dd>
-												password
+												""
+											</dd>
+										
+									</dl>
+								
+								
+								<div class="hr"></div>
+							
+								<div class="fixedFont heading" id=".periodLength">
+									<span class='lighter'>
+									&lt;static&gt; 
+									</span>
+									
+									<span class="light">{Number}</span>
+									
+									<span class="light">Config.defaults.</span><b>periodLength</b>							
+								</div>
+								
+								<div class="description">
+									Kuinka pitkään yksi kierros kestää. Aika sekunneissa. 0 tarkoittaa ettei erä pääty koskaan.
+									
+									
+									
+								</div>
+								
+								
+									
+									<dl class="detailList nomargin">
+									
+										
+										
+										
+										
+											<dt class="heading">Default Value:</dt>
+											<dd>
+												300
 											</dd>
 										
 									</dl>
@@ -615,7 +945,7 @@
 										
 											<dt class="heading">Default Value:</dt>
 											<dd>
-												"http://netmatch.vesq.org"
+												"http://tuhoojabotti.com/nm"
 											</dd>
 										
 									</dl>
@@ -650,7 +980,7 @@
 										
 											<dt class="heading">Default Value:</dt>
 											<dd>
-												false
+												true
 											</dd>
 										
 									</dl>

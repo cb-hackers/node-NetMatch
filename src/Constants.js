@@ -3,6 +3,8 @@
  * {@link PLR}
  */
 
+"use strict";
+
 /*
 // Voit kutsua tätä näin:
 var C = require('./Constants);
@@ -179,6 +181,9 @@ var PLR = {
 
   /** Nopeus sivulle (pikseliä sekunnissa) */
   SIDESTEP_SPEED: 160,
+
+  /** Kuinka iso on ympyrä-tilekartta törmäyksen ympyrän säde */
+  COL_RADIUS: 25
 };
 
 exports.NET = NET;

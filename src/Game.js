@@ -2,6 +2,8 @@
  * @fileOverview Pitää sisällään {@link Game}-luokan toteutuksen.
  */
 
+"use strict";
+
 /**#nocode+*/
 var log = require('./Utils').log
   , colors = require('colors')
@@ -19,6 +21,7 @@ function Game(server) {
   this.server = server;
   this.lastUpdate = 0;
   this.frameTime = 0;
+  this.isNextMapLoaded = false;
 }
 
 /**
@@ -27,6 +30,7 @@ function Game(server) {
  * @param {Number} updatesPerSecond  Kuinka monta kertaa sekunnissa palvelinta päivitetään
  */
 Game.prototype.start = function (updatesPerSecond) {
+  this.server.gameState.sessionStarted = Date.now();
   this.interval = setInterval(this.update, 1000 / updatesPerSecond, this);
 };
 
@@ -79,6 +83,11 @@ Game.prototype.updateBotsAI = function () {
     return;
   }
 
+  // Onko erä loppu
+  if (this.server.gameState.sessionComplete) {
+    return;
+  }
+
   // Pyyhitään jokaiselta pelaajalta debuggaukset, jos debugataan.
   if (this.server.debug) {
     this.server.loopPlayers (function (player) {
@@ -92,6 +101,7 @@ Game.prototype.updateBotsAI = function () {
     });
   }
 
+  // Päivitetään bottien tekoälyt
   this.server.loopPlayers (function (player) {
     if (player.zombie && player.active && !player.isDead) {
       player.botAI.update();
@@ -104,7 +114,67 @@ Game.prototype.updateBotsAI = function () {
  * @private
  */
 Game.prototype.updateRoundTime = function () {
+  var timeLeft, server = this.server;
 
+  // Jos asetuksissa on erän pituus pienempi tai yhtä suuri kuin 0, niin kello ei ole käytössä.
+  if (server.config.periodLength <= 0) {
+    return;
+  }
+
+  // Jos pelaajia ei ole palvelimella niin kello ei käy.
+  if (server.gameState.playerCount <= 0) {
+    server.gameState.sessionStarted = Date.now();
+    server.gameState.sessionComplete = false;
+    this.isNextMapLoaded = false;
+    return;
+  }
+
+  // Lasketaan jäljellä oleva aika
+  timeLeft = server.gameState.sessionStarted + server.config.periodLength * 1000 - Date.now();
+
+  if (timeLeft <= 0) {
+    server.gameState.sessionComplete = true;
+
+    // Poistetaan kaikki ammukset
+    server.bullets = {};
+
+    // Kierrätetään seuraava kartta peliin, jos karttoja on listassa yli yksi, eikä karttaa
+    // ole vielä vaihdettu.
+    if (!this.isNextMapLoaded && timeLeft < -5000 && server.config.map.length > 1) {
+      server.changeMap();
+      this.isNextMapLoaded = true;
+    }
+
+    // Tapetaan jokainen pelaaja
+    server.loopPlayers(function roundEndKill(player) {
+      player.health = -10;
+      player.timeToDeath = Date.now();
+    });
+  }
+
+  // Onko erä päättynyt 10 sekuntia sitten
+  if (timeLeft < -10000) {
+    server.gameState.sessionStarted = Date.now();
+    server.gameState.sessionComplete = false;
+    this.isNextMapLoaded = false;
+    server.loopPlayers(function mapStartLoop(player) {
+      player.timeToDeath = Date.now() - server.config.deathDelay * 2;
+      player.kills = 0;
+      player.deaths = 0;
+
+      // Tarkistetaan onko pelaajalla jo ladattuna sama kartta kuin palvelimella
+      if (player.active && player.loggedIn && !player.zombie && server.config.map.length > 1 && player.mapName !== server.gameState.map.name) {
+        // Kartta oli eri.
+        if (player.mapName) {
+          log.notice('Player %0 had a map %1 while the server was running map %2',
+            player.name.green, player.mapName.green, server.gameState.map.name.green);
+        } else {
+          log.notice('Player %0 did not have a map set!');
+        }
+        server.logout(player);
+      }
+    });
+  }
 };
 
 /**
@@ -141,6 +211,11 @@ Game.prototype.updatePlayers = function () {
       if (player.zombie) {
         player.isDead = false;
         player.weapon = this.server.getBotWeapon();
+        if (this.server.gameState.gameMode === 3) {
+          // Zombie-moodi, boteilla on vain 10hp eivätkä ne ole koskaan nakkeja
+          player.health = 10;
+          player.spawnTime = 0;
+        }
       }
     }
 
@@ -154,7 +229,30 @@ Game.prototype.updatePlayers = function () {
  * @private
  */
 Game.prototype.updateTimeouts = function () {
+  var server = this.server;
 
+  server.loopPlayers(function (player) {
+    if ((!player.active && !player.loggedIn) || player.zombie) {
+      // Pelaaja ei ole aktiivinen eikä sisäänkirjautunut taikka pelaaja on botti, joten
+      // ei tarkisteta tältä timeouttia.
+      return;
+    }
+    if (player.lastActivity + server.config.maxInactiveTime < Date.now()) {
+      // Timeout tuli, poistetaan pelaaja.
+      player.active = false;
+      player.loggedIn = false;
+      player.admin = false;
+      log.info('%0 timed out.', player.name.green);
+
+      server.gameState.playerCount--;
+
+      // Päivitetään tiedot servulistaukseen
+      server.registration.update();
+
+      // Kerrotaan siitä muillekin
+      server.messages.addToAll({ msgType: NET.LOGOUT, player: player });
+    }
+  });
 };
 
 /**
@@ -162,7 +260,56 @@ Game.prototype.updateTimeouts = function () {
  * @private
  */
 Game.prototype.updateBotsAmount = function () {
+  var server = this.server
+    , gs = server.gameState
+    , loopedBotsCount = 0;
 
+  // Pidetään huolta ettei botDepartCount eikä botCount ylitä maxPlayersin arvoa
+  if (gs.botCount > gs.maxPlayers) {
+    gs.botCount = gs.maxPlayers;
+  }
+  if (gs.botDepartLimit > gs.maxPlayers) {
+    gs.botDepartLimit = gs.maxPlayers;
+  }
+
+  // Pidetään huolta että botCount menee myös botDepartLimitin mukaan
+  if (gs.botDepartLimit < gs.botCount + gs.playerCount) {
+    gs.botCount = gs.botDepartLimit - gs.playerCount;
+  } else if (gs.botDepartLimit > gs.botCount + gs.playerCount) {
+    // Tarkistetaan että onko botDepartLimitin takia joskus poistettu botteja mutta ei lisätty
+    // takaisin sallittua määrää
+    if (server.config.botCount < 0 && gs.map.config && gs.map.config.botCount > gs.botCount) {
+      // Mennään kartan configin arvojen mukaan
+      gs.botCount = gs.map.config.botCount;
+    } else {
+      // Muulloin mennään normaalin configin arvojen mukaan
+      if (server.config.botCount > gs.botCount) {
+        gs.botCount = server.config.botCount;
+      }
+    }
+  }
+
+  server.loopPlayers(function (player) {
+    // Tarkistetaan vain aktiiviset botit
+    if (!player.zombie || !player.active) {
+      return;
+    }
+
+    // Tarkistetaan ollaanko ylitetty tämän botin kohdalla bottiraja
+    if (loopedBotsCount >= gs.botCount) {
+      // Yli ollaan menty. Kirjataan botti ulos.
+      server.logout(player);
+    }
+
+    loopedBotsCount++;
+  });
+
+  // Pidetään huolta ettei botteja ole liian vähän
+  if (loopedBotsCount < gs.botCount) {
+    for (var i = loopedBotsCount; i < gs.botCount; i++) {
+      server.addBot();
+    }
+  }
 };
 
 /**
