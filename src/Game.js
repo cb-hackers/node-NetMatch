@@ -163,10 +163,14 @@ Game.prototype.updateRoundTime = function () {
       player.deaths = 0;
 
       // Tarkistetaan onko pelaajalla jo ladattuna sama kartta kuin palvelimella
-      if (player.active && !player.zombie && server.config.map.length > 1 && player.mapName !== server.gameState.map.name) {
+      if (player.active && player.loggedIn && !player.zombie && server.config.map.length > 1 && player.mapName !== server.gameState.map.name) {
         // Kartta oli eri.
-        log.notice('Player %0 had a map %1 while the server was running map %2',
-          player.name.green, player.mapName.green, server.gameState.map.name.green);
+        if (player.mapName) {
+          log.notice('Player %0 had a map %1 while the server was running map %2',
+            player.name.green, player.mapName.green, server.gameState.map.name.green);
+        } else {
+          log.notice('Player %0 did not have a map set!');
+        }
         server.logout(player);
       }
     });
