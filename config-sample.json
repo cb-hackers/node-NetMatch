@@ -1,5 +1,5 @@
 // Voit asettaa tämän asetustiedoston polun node-NetMatchin tietoon seuraavasti:
-//         `npm set NetMatch:config /path/to/your/config.json`
+//         `netmatch -c /path/to/your/config.json`
 // Tiedostopäätteen tulee olla .json, sillä jos se puuttuu niin se lisätään automaattisesti.
 // Tiedostopääte on myös vapaaehtoinen, eli jos annat vain polun /path/to/config, etsii ohjelma
 // tiedostoa polusta /path/to/config.json
