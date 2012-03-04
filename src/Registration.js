@@ -47,7 +47,7 @@ Registration.prototype.apply = function (callback) {
     + '&ver='     + this.server.VERSION
     + '&mode=reg'
     + '&desc=' + encodeURI(config.description)
-    + (config.address ? '&addr=' + encodeURI(config.address) : '')
+    + ((config.dyndns || config.address) ? '&addr=' + encodeURI(config.dyndns || config.address) : '')
     + '&port=' + config.port
     + (config.devBuild ? '&devbuild=1' : '');
 
@@ -100,7 +100,7 @@ Registration.prototype.remove = function (callback) {
     , url = config.regHost
     + config.regPath
     + '?profile=' + encodeURI('NetMatch')
-    + (config.address ? '&addr=' + encodeURI(config.address) : '')
+    + ((config.dyndns || config.address) ? '&addr=' + encodeURI(config.dyndns || config.address) : '')
     + '&port=' + config.port
     + '&mode=unreg';
 
@@ -155,7 +155,7 @@ Registration.prototype.update = function (callback) {
     // Luodaan pyyntö
     , url = config.regHost + config.regPath
     + '?profile=NetMatch&mode=update'
-    + (config.address ? '&addr=' + encodeURI(config.address) : '')
+    + ((config.dyndns || config.address) ? '&addr=' + encodeURI(config.dyndns || config.address) : '')
     + '&port=' + config.port
     + '&data=' + data;
 
