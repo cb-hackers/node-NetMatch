@@ -5,7 +5,7 @@
 "use strict";
 
 /**
- * Kertoo kauanko palvelin on ollut päällä.
+ * Asettaa bottien departlimitin
  * @methodOf Commands
  */
 var botlimit = {
