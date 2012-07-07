@@ -181,7 +181,7 @@ Config.prototype.load = function (config) {
     , loadedConfig
     , i, mapPath;
 
-  if (!path.existsSync(filePath)) {
+  if (!fs.existsSync(filePath)) {
     log.error('Config %0 doesn\'t exist', filePath.green);
     log.error('Use `%0` to load your own config', 'netmatch -c /path/to/your/config.json'.yellow);
     return true;
@@ -214,7 +214,7 @@ Config.prototype.load = function (config) {
   for (i = 0; i < this.map.length; i++) {
     mapPath = path.resolve(__dirname, '..', 'maps', this.map[i] + '.json');
 
-    if (!path.existsSync(mapPath)) {
+    if (!fs.existsSync(mapPath)) {
       log.fatal('Map %0 doesn\'t exist in %1', this.map[i].green, mapPath.green);
       return false;
     }
