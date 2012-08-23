@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/VesQ/node-NetMatch.png)](http://travis-ci.org/VesQ/node-NetMatch)
 A [Node.js] implementation of [NetMatch]
 ========================================
 We're working on to create a fully functional server for [NetMatch], similar to the one made with
