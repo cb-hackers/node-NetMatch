@@ -38,6 +38,6 @@
   "preferGlobal": true,
   "license": "MIT",
   "engine": {
-    "node": ">=0.6.0"
+    "node": ">=0.8.0"
   }
 }

@@ -10,6 +10,7 @@ var log = require('./Utils').log
   , truncateNumber = require('./Utils').truncateNumber
   , distance = require('./Utils').distance
   , path = require('path')
+  , fs = require('fs')
   , cjson = require('cjson')
   , colors = require('colors')
   , Item = require('./Item')
@@ -55,7 +56,7 @@ function Map(server, name) {
   this.server = server;
   this.loaded = false;
 
-  if (!path.existsSync(filePath)) {
+  if (!fs.existsSync(filePath)) {
     log.error('Map %0 doesn\'t exist in %1', name.green, filePath.green);
     return;
   }
