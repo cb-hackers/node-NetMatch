@@ -1,10 +1,10 @@
 {
   "name": "NetMatch",
-  "version": "1.0.3",
-  "author": "Vesa Laakso <laakso.vesa@gmail.com> (http://vesq.net)",
+  "version": "1.0.4",
+  "author": "Vesa Laakso <laakso.vesa@gmail.com> (http://vesalaakso.com)",
   "description": "A node-server of a CoolBasic game NetMatch",
   "contributors": [
-    "Vesa Laakso <laakso.vesa@gmail.com> (http://vesq.net)",
+    "Vesa Laakso <laakso.vesa@gmail.com> (http://vesalaakso.com)",
     "Ville Lahdenvuo <tuhoojabotti@gmail.com> (http://tuhoojabotti.com)",
     "Vili Hietala <viltzu2@gmail.com> (http://viltzu.in)"
   ],
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/VesQ/node-NetMatch"
+    "url": "https://github.com/cb-hackers/node-NetMatch"
   },
   "keywords": [
     "game",
