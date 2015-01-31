@@ -14,7 +14,7 @@ Documentation
 -------------
 We document JavaScript with JsDoc and build an HTML-version of the project with [jsdoc-toolkit],
 powered by the awesome template [CodeView] \(thanks to [Wouter Bos] for it!). The latest build of
-documentations are in `gh-pages` branch and viewable here: http://vesq.github.com/node-NetMatch/doc/
+documentations are in `gh-pages` branch and viewable here: http://cb-hackers.github.com/node-NetMatch/doc/
 
 [Node.js]: http://nodejs.org/
 [NetMatch]: https://github.com/VesQ/NetMatch

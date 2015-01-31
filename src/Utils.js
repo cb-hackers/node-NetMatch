@@ -18,7 +18,7 @@ var argv = require('optimist')
 var Utils = {
   /**
    * Yleinen funktio lokiin/konsoliin (stdout) kirjoittamista varteen. Tämä on instanssi cbNetwork-noden
-   * <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Logger.html">Logger</a>-luokasta.
+   * <a href="http://cb-hackers.github.com/cbNetwork-node/doc/symbols/Logger.html">Logger</a>-luokasta.
    * Voit käyttää tätä näin:
    * @example
    * var log = Utils.log;

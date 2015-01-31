@@ -145,7 +145,7 @@ Server.prototype.initialize = function (port, address, config) {
   /**
    * cbNetwork-node UDP-palvelin
    * @type cbNetwork.Server
-   * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Server.html">cbNetwork.Server</a>
+   * @see <a href="http://cb-hackers.github.com/cbNetwork-node/doc/symbols/Server.html">cbNetwork.Server</a>
    */
   this.server = new cbNetwork.Server(this.config.port, this.config.address);
 
@@ -221,7 +221,7 @@ Server.prototype.initialize = function (port, address, config) {
  * Hoitaa saapuneiden viestien käsittelyn.
  *
  * @param {cbNetwork.Client}  cbNetwork-noden Client-luokan instanssi, jolta dataa tulee.
- * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a>
+ * @see <a href="http://cb-hackers.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a>
  */
 Server.prototype.handlePacket = function (client) {
   var data = client.data
@@ -325,7 +325,7 @@ Server.prototype.handlePacket = function (client) {
  *
  * @param {cbNetwork.Client} client  cbNetworkin Client-luokan instanssi
  * @param {Player} player            Pelaaja, keneltä on saatu dataa ja kenelle lähetetään vastaus tässä.
- * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a>
+ * @see <a href="http://cb-hackers.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a>
  */
 Server.prototype.sendReply = function (client, player) {
   var reply = new Packet()
@@ -475,7 +475,7 @@ Server.prototype.serverMessage = function (msg, player) {
  * Kirjaa pelaajan sisään peliin.
  * @param {cbNetwork.Client} client  cbNetworkin Client-luokan jäsen.
  * @returns {Boolean}                Onnistuiko pelaajan liittäminen peliin vai ei.
- * @see <a href="http://vesq.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a>
+ * @see <a href="http://cb-hackers.github.com/cbNetwork-node/doc/symbols/Client.html">cbNetwork.Client</a>
  */
 Server.prototype.login = function (client) {
   var data = client.data
